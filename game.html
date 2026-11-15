@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>AstroForge - Realistic Planetary Exploration Edition</title>
+    <title>AeroNOAH</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -152,16 +152,18 @@
         .action-sim-btn { background: #10b981; color: #000; border: 2px solid #ffffff; padding: 12px 24px; border-radius: 8px; font-weight: 800; cursor: pointer; box-shadow: 0 0 25px rgba(16,185,129,0.7); display: none; }
         .action-sim-btn:hover { background: #38bdf8; color: #fff; }
 
-        /* FIRST-PERSON 3D EXPLORATION & TRIVIA MODAL */
+        /* FIRST-PERSON 3D EXPLORATION & FIELD SHOP */
         .container-explore { gap: 1rem; }
         .explore-viewport-wrap { position: relative; width: 100%; height: 600px; border: 3px solid #38bdf8; border-radius: 12px; overflow: hidden; background: #020617; box-shadow: inset 0 0 60px rgba(56,189,248,0.5); }
         #surface-3d-canvas { width: 100%; height: 100%; display: block; cursor: crosshair; }
-        .explore-hud-topright { position: absolute; top: 16px; right: 16px; background: rgba(15, 23, 42, 0.95); border: 2px solid #38bdf8; padding: 16px 20px; border-radius: 10px; width: 380px; z-index: 20; box-shadow: 0 0 30px rgba(56, 189, 248, 0.6); display: flex; flex-direction: column; gap: 6px; max-height: 560px; overflow-y: auto; }
-        .explore-mission-item { font-size: 0.8rem; color: #cbd5e1; display: flex; justify-content: space-between; border-bottom: 1px solid #334155; padding-bottom: 4px; }
+        .explore-hud-topright { position: absolute; top: 16px; right: 16px; background: rgba(15, 23, 42, 0.95); border: 2px solid #38bdf8; padding: 14px 18px; border-radius: 10px; width: 340px; z-index: 20; box-shadow: 0 0 30px rgba(56, 189, 248, 0.6); display: flex; flex-direction: column; gap: 4px; max-height: 560px; overflow-y: auto; }
+        .explore-mission-item { font-size: 0.76rem; color: #cbd5e1; display: flex; justify-content: space-between; border-bottom: 1px solid #334155; padding-bottom: 3px; }
         
-        /* HABITAT TRIVIA MODAL */
-        #trivia-modal { position: absolute; inset: 0; background: rgba(2, 6, 23, 0.95); z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 30px; }
-        .trivia-box { background: rgba(15, 23, 42, 0.98); border: 3px solid #38bdf8; border-radius: 16px; padding: 35px; width: 100%; max-width: 750px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 0 60px rgba(56, 189, 248, 0.7); text-align: center; }
+        /* FIELD SHOP & TRIVIA MODALS */
+        #field-shop-modal, #trivia-modal { position: absolute; inset: 0; background: rgba(2, 6, 23, 0.95); z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 30px; }
+        .modal-box { background: rgba(15, 23, 42, 0.98); border: 3px solid #38bdf8; border-radius: 16px; padding: 35px; width: 100%; max-width: 750px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 0 60px rgba(56, 189, 248, 0.7); text-align: center; max-height: 85vh; overflow-y: auto; }
+        .shop-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; text-align: left; }
+        .shop-item-card { background: #020617; border: 2px solid #334155; border-radius: 10px; padding: 15px; display: flex; flex-direction: column; gap: 8px; }
 
         .container-contracts, .container-replay { gap: 2rem; }
         .contract-card { background: rgba(30, 41, 59, 0.9); border: 2px solid #334155; padding: 22px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
@@ -208,7 +210,7 @@
     <!-- SCREEN 1: HOME -->
     <div class="screen container-home">
         <canvas id="space-canvas"></canvas>
-        <h1>AstroForge Omniverse 🔥</h1>
+        <h1>AeroNOAH</h1>
         <div class="home-menu-content">
             <label for="quiz-toggle" class="btn" onclick="startCosmicQuiz()">
                 <span>🚀 Launch Quiz & Earn 150 Craters/Correct</span>
@@ -522,7 +524,7 @@
     <!-- SCREEN 5: FLIGHT SIMULATION -->
     <div class="screen container-flight">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #38bdf8; padding-bottom: 1.2rem;">
-            <h1>AstroForge Flight Control: <span id="flight-dest-title">Low Earth Orbit</span></h1>
+            <h1>AeroNOAH Flight Control: <span id="flight-dest-title">Low Earth Orbit</span></h1>
             <label for="vab-toggle" class="back-btn" onclick="stopSimulation()">Abort to VAB</label>
         </div>
 
@@ -558,19 +560,53 @@
         </div>
     </div>
 
-    <!-- SCREEN 6: FIRST-PERSON SURFACE EXPLORATION & SCATTERED ROVER BUILDER -->
+    <!-- SCREEN 6: FIRST-PERSON SURFACE EXPLORATION & 35 FEATURES & FIELD SHOP -->
     <div class="screen container-explore">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #38bdf8; padding-bottom: 1.2rem;">
             <h1>1st-Person Surface Exploration: <span id="explore-target-name">Moon Surface</span></h1>
-            <label for="home-toggle" class="back-btn" onclick="returnHomeToEarth()">🏠 Launch & Return Home</label>
+            <div style="display:flex; gap:10px;">
+                <button class="back-btn" onclick="openFieldShop()" style="background:#10b981; border-color:#fff;">🛍️ Field Shop ([B])</button>
+                <label for="home-toggle" class="back-btn" onclick="returnHomeToEarth()">🏠 Launch & Return Home</label>
+            </div>
         </div>
 
         <div class="explore-viewport-wrap">
             <canvas id="surface-3d-canvas" onclick="handleCanvasClick(event)"></canvas>
             
+            <!-- FIELD SHOP MODAL -->
+            <div id="field-shop-modal">
+                <div class="modal-box">
+                    <h2 style="color:#38bdf8;">🛍️ Planetary Surface Field Equipment Shop</h2>
+                    <p style="color:#cbd5e1; font-size:0.95rem;">Purchase advanced exploration tools using your Cosmic Craters:</p>
+                    <div class="shop-grid">
+                        <div class="shop-item-card">
+                            <strong>⚡ Diamond Drill Rig</strong>
+                            <span style="font-size:0.8rem; color:#10b981;">Excavate rare isotopes faster</span>
+                            <div class="price-tag" onclick="buyFieldTool('Diamond Drill Rig', 1000)">1,000 ☄️ Buy</div>
+                        </div>
+                        <div class="shop-item-card">
+                            <strong>🔭 Long-Range Radar Scope</strong>
+                            <span style="font-size:0.8rem; color:#10b981;">Reveals all scattered parts instantly</span>
+                            <div class="price-tag" onclick="buyFieldTool('Radar Scope', 2500)">2,500 ☄️ Buy</div>
+                        </div>
+                        <div class="shop-item-card">
+                            <strong>🛡️ Thermal Exosuit Shield</strong>
+                            <span style="font-size:0.8rem; color:#10b981;">Withstand extreme surface heat/cold</span>
+                            <div class="price-tag" onclick="buyFieldTool('Thermal Exosuit', 4000)">4,000 ☄️ Buy</div>
+                        </div>
+                        <div class="shop-item-card">
+                            <strong>🔋 Quantum Battery Pack</strong>
+                            <span style="font-size:0.8rem; color:#10b981;">Doubles visor battery duration</span>
+                            <div class="price-tag" onclick="buyFieldTool('Quantum Battery', 6000)">6,000 ☄️ Buy</div>
+                        </div>
+                    </div>
+                    <button class="back-btn" onclick="closeFieldShop()" style="align-self: center;">Close Field Shop</button>
+                </div>
+            </div>
+
             <!-- HABITAT TRIVIA MODAL -->
             <div id="trivia-modal">
-                <div class="trivia-box">
+                <div class="modal-box">
                     <h2 style="color:#38bdf8;">⛺ Habitat Science Uplink Terminal</h2>
                     <p id="trivia-question" style="font-size: 1.1rem; color: #fff; margin: 15px 0;">Loading Question...</p>
                     <div id="trivia-options" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px;"></div>
@@ -580,23 +616,17 @@
             </div>
 
             <div class="explore-hud-topright">
-                <h3 style="color:#38bdf8; font-size:0.95rem; border-bottom:1px solid #38bdf8; padding-bottom:6px;">🧪 Chemical & Mineral Catalog (<span id="chem-count">0</span>/38)</h3>
-                <div style="font-size: 0.78rem; color: #94a3b8; max-height: 120px; overflow-y: auto; margin-bottom: 8px;" id="chemical-list-box">Explore and left-click samples to discover 38 chemicals...</div>
+                <h3 style="color:#38bdf8; font-size:0.9rem; border-bottom:1px solid #38bdf8; padding-bottom:4px;">🧪 Chemicals (<span id="chem-count">0</span>/38) & Rover (<span id="rover-parts-count">0</span>/4)</h3>
+                <div style="font-size: 0.75rem; color: #94a3b8; max-height: 70px; overflow-y: auto; margin-bottom: 4px;" id="chemical-list-box">Left-click samples to discover 38 chemicals...</div>
                 
-                <h3 style="color:#38bdf8; font-size:0.95rem; border-bottom:1px solid #38bdf8; padding-bottom:6px; margin-top:6px;">🚜 Scattered Rover Parts (<span id="rover-parts-count">0</span>/4)</h3>
-                <div class="explore-mission-item"><span>1. Heavy All-Terrain Wheels</span><span id="rp-1" style="color:#facc15;">[Scattered]</span></div>
-                <div class="explore-mission-item"><span>2. Foldable Solar Array</span><span id="rp-2" style="color:#facc15;">[Scattered]</span></div>
-                <div class="explore-mission-item"><span>3. Diamond Core Drill</span><span id="rp-3" style="color:#facc15;">[Scattered]</span></div>
-                <div class="explore-mission-item"><span>4. Robotic Sample Arm</span><span id="rp-4" style="color:#facc15;">[Scattered]</span></div>
-                
-                <h3 style="color:#38bdf8; font-size:0.95rem; border-bottom:1px solid #38bdf8; padding-bottom:6px; margin-top:6px;">⛺ Base Erection & Visor</h3>
-                <div class="explore-mission-item"><span>Habitat Status</span><span id="hab-status" style="color:#facc15;">[Locked - Press E]</span></div>
-                <div class="explore-mission-item"><span>Special Vision Visor [V]</span><span id="vision-status" style="color:#facc15;">[Press V]</span></div>
-                <div class="explore-mission-item"><span>Scanner Hint</span><span style="color:#38bdf8;" id="scanner-hint">Explore terrain</span></div>
+                <h3 style="color:#38bdf8; font-size:0.9rem; border-bottom:1px solid #38bdf8; padding-bottom:4px; margin-top:4px;">🔥 35 Planetary Telemetry Features</h3>
+                <div style="max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px;" id="thirty-five-features-list">
+                    <!-- Populated dynamically via JS -->
+                </div>
             </div>
 
             <div style="position: absolute; bottom: 15px; left: 15px; background: rgba(15,23,42,0.9); border: 2px solid #38bdf8; padding: 10px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: 700; color: #10b981;" id="surface-action-prompt">
-                Walk [WASD] to Habitat and press [E] | Left-Click samples & rover parts to collect | Press [V] for Vision Radar!
+                Walk [WASD] to Habitat & press [E] | Press [B] for Field Shop | Left-Click samples & parts | Press [V] for Vision!
             </div>
         </div>
     </div>
@@ -637,7 +667,7 @@
     <div class="screen container-skins">
         <div class="shop-header-row">
             <div>
-                <h1>AstroForge Shop</h1>
+                <h1>AeroNOAH Shop</h1>
                 <div class="currency-display">Cosmic Reserves: <span id="player-balance">0</span> ☄️ Craters</div>
             </div>
             <label for="home-toggle" class="back-btn">⬅ Return to Menu</label>
@@ -842,6 +872,16 @@
             alert("Acquired +" + yieldAmt.toLocaleString() + " Craters!");
         }
 
+        function openFieldShop() { document.getElementById('field-shop-modal').style.display = 'flex'; }
+        function closeFieldShop() { document.getElementById('field-shop-modal').style.display = 'none'; }
+        function buyFieldTool(toolName, price) {
+            if (playerBalance < price) { showAlert("⚠️ Insufficient Cosmic Reserves in Field Wallet!"); return; }
+            playerBalance -= price;
+            document.getElementById('player-balance').innerText = playerBalance.toLocaleString();
+            showAlert(`🛍️ Purchased ${toolName}! Field advantage active.`);
+            closeFieldShop();
+        }
+
         const cosmosQuiz = [
             { q: "What is the primary gas composing stellar cores during main sequence fusion?", opts: ["Hydrogen", "Helium", "Oxygen", "Nitrogen"], ans: 0, hint: "Lightest element." },
             { q: "Which planet in our solar system has the most extreme volcanic activity?", opts: ["Mars", "Io (Jupiter's Moon)", "Venus", "Mercury"], ans: 1, hint: "Volcanic moon." },
@@ -922,10 +962,9 @@
         let reachedCheckpoints = {};
         
         let surfaceCanvas, surfaceCtx;
-        let player3D = { x: 0, z: 5, angle: 0, yVel: 0, isJumping: false, specialVision: false };
+        let player3D = { x: 0, z: 2, angle: 0, yVel: 0, isJumping: false, specialVision: false };
         let surfaceAnimationId = null;
 
-        // 38 CHEMICALS AND MINERALS
         const masterChemicals = [
             "Silicon Dioxide", "Iron Oxide", "Water Ice", "Methane Clathrate", "Sulfuric Acid", 
             "Olivine", "Pyroxene", "Hematite", "Perchlorates", "Carbon Dioxide Ice", 
@@ -1161,10 +1200,8 @@
                 e.preventDefault();
             }
             if (document.getElementById('explore-toggle').checked) {
-                if (e.code === 'KeyE') {
-                    checkHabitatInteraction();
-                    e.preventDefault();
-                }
+                if (e.code === 'KeyE') { checkHabitatInteraction(); e.preventDefault(); }
+                if (e.code === 'KeyB') { openFieldShop(); e.preventDefault(); }
                 if (e.code === 'KeyV') {
                     player3D.specialVision = !player3D.specialVision;
                     document.getElementById('vision-status').innerText = player3D.specialVision ? "🟢 Active (Visor ON)" : "🔴 Offline";
@@ -1289,43 +1326,55 @@
             
             discoveredChemicals = [];
             document.getElementById('chem-count').innerText = "0";
-            document.getElementById('chemical-list-box').innerText = "Explore and left-click samples to discover 38 chemicals...";
+            document.getElementById('chemical-list-box').innerText = "Left-click samples to discover 38 chemicals...";
             
             habitatUnlocked = false;
-            document.getElementById('hab-status').innerText = "[Locked - Press E]";
-            document.getElementById('hab-status').style.color = "#facc15";
 
-            // Initialize 38 Chemicals & Samples across the world
             surfaceSamples = [];
             for(let i=0; i<38; i++) {
-                let chemName = masterChemicals[i];
                 surfaceSamples.push({
                     id: i,
-                    name: chemName,
-                    x: (Math.random() - 0.5) * 35,
-                    z: Math.random() * 30 + 4,
-                    collected: false,
-                    type: 'chemical'
+                    name: masterChemicals[i],
+                    x: (Math.random() - 0.5) * 40,
+                    z: Math.random() * 32 + 4,
+                    collected: false
                 });
             }
 
-            // Initialize 4 Scattered Rover Parts across the world
             worldRoverParts = [
-                { id: 1, name: "Heavy All-Terrain Wheels", x: -8, z: 14, collected: false },
-                { id: 2, name: "Foldable Solar Array", x: 9, z: 18, collected: false },
-                { id: 3, name: "Diamond Core Drill", x: -5, z: 24, collected: false },
-                { id: 4, name: "Robotic Sample Arm", x: 6, z: 28, collected: false }
+                { id: 1, name: "Heavy All-Terrain Wheels", x: -9, z: 15, collected: false },
+                { id: 2, name: "Foldable Solar Array", x: 10, z: 19, collected: false },
+                { id: 3, name: "Diamond Core Drill", x: -6, z: 25, collected: false },
+                { id: 4, name: "Robotic Sample Arm", x: 7, z: 29, collected: false }
             ];
             collectedRoverPartsCount = 0;
-            for(let i=1; i<=4; i++) {
-                document.getElementById(`rp-${i}`).innerText = "[Scattered]";
-                document.getElementById(`rp-${i}`).style.color = "#facc15";
-            }
             document.getElementById('rover-parts-count').innerText = "0";
 
             player3D = { x: 0, z: 2, angle: 0, yVel: 0, isJumping: false, specialVision: false };
             document.getElementById('explore-toggle').checked = true;
             initSurface3DCanvas(destObj.dest);
+            populate35Features(destObj.dest);
+        }
+
+        function populate35Features(destName) {
+            const listContainer = document.getElementById('thirty-five-features-list');
+            let features = [
+                "1. Atmospheric Density", "2. Surface Temperature", "3. Radiation Flux", "4. Gravity Constant",
+                "5. Solar Illumination", "6. Terrain Roughness", "7. Seismic Activity", "8. Magnetic Dipole",
+                "9. Horizon Curvature", "10. Dust Storm Status", "11. Subsurface Ice", "12. Habitat Integrity",
+                "13. Rig Alignment", "14. Rover Assembly", "15. Chemical Reserve", "16. Visor Optic Mode",
+                "17. Scanner RSSI", "18. Comms Link", "19. Oxygen Reserves", "20. Thermal Stability",
+                "21. Regolith PH", "22. Crustal Pressure", "23. Solar Wind Speed", "24. Ionosphere Charge",
+                "25. Ejecta Rate", "26. Crater Density", "27. Albedo Index", "28. Spectral Signature",
+                "29. Gas Chromatograph", "30. Mass Spectrometer", "31. Core Rig Torque", "32. Power Grid Load",
+                "33. Battery Voltage", "34. CPU Core Temp", "35. Omniversal Sync"
+            ];
+            listContainer.innerHTML = features.map((feat, idx) => `
+                <div class="explore-mission-item">
+                    <span>${feat}</span>
+                    <span style="color:${idx < 15 ? '#10b981' : '#38bdf8'};" id="feat-val-${idx+1}">${idx === 11 ? (habitatUnlocked ? 'Operational' : 'Locked [Press E]') : 'Nominal'}</span>
+                </div>
+            `).join('');
         }
 
         function initSurface3DCanvas(destinationName) {
@@ -1352,9 +1401,8 @@
 
             let grad = surfaceCtx.createLinearGradient(0, 0, 0, surfaceCanvas.height);
             let gridColor = 'rgba(56, 189, 248, 0.25)';
-
-            // Realistic Planetary Surroundings Rendering
             let lowerSky = '#020617';
+
             if (destName.toLowerCase().includes('mars')) {
                 grad.addColorStop(0, '#7c2d12'); grad.addColorStop(0.4, '#c2410c'); grad.addColorStop(1, '#291107');
                 lowerSky = '#9a3412'; gridColor = 'rgba(249, 115, 22, 0.6)';
@@ -1370,17 +1418,14 @@
             } else if (destName.toLowerCase().includes('saturn')) {
                 grad.addColorStop(0, '#1e1b4b'); grad.addColorStop(0.4, '#312e81'); grad.addColorStop(1, '#09090b');
                 lowerSky = '#3730a3'; gridColor = 'rgba(129, 140, 248, 0.6)';
-            } else if (destName.toLowerCase().includes('europa') || destName.toLowerCase().includes('neptune') || destName.toLowerCase().includes('uranus')) {
+            } else {
                 grad.addColorStop(0, '#0369a1'); grad.addColorStop(0.4, '#0284c7'); grad.addColorStop(1, '#0f172a');
                 lowerSky = '#0284c7'; gridColor = 'rgba(56, 189, 248, 0.6)';
-            } else {
-                grad.addColorStop(0, '#020617'); grad.addColorStop(0.5, '#1e293b'); grad.addColorStop(1, '#334155');
             }
 
             surfaceCtx.fillStyle = grad;
             surfaceCtx.fillRect(0, 0, surfaceCanvas.width, surfaceCanvas.height);
 
-            // Horizon Terrain Mesh
             surfaceCtx.fillStyle = lowerSky;
             surfaceCtx.beginPath();
             surfaceCtx.moveTo(0, surfaceCanvas.height / 2);
@@ -1402,7 +1447,7 @@
                 surfaceCtx.stroke();
             }
 
-            // Render Habitat Module
+            // Habitat Module
             let habX = 0, habZ = 10;
             let dxH = habX - player3D.x, dzH = habZ - player3D.z;
             let rotXH = dxH * Math.cos(-player3D.angle) - dzH * Math.sin(-player3D.angle);
@@ -1417,10 +1462,10 @@
                 surfaceCtx.fillStyle = '#ffffff';
                 surfaceCtx.font = 'bold 12px sans-serif';
                 surfaceCtx.textAlign = 'center';
-                surfaceCtx.fillText(habitatUnlocked ? "⛺ Habitat [DEPOLYED]" : "⛺ Habitat Module [Press E]", screenX, screenY - size - 8);
+                surfaceCtx.fillText(habitatUnlocked ? "⛺ Habitat [OPERATIONAL]" : "⛺ Habitat Module [Press E]", screenX, screenY - size - 8);
             }
 
-            // Render Scattered Rover Parts
+            // Scattered Rover Parts
             worldRoverParts.forEach(part => {
                 if (!part.collected) {
                     let dx = part.x - player3D.x, dz = part.z - player3D.z;
@@ -1440,13 +1485,13 @@
                             surfaceCtx.fillStyle = '#facc15';
                             surfaceCtx.font = 'bold 11px sans-serif';
                             surfaceCtx.textAlign = 'center';
-                            surfaceCtx.fillText(`🔧 ${part.name} [Click to Collect]`, screenX, screenY - 35);
+                            surfaceCtx.fillText(`🔧 ${part.name} [Left-Click]`, screenX, screenY - 35);
                         }
                     }
                 }
             });
 
-            // Render Surface Samples (Chemicals)
+            // Surface Samples (Chemicals)
             let closestSampleDist = 999;
             surfaceSamples.forEach(sample => {
                 let dx = sample.x - player3D.x, dz = sample.z - player3D.z;
@@ -1485,7 +1530,6 @@
             surfaceAnimationId = requestAnimationFrame(() => runSurfaceLoop(destName));
         }
 
-        // LEFT CLICK COLLECTION HANDLER
         function handleCanvasClick(event) {
             const rect = surfaceCanvas.getBoundingClientRect();
             const mouseX = event.clientX - rect.left;
@@ -1493,7 +1537,6 @@
             const cx = surfaceCanvas.width / 2;
             const cy = surfaceCanvas.height / 2;
 
-            // Check sample clicks
             surfaceSamples.forEach(sample => {
                 if (!sample.collected) {
                     let dx = sample.x - player3D.x, dz = sample.z - player3D.z;
@@ -1515,7 +1558,6 @@
                 }
             });
 
-            // Check rover part clicks
             worldRoverParts.forEach((part, idx) => {
                 if (!part.collected) {
                     let dx = part.x - player3D.x, dz = part.z - player3D.z;
@@ -1527,8 +1569,6 @@
                         if (Math.hypot(mouseX - screenX, mouseY - (screenY - 25)) < 30 && Math.hypot(dx, dz) < 8.0) {
                             part.collected = true;
                             collectedRoverPartsCount++;
-                            document.getElementById(`rp-${idx+1}`).innerText = "[Installed ✓]";
-                            document.getElementById(`rp-${idx+1}`).style.color = "#10b981";
                             document.getElementById('rover-parts-count').innerText = collectedRoverPartsCount;
                             showAlert(`🔧 Assembled Rover Part: ${part.name}!`);
                             playerBalance += 1000;
@@ -1568,22 +1608,20 @@
         function answerTrivia(selected, correct) {
             if (selected === correct) {
                 habitatUnlocked = true;
-                document.getElementById('hab-status').innerText = "[Deployed ✓]";
-                document.getElementById('hab-status').style.color = "#10b981";
+                let habStatElem = document.getElementById('feat-val-12');
+                if (habStatElem) habStatElem.innerText = "Operational";
                 document.getElementById('trivia-modal').style.display = 'none';
-                showAlert("🎉 Correct! Habitat erected & radar hint unlocked for scattered rover parts!");
+                showAlert("🎉 Correct! Habitat erected & GPS radar hint unlocked for scattered rover parts!");
             } else {
                 document.getElementById('trivia-hint-display').innerText = "💡 Hint: Think about planetary geology and atmospheric composition!";
             }
         }
 
-        function closeTriviaModal() {
-            document.getElementById('trivia-modal').style.display = 'none';
-        }
+        function closeTriviaModal() { document.getElementById('trivia-modal').style.display = 'none'; }
 
         function returnHomeToEarth() {
             if (!habitatUnlocked || collectedRoverPartsCount < 4 || discoveredChemicals.length < 10) {
-                alert("⚠️ Unlock the Habitat via trivia, collect all 4 scattered rover parts, and discover at least 10 chemicals before returning home!");
+                alert("⚠️ Unlock Habitat via trivia, collect all 4 scattered rover parts, and discover at least 10 chemicals before returning home!");
                 return;
             }
             if (surfaceAnimationId) cancelAnimationFrame(surfaceAnimationId);
