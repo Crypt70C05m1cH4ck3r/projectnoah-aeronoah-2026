@@ -38,7 +38,7 @@
       pointer-events: none;
     }
     
-    /* Fact Box tucked neatly in the top right */
+    /* Fact Box fixed cleanly in the top right */
     .fact-box {
       position: fixed;
       top: 20px;
@@ -52,7 +52,12 @@
       z-index: 1000;
       box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
     }
-    .fact-radio, .fact-slide { display: none; }
+    .fact-radio { display: none; }
+    
+    /* Hide all slides by default */
+    .fact-slide { display: none; }
+    
+    /* Show only the active slide */
     #f1:checked ~ .slide-1, 
     #f2:checked ~ .slide-2, 
     #f3:checked ~ .slide-3, 
@@ -60,6 +65,7 @@
     #f5:checked ~ .slide-5 { 
       display: block; 
     }
+
     .fact-text { font-size: 11px; color: #cbd5e1; line-height: 1.4; margin-bottom: 8px; }
     .fact-btn { display: inline-block; border: 1px solid #9d4edd; color: #00f0ff; font-size: 10px; padding: 4px 10px; border-radius: 8px; cursor: pointer; background: rgba(157, 78, 221, 0.1); }
     .fact-btn:hover { background: rgba(157, 78, 221, 0.3); }
