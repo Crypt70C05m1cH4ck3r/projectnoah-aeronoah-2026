@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AstroForge</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: radial-gradient(circle at center, #09090b 0%, #020617 50%, #000000 100%);
+            color: #f8fafc;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            min-height: 100vh;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        input[name="screen"], input[name="shop-tab"] { display: none; }
+        @keyframes fadeIn { 0% { opacity: 0; transform: translateY(10px) scale(0.99); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes hyperVibrantPulse {
+            0% { border-color: #38bdf8; box-shadow: 0 0 70px rgba(56, 189, 248, 0.7), inset 0 0 50px rgba(244, 63, 94, 0.3); }
+            50% { border-color: #f43f5e; box-shadow: 0 0 110px rgba(244, 63, 94, 0.9), inset 0 0 70px rgba(56, 189, 248, 0.6); }
+            100% { border-color: #38bdf8; box-shadow: 0 0 70px rgba(56, 189, 248, 0.7), inset 0 0 50px rgba(244, 63, 94, 0.3); }
+        }
+        .screen {
+            display: none; width: 96vw; max-width: 1400px; min-height: 90vh;
+            background: rgba(2, 6, 23, 0.99); border: 4px solid #38bdf8; border-radius: 20px;
+            animation: hyperVibrantPulse 3s infinite ease-in-out; padding: 40px;
+            flex-direction: column; justify-content: flex-start; position: relative; overflow-y: auto;
+        }
+        #home-toggle:checked ~ .container-home,
+        #quiz-toggle:checked ~ .container-quiz,
+        #difficulty-toggle:checked ~ .container-difficulty,
+        #vab-toggle:checked ~ .container-vab,
+        #skins-toggle:checked ~ .container-skins,
+        #launch-toggle:checked ~ .container-flight,
+        #explore-toggle:checked ~ .container-explore,
+        #contracts-toggle:checked ~ .container-contracts,
+        #replay-toggle:checked ~ .container-replay { display: flex; animation: fadeIn 0.25s ease-out forwards; }
+        h1 {
+            font-size: 3rem; letter-spacing: 4px; color: #ffffff; text-transform: uppercase;
+            border-bottom: 4px solid #38bdf8; padding-bottom: 15px; margin-bottom: 2.5rem; text-align: center;
+            background: linear-gradient(90deg, #38bdf8, #8b5cf6, #f43f5e, #10b981, #facc15);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 40px rgba(56,189,248,0.7);
+        }
+        .btn {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(56, 189, 248, 0.5));
+            color: #ffffff; font-size: 1.3rem; font-weight: 800; padding: 22px 30px;
+            border: 2px solid #38bdf8; border-radius: 12px; cursor: pointer; display: flex;
+            justify-content: space-between; align-items: center; transition: 0.2s; text-decoration: none;
+            margin-bottom: 1.2rem; box-shadow: 0 0 30px rgba(56, 189, 248, 0.5);
+        }
+        .btn:hover { background: linear-gradient(135deg, #38bdf8, #f43f5e); border-color: #ffffff; color: #000; box-shadow: 0 0 60px #38bdf8; transform: translateY(-3px) scale(1.02); }
+        .back-btn {
+            background: rgba(15, 23, 42, 0.95); border: 2px solid #f43f5e; color: #ffffff;
+            padding: 10px 22px; border-radius: 8px; cursor: pointer; text-decoration: none;
+            font-size: 0.95rem; font-weight: 700; transition: 0.2s; box-shadow: 0 0 20px rgba(244, 63, 94, 0.4);
+        }
+        .back-btn:hover { background: #f43f5e; border-color: #ffffff; color: #000; box-shadow: 0 0 35px #f43f5e; }
+        #space-canvas { position: absolute; inset: 0; pointer-events: none; z-index: 1; border-radius: 16px; }
+        .home-menu-content { position: relative; z-index: 5; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-grow: 1; gap: 1rem; width: 100%; max-width: 600px; margin: 0 auto; }
+        .container-quiz { gap: 1.5rem; }
+        .quiz-box { background: rgba(15, 23, 42, 0.95); border: 2px solid #38bdf8; border-radius: 12px; padding: 30px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 0 50px rgba(56,189,248,0.4); max-width: 900px; margin: 0 auto; width: 100%; }
+        .quiz-options-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .quiz-option-btn { background: #020617; border: 2px solid #334155; color: #fff; padding: 16px 20px; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: 0.2s; text-align: left; }
+        .quiz-option-btn:hover { border-color: #f43f5e; background: rgba(244,63,94,0.25); box-shadow: 0 0 25px rgba(244,63,94,0.6); }
+        .hint-btn { background: #334155; border: 2px solid #facc15; color: #facc15; padding: 8px 16px; border-radius: 6px; font-weight: 700; cursor: pointer; margin-top: 5px; width: fit-content; }
+        .hint-btn:hover { background: #facc15; color: #000; }
+        .container-difficulty { gap: 2rem; }
+        .difficulty-list { display: flex; flex-direction: column; gap: 1.5rem; max-height: 54vh; overflow-y: auto; padding-right: 12px; }
+        .diff-card { background: rgba(15, 23, 42, 0.9); border: 2px solid #334155; padding: 20px 24px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; gap: 20px; cursor: pointer; transition: 0.2s; }
+        .diff-card:hover { border-color: #38bdf8; background: rgba(56, 189, 248, 0.25); box-shadow: 0 0 35px rgba(56, 189, 248, 0.6); }
+        .diff-card.selected-card { background: rgba(16, 185, 129, 0.3); border-color: #10b981; box-shadow: 0 0 40px rgba(16, 185, 129, 0.7); }
+        .proceed-vab-btn { background: linear-gradient(135deg, #10b981, #38bdf8, #f43f5e); color: #fff; border: 2px solid #ffffff; padding: 20px; border-radius: 10px; font-size: 1.2rem; font-weight: 800; text-align: center; cursor: pointer; display: block; text-decoration: none; transition: 0.2s; margin-top: 2rem; box-shadow: 0 0 40px rgba(56, 189, 248, 0.7); }
+        .proceed-vab-btn:hover { background: #ffffff; color: #000; box-shadow: 0 0 60px #ffffff; transform: scale(1.01); }
+        
+        .container-vab { gap: 1.5rem; }
+        .vab-hud { background: rgba(15, 23, 42, 0.95); border: 2px solid #38bdf8; padding: 18px 24px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 1rem; color: #ffffff; margin-bottom: 1rem; flex-wrap: wrap; gap: 15px; box-shadow: 0 0 35px rgba(56, 189, 248, 0.5); }
+        .vab-stack { display: flex; flex-direction: column; gap: 1.5rem; flex-grow: 1; }
+        .vab-panel { background: rgba(15, 23, 42, 0.9); border: 2px solid #334155; border-radius: 10px; padding: 22px; display: flex; flex-direction: column; gap: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .vab-panel h3 { color: #38bdf8; font-size: 1.2rem; border-bottom: 2px solid #f43f5e; padding-bottom: 10px; }
+        .config-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.2rem; background: rgba(15, 23, 42, 0.7); padding: 18px; border-radius: 8px; border: 1px solid #38bdf8; }
+        .config-item { display: flex; flex-direction: column; gap: 8px; }
+        .config-item label { font-size: 0.95rem; color: #cbd5e1; font-weight: 700; }
+        .config-item input, .config-item select { background: #020617; border: 2px solid #38bdf8; color: #fff; padding: 10px 14px; border-radius: 8px; font-size: 0.95rem; font-weight: 600; }
+        
+        .visualizer-canvas { 
+            background: radial-gradient(circle at center, #1e293b 0%, #020617 100%); 
+            border: 3px dashed #38bdf8; 
+            border-radius: 10px; 
+            position: relative; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            overflow-y: auto; 
+            overflow-x: hidden; 
+            padding: 30px; 
+            height: 380px; 
+            box-shadow: inset 0 0 35px rgba(0,0,0,0.8); 
+        }
+        .empty-canvas-msg { color: #94a3b8; font-style: italic; margin: auto; font-size: 1.1rem; position: absolute; }
+        .rocket-stack-inner { 
+            position: relative; 
+            width: 100%; 
+            display: flex; 
+            flex-direction: column-reverse; 
+            align-items: center; 
+            gap: 12px; 
+            min-height: max-content; 
+            padding: 20px 0; 
+            margin: auto 0;
+        }
+        .rocket-3d-segment { width: 160px; height: 65px; background: rgba(30, 41, 59, 0.95); border: 2px solid #38bdf8; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; padding: 6px 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.7); cursor: pointer; transition: border-color 0.1s; user-select: none; flex-shrink: 0; }
+        .rocket-3d-segment.selected-segment { border-color: #10b981; background: rgba(16, 185, 129, 0.25); box-shadow: 0 0 35px rgba(16, 185, 129, 0.8); }
+        .rocket-3d-segment canvas { width: 45px; height: 45px; border-radius: 6px; background: #0f172a; border: 2px solid #ffffff; }
+        .remove-node-btn { background: rgba(239, 68, 68, 0.4); border: 2px solid #ef4444; color: #f87171; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; z-index: 10; }
+        .remove-node-btn:hover { background: #ef4444; color: #fff; }
+
+        .parts-category-bar { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 1rem; }
+        .parts-tab-btn { background: rgba(15, 23, 42, 0.95); border: 2px solid #334155; padding: 12px 20px; border-radius: 8px; cursor: pointer; color: #cbd5e1; font-size: 0.95rem; white-space: nowrap; font-weight: 700; transition: 0.2s; }
+        .parts-tab-btn:hover, .parts-tab-btn.active-tab { background: #38bdf8; border-color: #ffffff; color: #000; box-shadow: 0 0 30px rgba(56, 189, 248, 0.9); }
+        .part-group { display: none; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.2rem; max-height: 320px; overflow-y: auto; padding: 5px; }
+        .part-group.active-group { display: grid; }
+        .part-shop-item { background: rgba(30, 41, 59, 0.9); border: 2px solid #334155; padding: 14px 18px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; gap: 15px; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
+        .generated-part-canvas { width: 60px; height: 60px; border-radius: 8px; border: 2px solid #38bdf8; background: #0f172a; flex-shrink: 0; box-shadow: 0 0 20px rgba(56,189,248,0.6); }
+        .add-part-btn { background: linear-gradient(135deg, #10b981, #38bdf8); color: #fff; border: 2px solid #ffffff; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-weight: 800; transition: 0.2s; box-shadow: 0 0 20px rgba(16,185,129,0.6); }
+        .launch-action-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; }
+        .rotate-btn-vab { background: #334155; border: 2px solid #38bdf8; color: #fff; padding: 12px 22px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        .rotate-btn-vab:hover { background: #38bdf8; color: #000; }
+        .launch-btn { background: linear-gradient(135deg, #38bdf8, #8b5cf6, #f43f5e, #10b981, #facc15); color: #fff; border: 2px solid #ffffff; padding: 18px 40px; border-radius: 12px; font-size: 1.3rem; font-weight: 900; cursor: pointer; box-shadow: 0 0 60px rgba(56, 189, 248, 0.9); transition: 0.2s; }
+        .launch-btn:hover { transform: scale(1.04); box-shadow: 0 0 80px #ffffff; }
+
+        /* FLIGHT SIMULATOR */
+        .container-flight { gap: 1.5rem; }
+        .flight-viewport {
+            background: linear-gradient(to top, #38bdf8 0%, #0284c7 40%, #0369a1 70%, #000000 100%);
+            border: 3px solid #38bdf8; border-radius: 12px; height: 620px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; overflow: hidden; margin-bottom: 1rem; box-shadow: inset 0 0 90px rgba(56,189,248,0.4);
+            transition: background 1.5s ease;
+        }
+        #flight-parallax-canvas { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+        .launchpad-base { position: absolute; bottom: 0; width: 360px; height: 45px; background: repeating-linear-gradient(45deg, #1e293b, #1e293b 15px, #334155 15px, #334155 30px); border-top: 4px solid #38bdf8; display: flex; justify-content: space-between; align-items: flex-end; z-index: 5; box-shadow: 0 0 40px rgba(56,189,248,0.6); transition: opacity 0.2s; }
+        .launch-tower { width: 28px; height: 220px; background: linear-gradient(to right, #334155, #0f172a); border: 2px solid #38bdf8; position: absolute; bottom: 0; left: calc(50% - 145px); z-index: 4; box-shadow: 0 0 30px rgba(56,189,248,0.7); transition: opacity 0.2s; }
+        .flight-top-bar { position: absolute; top: 16px; left: 16px; right: 16px; display: flex; flex-direction: column; gap: 10px; z-index: 20; }
+        .flight-hud-overlay { display: flex; justify-content: space-between; font-size: 0.95rem; color: #ffffff; background: rgba(15, 23, 42, 0.95); padding: 14px 20px; border-radius: 10px; border: 2px solid #38bdf8; flex-wrap: wrap; gap: 12px; box-shadow: 0 0 35px rgba(56, 189, 248, 0.6); }
+        .flight-camera-container { position: absolute; bottom: 45px; display: flex; flex-direction: column; align-items: center; z-index: 10; transition: transform 0.05s linear; transform-origin: bottom center; }
+        .flight-rocket-stack { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+        .flight-part-sprite { width: 90px; height: 75px; border-radius: 8px; border: 3px solid #38bdf8; box-shadow: 0 0 25px rgba(56, 189, 248, 0.7); background: #0f172a; }
+        .sim-exhaust { width: 70px; height: 150px; background: linear-gradient(to bottom, #ffffff, #facc15, #38bdf8, #f43f5e, transparent); clip-path: polygon(15% 0%, 85% 0%, 100% 70%, 50% 100%, 0% 70%); display: none; filter: drop-shadow(0 0 50px #38bdf8); margin-top: -4px; }
+        .flight-status-box { background: rgba(15, 23, 42, 0.95); border: 2px solid #38bdf8; padding: 18px; border-radius: 10px; font-size: 1rem; text-align: center; box-shadow: 0 0 35px rgba(56, 189, 248, 0.5); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .action-sim-btn { background: #10b981; color: #000; border: 2px solid #ffffff; padding: 12px 24px; border-radius: 8px; font-weight: 800; cursor: pointer; box-shadow: 0 0 25px rgba(16,185,129,0.7); display: none; }
+        .action-sim-btn:hover { background: #38bdf8; color: #fff; }
+
+        /* FIRST-PERSON 3D EXPLORATION & PARTS WORKBENCH MODAL */
+        .container-explore { gap: 1rem; }
+        .explore-viewport-wrap { position: relative; width: 100%; height: 600px; border: 3px solid #38bdf8; border-radius: 12px; overflow: hidden; background: #020617; box-shadow: inset 0 0 60px rgba(56,189,248,0.5); }
+        #surface-3d-canvas { width: 100%; height: 100%; display: block; }
+        .explore-hud-topright { position: absolute; top: 16px; right: 16px; background: rgba(15, 23, 42, 0.95); border: 2px solid #38bdf8; padding: 16px 20px; border-radius: 10px; width: 340px; z-index: 20; box-shadow: 0 0 30px rgba(56, 189, 248, 0.6); display: flex; flex-direction: column; gap: 10px; }
+        .explore-mission-item { font-size: 0.9rem; color: #cbd5e1; display: flex; flex-direction: column; gap: 4px; border-bottom: 1px solid #334155; padding-bottom: 8px; }
+        .explore-mission-item.done { color: #10b981; }
+
+        /* ENGINEERING WORKBENCH MODAL */
+        #workbench-modal { position: absolute; inset: 0; background: rgba(2, 6, 23, 0.92); z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 30px; }
+        .workbench-box { background: rgba(15, 23, 42, 0.98); border: 3px solid #38bdf8; border-radius: 16px; padding: 30px; width: 100%; max-width: 700px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 0 60px rgba(56, 189, 248, 0.7); }
+        .workbench-parts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; max-height: 250px; overflow-y: auto; }
+        .workbench-part-card { background: #020617; border: 2px solid #334155; border-radius: 10px; padding: 14px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s; }
+        .workbench-part-card:hover { border-color: #10b981; background: rgba(16,185,129,0.2); box-shadow: 0 0 20px rgba(16,185,129,0.5); }
+
+        .container-contracts, .container-replay { gap: 2rem; }
+        .contract-card { background: rgba(30, 41, 59, 0.9); border: 2px solid #334155; padding: 22px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .accept-contract-btn { background: #10b981; color: #000; font-weight: 800; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        .accept-contract-btn:hover { background: #38bdf8; color: #fff; box-shadow: 0 0 20px #38bdf8; }
+
+        .container-skins { gap: 2rem; }
+        .shop-header-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #38bdf8; padding-bottom: 1.5rem; margin-bottom: 1.5rem; }
+        .currency-display { background: rgba(15, 23, 42, 0.95); border: 2px solid #10b981; padding: 12px 24px; border-radius: 25px; font-size: 1.1rem; color: #ffffff; font-weight: 700; box-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
+        .shop-tabs-row { display: flex; gap: 15px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .shop-tab-label { background: rgba(15, 23, 42, 0.9); border: 2px solid #334155; padding: 14px 26px; border-radius: 8px; cursor: pointer; font-weight: 700; color: #cbd5e1; font-size: 1rem; transition: 0.2s; }
+        #shop-skins:checked ~ .container-skins label[for="shop-skins"],
+        #shop-coaches:checked ~ .container-skins label[for="shop-coaches"],
+        #shop-craters:checked ~ .container-skins label[for="shop-craters"] { background-color: #38bdf8; color: #000; border-color: #ffffff; box-shadow: 0 0 30px #38bdf8; font-weight: 800; }
+        .shop-content { display: none; overflow-y: auto; max-height: 52vh; padding-right: 15px; }
+        #shop-skins:checked ~ .container-skins .list-skins,
+        #shop-coaches:checked ~ .container-skins .list-coaches,
+        #shop-craters:checked ~ .container-skins .list-craters { display: flex; flex-direction: column; gap: 1.5rem; }
+        .item-card { background: rgba(30, 41, 59, 0.9); border: 2px solid #334155; padding: 20px 26px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; gap: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.5); }
+        .price-tag { background: #10b981; border: 2px solid #ffffff; padding: 12px 20px; border-radius: 8px; color: #000; font-weight: 800; font-size: 1rem; white-space: nowrap; cursor: pointer; transition: 0.2s; box-shadow: 0 0 15px rgba(16,185,129,0.5); }
+        .price-tag:hover { background: #38bdf8; color: #000; box-shadow: 0 0 25px #38bdf8; transform: scale(1.05); }
+
+        #notification-banner { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); background: #f43f5e; color: #fff; padding: 16px 32px; border-radius: 10px; font-weight: 800; font-size: 1.15rem; box-shadow: 0 0 50px rgba(244, 63, 94, 0.95); z-index: 9999; display: none; animation: fadeIn 0.2s ease-out forwards; }
+    </style>
+</head>
+<body>
+
+    <div id="notification-banner">⚠️ HYPE OVERLOAD!</div>
+
+    <input type="radio" name="screen" id="home-toggle" checked>
+    <input type="radio" name="screen" id="quiz-toggle">
+    <input type="radio" name="screen" id="difficulty-toggle">
+    <input type="radio" name="screen" id="vab-toggle">
+    <input type="radio" name="screen" id="skins-toggle">
+    <input type="radio" name="screen" id="launch-toggle">
+    <input type="radio" name="screen" id="explore-toggle">
+    <input type="radio" name="screen" id="contracts-toggle">
+    <input type="radio" name="screen" id="replay-toggle">
+
+    <input type="radio" name="shop-tab" id="shop-skins" checked>
+    <input type="radio" name="shop-tab" id="shop-coaches">
+    <input type="radio" name="shop-tab" id="shop-craters">
+
+    <!-- SCREEN 1: HOME -->
+    <div class="screen container-home">
+        <canvas id="space-canvas"></canvas>
+        <h1>AstroForge</h1>
+        <div class="home-menu-content">
+            <label for="quiz-toggle" class="btn" onclick="startCosmicQuiz()">
+                <span>🚀 Launch Quiz & Earn 150 Craters/Correct</span>
+                <span>➔</span>
+            </label>
+            <label for="difficulty-toggle" class="btn">
+                <span>⚡ Manual Override & Mission Selection</span>
+                <span>➔</span>
+            </label>
+            <label for="contracts-toggle" class="btn">
+                <span>📋 Career Mission Contract Hub</span>
+                <span>➔</span>
+            </label>
+            <label for="replay-toggle" class="btn">
+                <span>📈 Flight Telemetry Blackbox Replay</span>
+                <span>➔</span>
+            </label>
+            <label for="skins-toggle" class="btn">
+                <span>🛰️ Shop</span>
+                <span>➔</span>
+            </label>
+        </div>
+    </div>
+
+    <!-- SCREEN 2: 15-QUESTION COSMOS APTITUDE EXAM -->
+    <div class="screen container-quiz">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #38bdf8; padding-bottom: 1.2rem;">
+            <h1>Cosmic Aptitude Exam (<span id="quiz-q-num">1</span>/15)</h1>
+            <label for="difficulty-toggle" class="back-btn">Skip to Manual Selection ➔</label>
+        </div>
+        <div class="quiz-box">
+            <h2 id="quiz-question-title" style="color:#38bdf8; font-size:1.4rem;">Loading Question...</h2>
+            <div class="quiz-options-grid" id="quiz-options-container"></div>
+            <div>
+                <button class="hint-btn" onclick="showQuizHint()">💡 Get Hint</button>
+                <div id="quiz-hint-box" style="margin-top: 8px; color: #facc15; font-size: 0.95rem; font-style: italic;"></div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; color:#cbd5e1; font-weight:700;">
+                <div>Current Correct Score: <span id="quiz-score-val" style="color:#10b981;">0</span> / 15</div>
+                <div id="quiz-feedback" style="color:#f43f5e;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 3: DIFFICULTY SELECTION -->
+    <div class="screen container-difficulty">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #38bdf8; padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
+            <h1>Mission Profile Selection (Strictly Unique Altitudes, Max 95,000 km)</h1>
+            <label for="home-toggle" class="back-btn">⬅ Return to Menu</label>
+        </div>
+
+        <div id="quiz-result-banner" style="background: rgba(16, 185, 129, 0.2); border: 2px solid #10b981; padding: 16px 22px; border-radius: 10px; margin-bottom: 1.5rem; display:none; font-size: 1.1rem; color: #fff;">
+            Your difficulty is : <strong id="dynamic-difficulty-result" style="color:#38bdf8;">First-Looker (Tier 1)</strong>
+        </div>
+        
+        <div class="difficulty-list" id="diff-list-container">
+            <script>
+                const missions = [
+                    { tier: 1, rank: "First-Looker", dest: "Low Earth Orbit (LEO)", alt: 2000, desc: "Initial orbital mechanics and basic ascent.", budget: "$675 Billion" },
+                    { tier: 2, rank: "Starter", dest: "Mercury Orbit (Inner Solar)", alt: 6500, desc: "Scorched solar flats near the Sun.", budget: "$450 Billion" },
+                    { tier: 3, rank: "Learner", dest: "Venus Atmosphere", alt: 11000, desc: "Crushing high-pressure cloud decks.", budget: "$300 Billion" },
+                    { tier: 4, rank: "Beginner", dest: "Moon Surface", alt: 15500, desc: "Lunar crater basins and low-gravity landing.", budget: "$200 Billion" },
+                    { tier: 5, rank: "Amateur", dest: "Mars Orbit", alt: 20000, desc: "Martian upper atmosphere insertion.", budget: "$135 Billion" },
+                    { tier: 6, rank: "Intermediate", dest: "Mars Surface", alt: 24500, desc: "Dusty red plains and atmospheric entry.", budget: "$90 Billion" },
+                    { tier: 7, rank: "Explorer", dest: "Asteroid Belt", alt: 29000, desc: "Dense rocky debris fields navigation.", budget: "$60 Billion" },
+                    { tier: 8, rank: "Advanced", dest: "Jupiter Cloud Tops", alt: 33500, desc: "Swirling gas giant storms and high gravity.", budget: "$40 Billion" },
+                    { tier: 9, rank: "Specialist", dest: "Io (Jupiter's Moon)", alt: 38000, desc: "Active volcanic sulphur plains.", budget: "$26 Billion" },
+                    { tier: 10, rank: "Professional", dest: "Europa Subsurface", alt: 42500, desc: "Icy oceanic crust penetration.", budget: "$17 Billion" },
+                    { tier: 11, rank: "Experienced", dest: "Saturn's Rings", alt: 47000, desc: "Icy particle ring system traversal.", budget: "$11 Billion" },
+                    { tier: 12, rank: "Master", dest: "Titan's Methane Lakes", alt: 51500, desc: "Hydrocarbon liquid basin exploration.", budget: "$7 Billion" },
+                    { tier: 13, rank: "Veteran", dest: "Uranus Ice Fields", alt: 56000, desc: "Tilted ice giant magnetic fields.", budget: "$4.5 Billion" },
+                    { tier: 14, rank: "Elite", dest: "Neptune Storms", alt: 60500, desc: "Supersonic wind tunnel navigation.", budget: "$2.8 Billion" },
+                    { tier: 15, rank: "Legend", dest: "Pluto & Kuiper Belt", alt: 65000, desc: "Nitrogen-ice dwarf planet frontier.", budget: "$1.8 Billion" },
+                    { tier: 16, rank: "Commander", dest: "Alpha Centauri System", alt: 70000, desc: "Neighboring interstellar star system.", budget: "$1.2 Billion" },
+                    { tier: 17, rank: "Interstellar", dest: "Oort Cloud", alt: 76000, desc: "Primordial comet cradle boundary.", budget: "$1 Billion" },
+                    { tier: 18, rank: "Cosmic Pioneer", dest: "Exoplanet Kepler-186f", alt: 82000, desc: "Earth-like habitable alien world.", budget: "$995 Million" },
+                    { tier: 19, rank: "Space Zoomer", dest: "Black Hole Horizon", alt: 88500, desc: "Event horizon gravitational abyss.", budget: "$985 Million" },
+                    { tier: 20, rank: "Omniversal", dest: "Edge of the Universe", alt: 95000, desc: "Cosmic expansion boundary frontier.", budget: "$975 Million" }
+                ];
+
+                document.write(missions.map((m) => `
+                    <div class="diff-card ${m.tier === 1 ? 'selected-card' : ''}" id="rank-card-${m.tier}" onclick="selectDifficulty(${m.tier})">
+                        <div class="diff-info">
+                            <h3>${m.rank}</h3>
+                            <p>Destination: <strong>${m.dest} (Tier ${m.tier})</strong> — ${m.desc}<br><span style="color:#38bdf8; font-size:0.85rem;">Target Altitude: ${m.alt.toLocaleString()} km</span></p>
+                        </div>
+                        <div style="color:#ffffff; font-size:0.95rem; font-weight:700; white-space:nowrap; text-align:right;">
+                            Budget: ${m.budget}<br><br>
+                            <span style="font-size:0.85rem; color:#10b981;" id="rank-status-${m.tier}">${m.tier === 1 ? '✓ Active Profile' : 'Select Profile ➔'}</span>
+                        </div>
+                    </div>
+                `).join(''));
+            </script>
+        </div>
+        <label for="vab-toggle" class="proceed-vab-btn" onclick="prepareVAB()">🚀 Proceed to Vehicle Assembly Building (VAB) ➔</label>
+    </div>
+
+    <!-- SCREEN 4: VAB ROCKET BUILDER -->
+    <div class="screen container-vab">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #38bdf8; padding-bottom: 1.2rem; margin-bottom: 1.0rem;">
+            <h1>Vehicle Assembly Building (VAB)</h1>
+            <label for="difficulty-toggle" class="back-btn">⬅ Modify Mission Profile</label>
+        </div>
+
+        <div class="vab-hud">
+            <div>Current Difficulty: <span id="hud-user-difficulty" style="color:#facc15; font-weight:700;">First-Looker (Tier 1)</span></div>
+            <div>Selected Destination: <span id="hud-destination" style="color:#10b981; font-weight:700;">Low Earth Orbit (Tier 1)</span></div>
+            <div>Allocation Budget: <span id="hud-budget" style="color:#ffffff; font-weight:700;">$675 Billion</span></div>
+            <div>Expenditure: <span id="hud-spent" style="color:#38bdf8; font-weight:700;">$0</span></div>
+            <div>TWR: <span id="hud-twr">0.00</span></div>
+            <div>Gross Mass: <span id="hud-mass">0 t</span></div>
+        </div>
+
+        <div class="vab-stack">
+            <div class="vab-panel">
+                <h3>1. Mission Destination, Transportation System & Alloy Parameters</h3>
+                <div class="config-grid">
+                    <div class="config-item">
+                        <label for="cfg-destination-pick">🎯 Destination Pick (Locked above your difficulty):</label>
+                        <select id="cfg-destination-pick" onchange="updateDestinationPick()">
+                            <script>
+                                document.write(missions.map(m => `<option value="${m.tier}" id="dest-opt-${m.tier}">${m.rank}: ${m.dest}</option>`).join(''));
+                            </script>
+                        </select>
+                    </div>
+                    <div class="config-item">
+                        <label for="cfg-transport">🚀 Transportation System Drive:</label>
+                        <select id="cfg-transport" onchange="updateConfiguration()">
+                            <option value="Chemical" data-cost="50000000" data-mult="1.0">Chemical Rocket Stage ($50M)</option>
+                            <option value="Ion" data-cost="120000000" data-mult="1.2">Ion Propulsion Drive ($120M)</option>
+                            <option value="Nuclear" data-cost="250000000" data-mult="1.5">Nuclear Thermal Engine ($250M)</option>
+                            <option value="Antimatter" data-cost="500000000" data-mult="2.0">Antimatter Drive ($500M)</option>
+                        </select>
+                    </div>
+                    <div class="config-item">
+                        <label for="cfg-material">🏗️ Structural Material Alloy:</label>
+                        <select id="cfg-material" onchange="updateConfiguration()">
+                            <option value="Aluminum" data-cost="10000000" data-mult="1.0">Aerospace Aluminum ($10M / 1x Mass)</option>
+                            <option value="Titanium" data-cost="25000000" data-mult="1.2">Reinforced Titanium ($25M / 1.2x Mass)</option>
+                            <option value="Carbon" data-cost="50000000" data-mult="0.8">Carbon Composite ($50M / 0.8x Mass)</option>
+                            <option value="Graphene" data-cost="100000000" data-mult="0.6">Quantum Graphene ($100M / 0.6x Mass)</option>
+                        </select>
+                    </div>
+                    <div class="config-item">
+                        <label for="cfg-crew">Crew Size (1 - 50 @ $2M/ea): <span id="val-crew" style="color:#10b981;">1</span></label>
+                        <input type="range" id="cfg-crew" min="1" max="50" value="1" oninput="updateConfiguration()">
+                    </div>
+                    <div class="config-item">
+                        <label for="cfg-paint">🎨 Airframe Paint Accent:</label>
+                        <input type="color" id="cfg-paint" value="#38bdf8" style="height:40px; cursor:pointer;" onchange="updateConfiguration()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="vab-panel">
+                <h3>2. Assembly Stand (Scroll vertically to view entire stack, click part to select, use [↑↓] to reorder stack, [←→] to position X, [R] to rotate, [Backspace] to delete)</h3>
+                <div class="visualizer-canvas" id="canvas-area">
+                    <div class="empty-canvas-msg" id="empty-msg">Assembly stand is empty. Add unlimited components below!</div>
+                </div>
+                <div class="launch-action-bar">
+                    <button class="rotate-btn-vab" onclick="rotateSelectedPart()">🔄 Rotate Selected ([R])</button>
+                    <button class="launch-btn" onclick="attemptLaunch()">🚀 Initialize Omniversal Launch Sequence</button>
+                </div>
+            </div>
+
+            <div class="vab-panel">
+                <h3>3. Certified Component Inventory (Unique Sci-Fi Procedural Parts)</h3>
+                <div class="parts-category-bar">
+                    <div class="parts-tab-btn active-tab" onclick="switchTab('capsules', this)">Command Capsules</div>
+                    <div class="parts-tab-btn" onclick="switchTab('fuels', this)">Fuel Tanks</div>
+                    <div class="parts-tab-btn" onclick="switchTab('engines', this)">Rocket Engines</div>
+                    <div class="parts-tab-btn" onclick="switchTab('decouplers', this)">Decouplers & Stages</div>
+                    <div class="parts-tab-btn" onclick="switchTab('others', this)">Avionics & Subs</div>
+                </div>
+
+                <div class="parts-panel-wrap">
+                    <!-- 8 Capsules -->
+                    <div class="part-group group-capsules active-group" id="group-capsules">
+                        <script>
+                            const caps = [
+                                { id: "cap1", name: "Astra Command Pod", mass: 3, cost: 40000000, type: "capsule", style: "capsule1", c: ["#38bdf8", "#0f172a"] },
+                                { id: "cap2", name: "Vanguard Cockpit", mass: 4, cost: 50000000, type: "capsule", style: "capsule2", c: ["#818cf8", "#1e1b4b"] },
+                                { id: "cap3", name: "Orion Dome", mass: 5, cost: 65000000, type: "capsule", style: "capsule3", c: ["#10b981", "#022c22"] },
+                                { id: "cap4", name: "Zephyr Cabin", mass: 6, cost: 80000000, type: "capsule", style: "capsule4", c: ["#f43f5e", "#4c0519"] },
+                                { id: "cap5", name: "Apollo Core", mass: 7, cost: 100000000, type: "capsule", style: "capsule5", c: ["#fbbf24", "#451a03"] },
+                                { id: "cap6", name: "Hermes Bridge", mass: 8, cost: 125000000, type: "capsule", style: "capsule6", c: ["#c084fc", "#3b0764"] },
+                                { id: "cap7", name: "Horizon Dome", mass: 9, cost: 150000000, type: "capsule", style: "capsule7", c: ["#22d3ee", "#083344"] },
+                                { id: "cap8", name: "Odyssey Hub", mass: 12, cost: 200000000, type: "capsule", style: "capsule8", c: ["#f87171", "#450a0a"] }
+                            ];
+                            document.write(caps.map(c => `
+                                <div class="part-shop-item">
+                                    <canvas class="generated-part-canvas" id="shop-draw-${c.id}" width="60" height="60"></canvas>
+                                    <div style="flex-grow:1;">
+                                        <strong>${c.name}</strong><br>
+                                        <span style="font-size:0.8rem; color:#10b981;">Mass: ${c.mass}t | Cost: $${(c.cost/1000000).toFixed(0)}M</span>
+                                    </div>
+                                    <button class="add-part-btn" onclick="addPartFromMaster('${c.id}')">Add</button>
+                                </div>
+                            `).join(''));
+                        </script>
+                    </div>
+
+                    <!-- 8 Fuel Tanks -->
+                    <div class="part-group group-fuels" id="group-fuels">
+                        <script>
+                            const tanks = [
+                                { id: "tank1", name: "Titanium Cistern", mass: 10, cost: 30000000, type: "tank", style: "tank1", c: ["#94a3b8", "#1e293b"] },
+                                { id: "tank2", name: "Carbon Fuel Pod", mass: 12, cost: 35000000, type: "tank", style: "tank2", c: ["#334155", "#020617"] },
+                                { id: "tank3", name: "Cryogenic Drum", mass: 15, cost: 45000000, type: "tank", style: "tank3", c: ["#f43f5e", "#2a080c"] },
+                                { id: "tank4", name: "Xenon Spherical Cell", mass: 18, cost: 55000000, type: "tank", style: "tank4", c: ["#60a5fa", "#0f172a"] },
+                                { id: "tank5", name: "Oxygen Reservoir", mass: 22, cost: 70000000, type: "tank", style: "tank5", c: ["#34d399", "#064e3b"] },
+                                { id: "tank6", name: "Hydrogen Vault", mass: 26, cost: 85000000, type: "tank", style: "tank6", c: ["#f472b6", "#500724"] },
+                                { id: "tank7", name: "Plutonium Tank", mass: 30, cost: 100000000, type: "tank", style: "tank7", c: ["#fbbf24", "#451a03"] },
+                                { id: "tank8", name: "Quantum Fuel Vault", mass: 38, cost: 130000000, type: "tank", style: "tank8", c: ["#c084fc", "#3b0764"] }
+                            ];
+                            document.write(tanks.map(t => `
+                                <div class="part-shop-item">
+                                    <canvas class="generated-part-canvas" id="shop-draw-${t.id}" width="60" height="60"></canvas>
+                                    <div style="flex-grow:1;">
+                                        <strong>${t.name}</strong><br>
+                                        <span style="font-size:0.8rem; color:#10b981;">Mass: ${t.mass}t | Cost: $${(t.cost/1000000).toFixed(0)}M</span>
+                                    </div>
+                                    <button class="add-part-btn" onclick="addPartFromMaster('${t.id}')">Add</button>
+                                </div>
+                            `).join(''));
+                        </script>
+                    </div>
+
+                    <!-- 8 Engines -->
+                    <div class="part-group group-engines" id="group-engines">
+                        <script>
+                            const engs = [
+                                { id: "eng1", name: "Merlin-1D", mass: 5, cost: 50000000, type: "engine", style: "eng1", c: ["#f97316", "#431407"] },
+                                { id: "eng2", name: "Raptor V2", mass: 7, cost: 70000000, type: "engine", style: "eng2", c: ["#f43f5e", "#4c0519"] },
+                                { id: "eng3", name: "Valkyrie Ion", mass: 9, cost: 95000000, type: "engine", style: "eng3", c: ["#38bdf8", "#082f49"] },
+                                { id: "eng4", name: "Vector-S", mass: 12, cost: 120000000, type: "engine", style: "eng4", c: ["#fb7185", "#4c0519"] },
+                                { id: "eng5", name: "Rhino Heavy", mass: 16, cost: 160000000, type: "engine", style: "eng5", c: ["#facc15", "#422006"] },
+                                { id: "eng6", name: "Mainsail High-Thrust", mass: 20, cost: 200000000, type: "engine", style: "eng6", c: ["#a78bfa", "#2e1065"] },
+                                { id: "eng7", name: "Supernova Thrust", mass: 25, cost: 260000000, type: "engine", style: "eng7", c: ["#e11d48", "#4c0519"] },
+                                { id: "eng8", name: "Omni-Drive", mass: 32, cost: 340000000, type: "engine", style: "eng8", c: ["#2dd4bf", "#042f2e"] }
+                            ];
+                            document.write(engs.map(e => `
+                                <div class="part-shop-item">
+                                    <canvas class="generated-part-canvas" id="shop-draw-${e.id}" width="60" height="60"></canvas>
+                                    <div style="flex-grow:1;">
+                                        <strong>${e.name}</strong><br>
+                                        <span style="font-size:0.8rem; color:#10b981;">Mass: ${e.mass}t | Cost: $${(e.cost/1000000).toFixed(0)}M</span>
+                                    </div>
+                                    <button class="add-part-btn" onclick="addPartFromMaster('${e.id}')">Add</button>
+                                </div>
+                            `).join(''));
+                        </script>
+                    </div>
+
+                    <!-- 8 Decouplers -->
+                    <div class="part-group group-decouplers" id="group-decouplers">
+                        <script>
+                            const decouplers = [
+                                { id: "dec1", name: "Standard Stage Decoupler", mass: 1, cost: 12000000, type: "decoupler", style: "dec1", c: ["#a855f7", "#3b0764"] },
+                                { id: "dec2", name: "Radial Separation Ring", mass: 2, cost: 18000000, type: "decoupler", style: "dec2", c: ["#38bdf8", "#082f49"] },
+                                { id: "dec3", name: "Interstage Fairing Base", mass: 3, cost: 24000000, type: "decoupler", style: "dec3", c: ["#10b981", "#022c22"] },
+                                { id: "dec4", name: "Pyrotechnic Bolt Ring", mass: 1, cost: 15000000, type: "decoupler", style: "dec4", c: ["#f43f5e", "#4c0519"] },
+                                { id: "dec5", name: "Heavy Structural Separator", mass: 4, cost: 32000000, type: "decoupler", style: "dec5", c: ["#f59e0b", "#451a03"] },
+                                { id: "dec6", name: "Quick-Release Clamp-O-Tron", mass: 2, cost: 20000000, type: "decoupler", style: "dec6", c: ["#6366f1", "#1e1b4b"] },
+                                { id: "dec7", name: "Pneumatic Ejector Ring", mass: 3, cost: 28000000, type: "decoupler", style: "dec7", c: ["#ec4899", "#500724"] },
+                                { id: "dec8", name: "Quantum Staging Separator", mass: 5, cost: 45000000, type: "decoupler", style: "dec8", c: ["#14b8a6", "#042f2e"] }
+                            ];
+                            document.write(decouplers.map(d => `
+                                <div class="part-shop-item">
+                                    <canvas class="generated-part-canvas" id="shop-draw-${d.id}" width="60" height="60"></canvas>
+                                    <div style="flex-grow:1;">
+                                        <strong>${d.name}</strong><br>
+                                        <span style="font-size:0.8rem; color:#10b981;">Mass: ${d.mass}t | Cost: $${(d.cost/1000000).toFixed(0)}M</span>
+                                    </div>
+                                    <button class="add-part-btn" onclick="addPartFromMaster('${d.id}')">Add</button>
+                                </div>
+                            `).join(''));
+                        </script>
+                    </div>
+
+                    <!-- 8 Avionics -->
+                    <div class="part-group group-others" id="group-others">
+                        <script>
+                            const others = [
+                                { id: "oth1", name: "Thermal Blanket", mass: 1, cost: 10000000, type: "other", style: "oth1", c: ["#fbbf24", "#451a03"] },
+                                { id: "oth2", name: "Solar Array Wing", mass: 2, cost: 18000000, type: "other", style: "oth2", c: ["#3b82f6", "#1e3a8a"] },
+                                { id: "oth3", name: "Reaction Wheel", mass: 3, cost: 25000000, type: "other", style: "oth3", c: ["#94a3b8", "#1e293b"] },
+                                { id: "oth4", name: "Parachute Pack", mass: 2, cost: 15000000, type: "other", style: "oth4", c: ["#84cc16", "#1a2e05"] },
+                                { id: "oth5", name: "Landing Strut", mass: 4, cost: 30000000, type: "other", style: "oth5", c: ["#e2e8f0", "#334155"] },
+                                { id: "oth6", name: "Radar Dish", mass: 2, cost: 20000000, type: "other", style: "oth6", c: ["#f43f5e", "#4c0519"] },
+                                { id: "oth7", name: "Heat Shield", mass: 5, cost: 45000000, type: "other", style: "oth7", c: ["#ef4444", "#450a0a"] },
+                                { id: "oth8", name: "Communication Relay", mass: 2, cost: 22000000, type: "other", style: "oth8", c: ["#a855f7", "#3b0764"] }
+                            ];
+                            document.write(others.map(o => `
+                                <div class="part-shop-item">
+                                    <canvas class="generated-part-canvas" id="shop-draw-${o.id}" width="60" height="60"></canvas>
+                                    <div style="flex-grow:1;">
+                                        <strong>${o.name}</strong><br>
+                                        <span style="font-size:0.8rem; color:#10b981;">Mass: ${o.mass}t | Cost: $${(o.cost/1000000).toFixed(0)}M</span>
+                                    </div>
+                                    <button class="add-part-btn" onclick="addPartFromMaster('${o.id}')">Add</button>
+                                </div>
+                            `).join(''));
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 5: FLIGHT SIMULATION -->
+    <div class="screen container-flight">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #38bdf8; padding-bottom: 1.2rem;">
+            <h1>AstroForge Flight Control: <span id="flight-dest-title">Low Earth Orbit</span></h1>
+            <label for="vab-toggle" class="back-btn" onclick="stopSimulation()">Abort to VAB</label>
+        </div>
+
+        <div class="flight-viewport" id="flight-viewport">
+            <canvas id="flight-parallax-canvas"></canvas>
+            <div class="launch-tower" id="flight-launch-tower"></div>
+            <div class="launchpad-base" id="flight-launchpad-base">
+                <div style="width:22px; height:22px; background:#10b981; border-radius:50%; margin:6px;"></div>
+                <div style="width:22px; height:22px; background:#38bdf8; border-radius:50%; margin:6px;"></div>
+            </div>
+
+            <div class="flight-top-bar">
+                <div class="flight-hud-overlay">
+                    <div>Altitude: <span id="sim-alt">0</span> km</div>
+                    <div>Propellant: <span id="sim-fuel">100</span>%</div>
+                    <div>Flight Mode: <span id="sim-mode" style="color:#38bdf8;">Vertical Ascent</span></div>
+                    <div>Velocity: <span id="sim-vel">0.0</span> km/s</div>
+                </div>
+            </div>
+
+            <div id="sim-rocket-wrap" class="flight-camera-container" style="bottom: 45px; transform: translate(0px, 0px) rotate(0deg);">
+                <div class="flight-rocket-stack" id="flight-rocket-stack"></div>
+                <div id="exhaust-sprite" class="sim-exhaust"></div>
+            </div>
+        </div>
+
+        <div class="flight-status-box">
+            <div id="sim-status-msg">Hold [W] / [↑] to ignite, [←][→] or [A][D] to tilt/steer rocket nose (Sticky Tilt), [SPACEBAR] to stage!</div>
+            <div style="display:flex; gap:10px;">
+                <button class="action-sim-btn" id="explore-dest-btn" onclick="goToSurfaceExploration()">🔭 Explore Surrounding (Surface Mission)</button>
+                <button class="try-again-btn" id="try-again-btn" onclick="resetToVAB()">Return to VAB</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 6: FIRST-PERSON SURFACE EXPLORATION & PARTS WORKBENCH -->
+    <div class="screen container-explore">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #38bdf8; padding-bottom: 1.2rem;">
+            <h1>1st-Person Surface Exploration: <span id="explore-target-name">Moon Surface</span></h1>
+            <label for="home-toggle" class="back-btn" onclick="returnHomeToEarth()">🏠 Launch & Return Home</label>
+        </div>
+
+        <div class="explore-viewport-wrap">
+            <canvas id="surface-3d-canvas"></canvas>
+            
+            <!-- ENGINEERING WORKBENCH MODAL -->
+            <div id="workbench-modal">
+                <div class="workbench-box">
+                    <h2 id="workbench-title" style="color:#38bdf8;">🔧 Engineering Workbench</h2>
+                    <p id="workbench-desc" style="color:#cbd5e1; font-size:0.95rem;">Select the required component from inventory to execute this operation:</p>
+                    <div class="workbench-parts-grid" id="workbench-parts-grid"></div>
+                    <button class="back-btn" onclick="closeWorkbench()" style="align-self: flex-end;">Cancel</button>
+                </div>
+            </div>
+
+            <div class="explore-hud-topright">
+                <h3 style="color:#38bdf8; font-size:1rem; border-bottom:1px solid #38bdf8; padding-bottom:6px;">📋 Interactive Parts Engineering</h3>
+                <div class="explore-mission-item" id="obj-1">
+                    <span><strong>1. Habitat Erection</strong></span>
+                    <span id="stat-1" style="color:#facc15;">Phase 1: Build Structure [Pending]</span>
+                </div>
+                <div class="explore-mission-item" id="obj-2">
+                    <span><strong>2. Seismic Drilling</strong></span>
+                    <span id="stat-2" style="color:#facc15;">Phase 2: Rig Diagnostics [Pending]</span>
+                </div>
+                <div class="explore-mission-item" id="obj-3">
+                    <span><strong>3. Rover Calibration</strong></span>
+                    <span id="stat-3" style="color:#facc15;">Phase 3: Power Deploy [Pending]</span>
+                </div>
+                <div style="font-size:0.8rem; color:#facc15; margin-top:4px;">Controls: [W][A][S][D] to walk to station, press [E] to open Parts Workbench!</div>
+            </div>
+
+            <div style="position: absolute; bottom: 15px; left: 15px; background: rgba(15,23,42,0.9); border: 2px solid #38bdf8; padding: 10px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: 700; color: #10b981;" id="surface-action-prompt">
+                Walk [WASD] toward station and press [E] to install required parts!
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 7: CAREER MISSION CONTRACT HUB -->
+    <div class="screen container-contracts">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #38bdf8; padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
+            <h1>Career Mission Contract Hub</h1>
+            <label for="home-toggle" class="back-btn">⬅ Return to Menu</label>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:1rem; overflow-y:auto; max-height:60vh;">
+            <div class="contract-card">
+                <div><strong>Low Earth Orbit Communications Probe</strong><br><span style="color:#cbd5e1; font-size:0.9rem;">Target: LEO (2,000 km) | Reward: +15,000 Cosmic Craters</span></div>
+                <button class="accept-contract-btn" onclick="acceptContract(1, 15000)">Accept</button>
+            </div>
+            <div class="contract-card">
+                <div><strong>Lunar Sample Return Mission</strong><br><span style="color:#cbd5e1; font-size:0.9rem;">Target: Moon Surface (15,500 km) | Reward: +40,000 Cosmic Craters</span></div>
+                <button class="accept-contract-btn" onclick="acceptContract(4, 40000)">Accept</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 8: FLIGHT TELEMETRY BLACKBOX REPLAY -->
+    <div class="screen container-replay">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #38bdf8; padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
+            <h1>Flight Telemetry Blackbox Debrief</h1>
+            <label for="home-toggle" class="back-btn">⬅ Return to Menu</label>
+        </div>
+        <div style="background: rgba(15,23,42,0.9); border: 2px solid #38bdf8; padding: 30px; border-radius: 12px; display:flex; flex-direction:column; gap:15px; font-size:1.1rem;">
+            <div>Last Flight Peak Altitude: <strong id="replay-alt" style="color:#10b981;">0 km</strong></div>
+            <div>Maximum Velocity Reached: <strong id="replay-vel" style="color:#38bdf8;">0.00 km/s</strong></div>
+            <div>Structural Stress Rating: <strong style="color:#f43f5e;">Optimal (No Failures)</strong></div>
+            <div style="margin-top:20px; color:#cbd5e1; font-style:italic;" id="replay-status-text">No recent flight recorded. Complete a launch to view blackbox telemetry analysis.</div>
+        </div>
+    </div>
+
+    <!-- SCREEN 9: SHOP -->
+    <div class="screen container-skins">
+        <div class="shop-header-row">
+            <div>
+                <h1>AstroForge Shop</h1>
+                <div class="currency-display">Cosmic Reserves: <span id="player-balance">0</span> ☄️ Craters</div>
+            </div>
+            <label for="home-toggle" class="back-btn">⬅ Return to Menu</label>
+        </div>
+
+        <div class="shop-tabs-row">
+            <label for="shop-skins" class="shop-tab-label">Airframe Coatings (Skins)</label>
+            <label for="shop-coaches" class="shop-tab-label">Flight Directors (Coaches)</label>
+            <label for="shop-craters" class="shop-tab-label">Cosmic Crater Caches</label>
+        </div>
+
+        <div class="shop-content list-skins">
+            <script>
+                const shopSkins = ["Titanium Chrome Hull", "Gold Leaf Thermal Shield", "Obsidian Stealth Coating", "Neon Cyan Prism", "Crimson Plasma Wrap", "Emerald Carbon Weave", "Violet Aurora Finish", "Solar Flare Gold"];
+                document.write(shopSkins.map((s, i) => `
+                    <div class="item-card">
+                        <div><strong>${s}</strong><br><span style="color:#cbd5e1; font-size:0.9rem;">Advanced aerodynamic airframe coating</span></div>
+                        <div class="price-tag" onclick="buyItem(1500, '${s}')">1,500 ☄️ Buy</div>
+                    </div>
+                `).join(''));
+            </script>
+        </div>
+
+        <div class="shop-content list-coaches">
+            <script>
+                const shopCoaches = ["Robot Commander Vex", "AI Flight Instructor Nova", "Veteran Captain Vance", "Quantum Navigator Iris", "Astrodynamics Expert Orion", "Senior Payload Officer Jax"];
+                document.write(shopCoaches.map((c, i) => `
+                    <div class="item-card">
+                        <div><strong>${c}</strong><br><span style="color:#cbd5e1; font-size:0.9rem;">AI & Human Flight Director telemetry guidance</span></div>
+                        <div class="price-tag" onclick="buyItem(3000, '${c}')">3,000 ☄️ Hire</div>
+                    </div>
+                `).join(''));
+            </script>
+        </div>
+
+        <div class="shop-content list-craters">
+            <div class="item-card">
+                <div><strong>Quantum Data Cache (+25,000 Craters)</strong><br><span style="color:#cbd5e1; font-size:0.9rem;">Cost: 1,500 ☄️ Craters</span></div>
+                <div class="price-tag" onclick="buyCache(25000, 1500)">1,500 ☄️ Purchase</div>
+            </div>
+            <div class="item-card">
+                <div><strong>Omniversal Mega Bundle (+100,000 Craters)</strong><br><span style="color:#cbd5e1; font-size:0.9rem;">Cost: 5,000 ☄️ Craters</span></div>
+                <div class="price-tag" onclick="buyCache(100000, 5000)">5,000 ☄️ Purchase</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showAlert(msg) {
+            const banner = document.getElementById('notification-banner');
+            banner.innerText = msg;
+            banner.style.display = 'block';
+            setTimeout(() => { banner.style.display = 'none'; }, 3000);
+        }
+
+        const canvas = document.getElementById('space-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let stars = [], shootingStars = [], comets = [];
+
+        function initSpaceCanvas() {
+            width = canvas.width = canvas.parentElement.clientWidth;
+            height = canvas.height = canvas.parentElement.clientHeight;
+            stars = [];
+            for(let i=0; i<180; i++) {
+                stars.push({ x: Math.random() * width, y: Math.random() * height, radius: Math.random() * 2.5, alpha: Math.random(), speed: Math.random() * 0.05 + 0.01 });
+            }
+        }
+        function spawnShootingStar() { shootingStars.push({ x: Math.random() * width, y: 0, length: Math.random() * 100 + 40, speed: Math.random() * 15 + 8, angle: Math.PI / 4 }); }
+        function spawnComet() { comets.push({ x: -50, y: Math.random() * (height / 2), radius: 7, speed: 6, tailLength: 160 }); }
+
+        function animateSpace() {
+            ctx.clearRect(0, 0, width, height);
+            stars.forEach(s => {
+                s.alpha += s.speed;
+                if(s.alpha > 1 || s.alpha < 0) s.speed = -s.speed;
+                ctx.fillStyle = `rgba(255, 255, 255, ${Math.abs(s.alpha)})`;
+                ctx.beginPath(); ctx.arc(s.x, s.y, s.radius, 0, Math.PI*2); ctx.fill();
+            });
+            requestAnimationFrame(animateSpace);
+        }
+        window.addEventListener('resize', initSpaceCanvas);
+
+        const pCanvas = document.getElementById('flight-parallax-canvas');
+        const pCtx = pCanvas.getContext('2d');
+        let pWidth, pHeight, pStars = [], pOffset = 0;
+
+        function initParallaxCanvas() {
+            pWidth = pCanvas.width = pCanvas.parentElement.clientWidth;
+            pHeight = pCanvas.height = pCanvas.parentElement.clientHeight;
+            pStars = [];
+            for(let i=0; i<150; i++) {
+                pStars.push({ x: Math.random() * pWidth, y: Math.random() * pHeight, radius: Math.random() * 2.2 + 0.5, alpha: Math.random() });
+            }
+        }
+        function animateParallaxSky(scrollSpeed) {
+            pCtx.clearRect(0, 0, pWidth, pHeight);
+            pOffset += scrollSpeed * 1.5;
+            pStars.forEach(s => {
+                let drawY = (s.y + pOffset) % pHeight;
+                pCtx.fillStyle = `rgba(255, 255, 255, ${s.alpha})`;
+                pCtx.beginPath(); pCtx.arc(s.x, drawY, s.radius, 0, Math.PI*2); pCtx.fill();
+            });
+        }
+
+        let customAccentColor = '#38bdf8';
+        function drawUniquePartShape(ctx, w, h, styleType, colorArray, rotation = 0) {
+            ctx.save();
+            ctx.clearRect(0, 0, w, h);
+            ctx.translate(w/2, h/2);
+            ctx.rotate((rotation * Math.PI) / 180);
+            ctx.translate(-w/2, -h/2);
+
+            ctx.fillStyle = colorArray[1] || '#1e293b';
+            ctx.strokeStyle = customAccentColor;
+            ctx.lineWidth = 2.5;
+
+            ctx.beginPath();
+            if (styleType === 'capsule1') {
+                ctx.moveTo(w*0.5, h*0.05); ctx.lineTo(w*0.85, h*0.85); ctx.lineTo(w*0.15, h*0.85); ctx.closePath();
+                ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#38bdf8'; ctx.beginPath(); ctx.arc(w*0.5, h*0.45, w*0.15, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+            } else if (styleType === 'tank1') {
+                ctx.roundRect(w*0.2, h*0.15, w*0.6, h*0.7, [6]); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = customAccentColor; ctx.fillRect(w*0.35, h*0.3, w*0.3, h*0.1); ctx.fillRect(w*0.35, h*0.6, w*0.3, h*0.1);
+            } else if (styleType === 'eng1') {
+                ctx.moveTo(w*0.3, h*0.1); ctx.lineTo(w*0.7, h*0.1); ctx.lineTo(w*0.85, h*0.9); ctx.lineTo(w*0.15, h*0.9); ctx.closePath(); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#f97316'; ctx.beginPath(); ctx.arc(w*0.5, h*0.5, w*0.12, 0, Math.PI*2); ctx.fill();
+            } else {
+                ctx.roundRect(w*0.15, h*0.25, w*0.7, h*0.5, [8]); ctx.fill(); ctx.stroke();
+            }
+            ctx.restore();
+        }
+
+        let playerBalance = 0;
+        function buyItem(price, itemName) {
+            if (playerBalance < price) { showAlert("⚠️ Not enough Cosmic Craters!"); return; }
+            playerBalance -= price;
+            document.getElementById('player-balance').innerText = playerBalance.toLocaleString();
+            alert("Successfully purchased " + itemName + "!");
+        }
+
+        function buyCache(yieldAmt, cost) {
+            if (playerBalance < cost) { showAlert("⚠️ Insufficient Cosmic Reserves!"); return; }
+            playerBalance -= cost; playerBalance += yieldAmt;
+            document.getElementById('player-balance').innerText = playerBalance.toLocaleString();
+            alert("Acquired +" + yieldAmt.toLocaleString() + " Craters!");
+        }
+
+        const cosmosQuiz = [
+            { q: "What is the primary gas composing stellar cores during main sequence fusion?", opts: ["Hydrogen", "Helium", "Oxygen", "Nitrogen"], ans: 0, hint: "Lightest element." },
+            { q: "Which planet in our solar system has the most extreme volcanic activity?", opts: ["Mars", "Io (Jupiter's Moon)", "Venus", "Mercury"], ans: 1, hint: "Volcanic moon." },
+            { q: "What is the event horizon of a black hole?", opts: ["Accretion center", "Point of no return where light cannot escape", "Magnetic pole", "Neutron site"], ans: 1, hint: "Point of no return." },
+            { q: "Approximately how long does light take to travel from the Sun to Earth?", opts: ["8 seconds", "8 minutes", "8 hours", "8 days"], ans: 1, hint: "Five hundred seconds." },
+            { q: "Which galaxy is on a direct collision course with our Milky Way?", opts: ["Sombrero", "Andromeda", "Triangulum", "Magellanic Cloud"], ans: 1, hint: "Princess in the sky." }
+        ];
+
+        let currentQuizIndex = 0, quizCorrectScore = 0;
+        let unlockedDifficultyTier = 1;
+
+        function startCosmicQuiz() {
+            currentQuizIndex = 0; quizCorrectScore = 0;
+            document.getElementById('quiz-toggle').checked = true;
+            loadQuizQuestion();
+        }
+
+        function loadQuizQuestion() {
+            if (currentQuizIndex >= cosmosQuiz.length) {
+                unlockedDifficultyTier = Math.min(20, Math.max(1, Math.round((quizCorrectScore / 5) * 20)));
+                let rankName = missions[unlockedDifficultyTier - 1].rank;
+                document.getElementById('dynamic-difficulty-result').innerText = `${rankName} (Tier ${unlockedDifficultyTier})`;
+                document.getElementById('quiz-result-banner').style.display = 'block';
+                selectDifficulty(unlockedDifficultyTier);
+                document.getElementById('difficulty-toggle').checked = true;
+                return;
+            }
+            let qObj = cosmosQuiz[currentQuizIndex];
+            document.getElementById('quiz-q-num').innerText = currentQuizIndex + 1;
+            document.getElementById('quiz-question-title').innerText = qObj.q;
+            document.getElementById('quiz-score-val').innerText = quizCorrectScore;
+            document.getElementById('quiz-feedback').innerText = '';
+            document.getElementById('quiz-hint-box').innerText = '';
+
+            let optsContainer = document.getElementById('quiz-options-container');
+            optsContainer.innerHTML = qObj.opts.map((opt, idx) => `
+                <button class="quiz-option-btn" onclick="submitQuizAnswer(${idx})">${String.fromCharCode(65 + idx)}. ${opt}</button>
+            `).join('');
+        }
+
+        function showQuizHint() {
+            document.getElementById('quiz-hint-box').innerText = `Hint: ${cosmosQuiz[currentQuizIndex].hint}`;
+        }
+
+        function submitQuizAnswer(selectedIdx) {
+            let qObj = cosmosQuiz[currentQuizIndex];
+            if (selectedIdx === qObj.ans) {
+                quizCorrectScore++; playerBalance += 150;
+                document.getElementById('player-balance').innerText = playerBalance.toLocaleString();
+                document.getElementById('quiz-feedback').style.color = '#10b981';
+                document.getElementById('quiz-feedback').innerText = '✓ Correct (+150 Craters)!';
+            } else {
+                document.getElementById('quiz-feedback').style.color = '#f43f5e';
+                document.getElementById('quiz-feedback').innerText = `✗ Incorrect! Answer: ${qObj.opts[qObj.ans]}`;
+            }
+            setTimeout(() => { currentQuizIndex++; loadQuizQuestion(); }, 1000);
+        }
+
+        function acceptContract(targetTier, reward) {
+            if (targetTier > unlockedDifficultyTier) { alert(`⚠️ Requires tier ${targetTier}!`); return; }
+            selectDifficulty(targetTier);
+            document.getElementById('vab-toggle').checked = true;
+            alert(`Contract Accepted! Build rocket for Tier ${targetTier} (+${reward.toLocaleString()} Craters)`);
+        }
+
+        let rocketParts = [];
+        let selectedPartId = null;
+        let partsSpentAmount = 0, configSpentAmount = 0, materialCost = 10000000, materialMultiplier = 1.0;
+        let transportMultiplier = 1.0;
+        let selectedDifficultyTier = 1;
+        let selectedDestinationTier = 1;
+        let simInterval = null;
+        let currentAlt = 0, currentVel = 0, currentFuel = 100, engineOn = false;
+        let keysPressed = {};
+        let targetAltitude = 2000;
+        let flightMode = "Vertical Ascent";
+        let rocketXPos = 0, rocketTiltAngle = 0;
+        let reachedCheckpoints = {};
+        
+        let surfaceCanvas, surfaceCtx;
+        let player3D = { x: 0, z: 5, angle: 0 };
+        // COD-style interactive parts engineering missions
+        let surfaceMissions = { 
+            1: { phase: 1, name: "Habitat Erection", reqType: "tank" }, 
+            2: { phase: 2, name: "Seismic Drilling", reqType: "other" }, 
+            3: { phase: 3, name: "Rover Calibration", reqType: "engine" } 
+        };
+        let activeWorkbenchModuleId = null;
+        let surfaceAnimationId = null;
+
+        const allPartsList = [...caps, ...tanks, ...engs, ...decouplers, ...others];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initSpaceCanvas(); animateSpace();
+            initParallaxCanvas();
+            setInterval(spawnShootingStar, 2200); setInterval(spawnComet, 9000);
+
+            allPartsList.forEach(p => {
+                const canvas = document.getElementById(`shop-draw-${p.id}`);
+                if (canvas) drawUniquePartShape(canvas.getContext('2d'), canvas.width, canvas.height, p.style, p.c, 0);
+            });
+            updateDestinationDropdowns();
+            updateRocketVisualizer();
+        });
+
+        function updateDestinationDropdowns() {
+            missions.forEach(m => {
+                let opt = document.getElementById(`dest-opt-${m.tier}`);
+                if (opt) {
+                    if (m.tier > selectedDifficultyTier) {
+                        opt.disabled = true; opt.innerText = `${m.rank}: ${m.dest} (🔒 Locked)`;
+                    } else {
+                        opt.disabled = false; opt.innerText = `${m.rank}: ${m.dest} (${m.alt.toLocaleString()} km)`;
+                    }
+                }
+            });
+        }
+
+        function selectDifficulty(tierNum) {
+            unlockedDifficultyTier = Math.max(unlockedDifficultyTier, tierNum);
+            selectedDifficultyTier = tierNum;
+            if (selectedDestinationTier > selectedDifficultyTier) {
+                selectedDestinationTier = selectedDifficultyTier;
+                document.getElementById('cfg-destination-pick').value = selectedDestinationTier;
+            }
+            updateDestinationDropdowns();
+            for (let i = 1; i <= 20; i++) {
+                const card = document.getElementById(`rank-card-${i}`);
+                const status = document.getElementById(`rank-status-${i}`);
+                if (card && status) {
+                    if (i === tierNum) { card.classList.add('selected-card'); status.innerText = '✓ Active Profile'; }
+                    else { card.classList.remove('selected-card'); status.innerText = i <= unlockedDifficultyTier ? 'Select ➔' : '🔒 Locked'; }
+                }
+            }
+        }
+
+        function updateDestinationPick() {
+            let val = parseInt(document.getElementById('cfg-destination-pick').value);
+            if (val > selectedDifficultyTier) {
+                showAlert(`⚠️ Exceeds current difficulty tier!`);
+                document.getElementById('cfg-destination-pick').value = selectedDifficultyTier;
+                selectedDestinationTier = selectedDifficultyTier;
+                return;
+            }
+            selectedDestinationTier = val;
+            targetAltitude = missions[val - 1].alt;
+            prepareVAB();
+        }
+
+        function prepareVAB() {
+            if (selectedDestinationTier > selectedDifficultyTier) {
+                selectedDestinationTier = selectedDifficultyTier;
+                document.getElementById('cfg-destination-pick').value = selectedDestinationTier;
+            }
+            const diffObj = missions[selectedDifficultyTier - 1];
+            const destObj = missions[selectedDestinationTier - 1];
+            targetAltitude = destObj.alt;
+            document.getElementById('hud-user-difficulty').innerText = `${diffObj.rank} (Tier ${selectedDifficultyTier})`;
+            document.getElementById('hud-destination').innerText = `${destObj.dest} (${destObj.alt.toLocaleString()} km)` ;
+            document.getElementById('hud-budget').innerText = diffObj.budget;
+            document.getElementById('flight-dest-title').innerText = destObj.dest;
+            updateConfiguration();
+        }
+
+        function updateConfiguration() {
+            customAccentColor = document.getElementById('cfg-paint').value;
+            let crewVal = parseInt(document.getElementById('cfg-crew').value);
+            document.getElementById('val-crew').innerText = crewVal;
+            let crewCost = crewVal * 2000000;
+            
+            let transportOpt = document.getElementById('cfg-transport').selectedOptions[0];
+            let transportCost = parseInt(transportOpt.getAttribute('data-cost')) || 50000000;
+            transportMultiplier = parseFloat(transportOpt.getAttribute('data-mult')) || 1.0;
+            
+            let matOpt = document.getElementById('cfg-material').selectedOptions[0];
+            materialCost = parseInt(matOpt.getAttribute('data-cost')) || 10000000;
+            materialMultiplier = parseFloat(matOpt.getAttribute('data-mult')) || 1.0;
+
+            configSpentAmount = crewCost + transportCost + materialCost;
+            document.getElementById('hud-spent').innerText = '$' + ((partsSpentAmount + configSpentAmount) / 1000000).toFixed(0) + 'M';
+            updateRocketVisualizer();
+        }
+
+        function switchTab(groupName, clickedElement) {
+            document.querySelectorAll('.part-group').forEach(group => group.classList.remove('active-group'));
+            document.querySelectorAll('.parts-tab-btn').forEach(btn => btn.classList.remove('active-tab'));
+            document.getElementById('group-' + groupName).classList.add('active-group');
+            clickedElement.classList.add('active-tab');
+        }
+
+        function addPartFromMaster(partIdKey) {
+            let found = allPartsList.find(p => p.id === partIdKey);
+            if (!found) return;
+            partsSpentAmount += found.cost;
+            let uniqueId = Date.now() + Math.random();
+            rocketParts.push({ id: uniqueId, name: found.name, mass: found.mass, cost: found.cost, type: found.type, style: found.style, c: [...found.c], x: 0, rotation: 0 });
+            selectedPartId = uniqueId;
+            updateRocketVisualizer();
+            updateConfiguration();
+        }
+
+        function removePart(partId, cost, event) {
+            if (event) event.stopPropagation();
+            let pIndex = rocketParts.findIndex(item => item.id === partId);
+            if (pIndex !== -1) {
+                partsSpentAmount -= rocketParts[pIndex].cost;
+                if (partsSpentAmount < 0) partsSpentAmount = 0;
+                rocketParts.splice(pIndex, 1);
+            }
+            if (selectedPartId === partId) selectedPartId = null;
+            updateRocketVisualizer();
+            updateConfiguration();
+        }
+
+        function selectRocketNode(partId, event) {
+            if (event) event.stopPropagation();
+            selectedPartId = partId;
+            updateRocketVisualizer();
+        }
+
+        function rotateSelectedPart() {
+            if (selectedPartId === null) return;
+            let p = rocketParts.find(item => item.id === selectedPartId);
+            if (p) { p.rotation = (p.rotation || 0) + 90; if (p.rotation >= 360) p.rotation = 0; updateRocketVisualizer(); }
+        }
+
+        function updateRocketVisualizer() {
+            const canvasArea = document.getElementById('canvas-area');
+            let stackInner = canvasArea.querySelector('.rocket-stack-inner');
+            if (!stackInner) {
+                canvasArea.innerHTML = '';
+                stackInner = document.createElement('div');
+                stackInner.className = 'rocket-stack-inner';
+                canvasArea.appendChild(stackInner);
+            }
+            stackInner.innerHTML = '';
+            if (rocketParts.length === 0) {
+                if (!document.getElementById('empty-msg')) {
+                    let msg = document.createElement('div'); msg.id = 'empty-msg'; msg.className = 'empty-canvas-msg';
+                    msg.innerText = 'Assembly stand is empty. Add components below!';
+                    canvasArea.appendChild(msg);
+                }
+            } else {
+                let msg = document.getElementById('empty-msg');
+                if (msg) msg.remove();
+                rocketParts.forEach((p) => {
+                    let node = document.createElement('div');
+                    node.id = `node-elem-${p.id}`;
+                    node.className = `rocket-3d-segment ${p.id === selectedPartId ? 'selected-segment' : ''}`;
+                    node.onclick = (e) => selectRocketNode(p.id, e);
+                    node.innerHTML = `
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <canvas id="canvas-node-${p.id}" width="45" height="45"></canvas>
+                            <div style="font-size:0.75rem; line-height:1.2;"><strong>${p.name}</strong><br><span style="color:#10b981;">${(p.mass * materialMultiplier).toFixed(1)}t</span></div>
+                        </div>
+                        <button class="remove-node-btn" onclick="removePart(${p.id}, ${p.cost}, event)">×</button>
+                    `;
+                    node.style.transform = `translateX(${p.x || 0}px)`;
+                    stackInner.appendChild(node);
+                    setTimeout(() => {
+                        const nodeCanvas = document.getElementById(`canvas-node-${p.id}`);
+                        if (nodeCanvas) drawUniquePartShape(nodeCanvas.getContext('2d'), 45, 45, p.style, p.c, p.rotation);
+                    }, 5);
+                });
+            }
+            let totalMass = (rocketParts.reduce((acc, p) => acc + p.mass, 0) * materialMultiplier) + 2;
+            let hasEngine = rocketParts.some(p => p.type === 'engine');
+            let twr = (hasEngine && totalMass > 0) ? ((22.0 * transportMultiplier) / totalMass).toFixed(2) : "0.00";
+            document.getElementById('hud-twr').innerText = twr;
+            document.getElementById('hud-mass').innerText = totalMass.toFixed(1) + ' t';
+        }
+
+        window.addEventListener('keydown', (e) => {
+            keysPressed[e.code] = true;
+            if (document.getElementById('vab-toggle').checked) {
+                if (selectedPartId !== null) {
+                    let pIndex = rocketParts.findIndex(item => item.id === selectedPartId);
+                    if (pIndex !== -1) {
+                        let p = rocketParts[pIndex];
+                        if (e.code === 'ArrowLeft') { p.x = (p.x || 0) - 10; updateRocketVisualizer(); e.preventDefault(); }
+                        else if (e.code === 'ArrowRight') { p.x = (p.x || 0) + 10; updateRocketVisualizer(); e.preventDefault(); }
+                        else if (e.code === 'ArrowUp' && pIndex < rocketParts.length - 1) {
+                            let temp = rocketParts[pIndex]; rocketParts[pIndex] = rocketParts[pIndex + 1]; rocketParts[pIndex + 1] = temp;
+                            updateRocketVisualizer(); e.preventDefault();
+                        }
+                        else if (e.code === 'ArrowDown' && pIndex > 0) {
+                            let temp = rocketParts[pIndex]; rocketParts[pIndex] = rocketParts[pIndex - 1]; rocketParts[pIndex - 1] = temp;
+                            updateRocketVisualizer(); e.preventDefault();
+                        }
+                        else if (e.code === 'KeyR') { rotateSelectedPart(); e.preventDefault(); }
+                    }
+                }
+                if (e.code === 'Backspace' && selectedPartId !== null) {
+                    let p = rocketParts.find(item => item.id === selectedPartId);
+                    if (p) { removePart(p.id, p.cost, null); e.preventDefault(); }
+                }
+            }
+            if (e.code === 'Space' && document.getElementById('launch-toggle').checked) {
+                let decouplerIndex = rocketParts.findIndex(p => p.type === 'decoupler');
+                if (decouplerIndex !== -1) {
+                    let removedParts = rocketParts.splice(0, decouplerIndex + 1);
+                    partsSpentAmount = Math.max(0, partsSpentAmount - removedParts.reduce((acc, p) => acc + p.cost, 0));
+                    renderFlightRocketStack(); updateConfiguration();
+                    document.getElementById('sim-status-msg').innerText = `⚡ STAGING EVENT SUCCESSFUL!`;
+                }
+                e.preventDefault();
+            }
+            if (document.getElementById('explore-toggle').checked) {
+                if (e.code === 'KeyE') {
+                    openWorkbenchForClosestModule();
+                    e.preventDefault();
+                }
+            }
+        });
+        window.addEventListener('keyup', (e) => { keysPressed[e.code] = false; });
+
+        function renderFlightRocketStack() {
+            const stackContainer = document.getElementById('flight-rocket-stack');
+            stackContainer.innerHTML = rocketParts.map((p, idx) => `
+                <canvas class="flight-part-sprite" id="flight-canvas-${idx}" width="90" height="75"></canvas>
+            `).join('');
+            setTimeout(() => {
+                rocketParts.forEach((p, idx) => {
+                    const fCanvas = document.getElementById(`flight-canvas-${idx}`);
+                    if (fCanvas) drawUniquePartShape(fCanvas.getContext('2d'), 90, 75, p.style, p.c, p.rotation);
+                });
+            }, 10);
+        }
+
+        function attemptLaunch() {
+            if (!rocketParts.some(p => p.type === 'engine') || !rocketParts.some(p => p.type === 'tank') || !rocketParts.some(p => p.type === 'capsule')) {
+                alert("⚠️ Rocket requires 1 Capsule, 1 Tank, and 1 Engine!"); return;
+            }
+            renderFlightRocketStack();
+            document.getElementById('launch-toggle').checked = true;
+            startFlightSimulation();
+        }
+
+        function startFlightSimulation() {
+            currentAlt = 0; currentVel = 0; currentFuel = 100; engineOn = false; flightMode = "Vertical Ascent";
+            rocketXPos = 0; rocketTiltAngle = 0; reachedCheckpoints = {};
+            document.getElementById('sim-mode').innerText = flightMode;
+            document.getElementById('try-again-btn').style.display = 'none';
+            document.getElementById('explore-dest-btn').style.display = 'none';
+            document.getElementById('exhaust-sprite').style.display = 'none';
+            document.getElementById('flight-launchpad-base').style.opacity = '1';
+            document.getElementById('flight-launch-tower').style.opacity = '1';
+            let rocketWrap = document.getElementById('sim-rocket-wrap');
+            let viewHeight = 45;
+            let twrFactor = 22.0 * transportMultiplier / Math.max(5, (rocketParts.reduce((acc, p) => acc + p.mass, 0) * materialMultiplier) + 2);
+
+            if (simInterval) clearInterval(simInterval);
+            simInterval = setInterval(() => {
+                if (keysPressed['ArrowLeft'] || keysPressed['KeyA']) rocketTiltAngle = Math.max(-45, rocketTiltAngle - 3);
+                else if (keysPressed['ArrowRight'] || keysPressed['KeyD']) rocketTiltAngle = Math.min(45, rocketTiltAngle + 3);
+                
+                rocketXPos = Math.max(-350, Math.min(350, rocketXPos + rocketTiltAngle * 0.12));
+
+                if ((keysPressed['KeyW'] || keysPressed['ArrowUp'])) {
+                    if (currentFuel > 0) {
+                        engineOn = true;
+                        currentFuel = Math.max(0, currentFuel - (0.04 / (rocketParts.filter(p => p.type === 'tank').length || 1)));
+                        currentVel = Math.min(35.0, currentVel + (0.035 * twrFactor));
+                        document.getElementById('exhaust-sprite').style.display = 'block';
+                    } else {
+                        engineOn = false; document.getElementById('exhaust-sprite').style.display = 'none';
+                        document.getElementById('sim-status-msg').innerText = "⚠️ PROPELLANT DEPLETED! Ballistic Coasting...";
+                    }
+                } else {
+                    engineOn = false; document.getElementById('exhaust-sprite').style.display = 'none';
+                    if (currentAlt > 0) currentVel = Math.max(0, currentVel - 0.025);
+                }
+
+                currentAlt += Math.max(0, currentVel * 3.5);
+                if (engineOn && viewHeight < 240) viewHeight += currentVel * 0.3;
+
+                for (let t = 1; t <= selectedDestinationTier; t++) {
+                    let cpAlt = missions[t-1].alt;
+                    if (currentAlt >= cpAlt && !reachedCheckpoints[t]) {
+                        reachedCheckpoints[t] = true; playerBalance += t * 150;
+                        document.getElementById('player-balance').innerText = playerBalance.toLocaleString();
+                        showAlert(`🎯 Milestone Reached (${missions[t-1].dest}): +${t * 150} Craters!`);
+                    }
+                }
+
+                if (currentAlt > 10) {
+                    let fade = Math.max(0, 1 - (currentAlt - 10) / 40);
+                    document.getElementById('flight-launchpad-base').style.opacity = fade;
+                    document.getElementById('flight-launch-tower').style.opacity = fade;
+                }
+
+                let viewport = document.getElementById('flight-viewport');
+                if (currentAlt > 8000) viewport.style.background = "radial-gradient(circle at center, #020617 0%, #000000 100%)";
+                else if (currentAlt > 3000) viewport.style.background = "linear-gradient(to top, #0284c7 0%, #0369a1 40%, #020617 80%, #000000 100%)";
+                else viewport.style.background = "linear-gradient(to top, #38bdf8 0%, #0284c7 40%, #0369a1 70%, #000000 100%)";
+
+                if (currentAlt > 500 && flightMode === "Vertical Ascent") {
+                    flightMode = "Orbital Insertion & Cruise"; document.getElementById('sim-mode').innerText = flightMode;
+                }
+
+                rocketWrap.style.bottom = viewHeight + 'px';
+                rocketWrap.style.transform = `translateX(${rocketXPos}px) rotate(${rocketTiltAngle}deg)`;
+                animateParallaxSky(currentVel);
+
+                document.getElementById('sim-alt').innerText = Math.round(currentAlt).toLocaleString();
+                document.getElementById('sim-fuel').innerText = Math.round(currentFuel);
+                document.getElementById('sim-vel').innerText = currentVel.toFixed(2);
+
+                if (currentAlt >= targetAltitude) {
+                    clearInterval(simInterval);
+                    document.getElementById('exhaust-sprite').style.display = 'none';
+                    document.getElementById('sim-status-msg').innerText = "🎉 DESTINATION REACHED! Engage surface investigations.";
+                    document.getElementById('explore-dest-btn').style.display = 'inline-block';
+                    updateBlackboxReplay();
+                }
+            }, 60);
+        }
+
+        function goToSurfaceExploration() {
+            if (simInterval) clearInterval(simInterval);
+            let destObj = missions[selectedDestinationTier - 1];
+            document.getElementById('explore-target-name').innerText = destObj.dest;
+            surfaceMissions = { 
+                1: { phase: 1, name: "Habitat Erection", done: false }, 
+                2: { phase: 2, name: "Seismic Drilling", done: false }, 
+                3: { phase: 3, name: "Rover Calibration", done: false } 
+            };
+            player3D = { x: 0, z: 5, angle: 0 };
+            document.getElementById('explore-toggle').checked = true;
+            initSurface3DCanvas(destObj.dest);
+        }
+
+        function initSurface3DCanvas(destinationName) {
+            surfaceCanvas = document.getElementById('surface-3d-canvas');
+            surfaceCtx = surfaceCanvas.getContext('2d');
+            surfaceCanvas.width = surfaceCanvas.parentElement.clientWidth;
+            surfaceCanvas.height = surfaceCanvas.parentElement.clientHeight;
+            if (surfaceAnimationId) cancelAnimationFrame(surfaceAnimationId);
+            runSurfaceLoop(destinationName);
+        }
+
+        function runSurfaceLoop(destName) {
+            if (keysPressed['KeyW'] || keysPressed['ArrowUp']) { player3D.x += Math.sin(player3D.angle) * 0.15; player3D.z += Math.cos(player3D.angle) * 0.15; }
+            if (keysPressed['KeyS'] || keysPressed['ArrowDown']) { player3D.x -= Math.sin(player3D.angle) * 0.15; player3D.z -= Math.cos(player3D.angle) * 0.15; }
+            if (keysPressed['KeyA'] || keysPressed['Left']) player3D.angle -= 0.04;
+            if (keysPressed['KeyD'] || keysPressed['Right']) player3D.angle += 0.04;
+
+            surfaceCtx.clearRect(0, 0, surfaceCanvas.width, surfaceCanvas.height);
+
+            // UNIQUE PLANETARY SURROUNDINGS
+            let grad = surfaceCtx.createLinearGradient(0, 0, 0, surfaceCanvas.height);
+            let gridColor = 'rgba(56, 189, 248, 0.25)';
+
+            if (destName.toLowerCase().includes('mars')) {
+                grad.addColorStop(0, '#7c2d12'); grad.addColorStop(0.5, '#9a3412'); grad.addColorStop(1, '#431407');
+                gridColor = 'rgba(249, 115, 22, 0.4)';
+            } else if (destName.toLowerCase().includes('moon')) {
+                grad.addColorStop(0, '#09090b'); grad.addColorStop(0.5, '#18181b'); grad.addColorStop(1, '#27272a');
+                gridColor = 'rgba(255, 255, 255, 0.25)';
+            } else if (destName.toLowerCase().includes('venus')) {
+                grad.addColorStop(0, '#ca8a04'); grad.addColorStop(0.5, '#854d0e'); grad.addColorStop(1, '#422006');
+                gridColor = 'rgba(250, 204, 21, 0.4)';
+            } else if (destName.toLowerCase().includes('saturn') || destName.toLowerCase().includes('jupiter')) {
+                grad.addColorStop(0, '#0369a1'); grad.addColorStop(0.5, '#1e1b4b'); grad.addColorStop(1, '#020617');
+                gridColor = 'rgba(168, 85, 247, 0.45)';
+            } else {
+                grad.addColorStop(0, '#020617'); grad.addColorStop(0.5, '#1e293b'); grad.addColorStop(1, '#334155');
+            }
+
+            surfaceCtx.fillStyle = grad;
+            surfaceCtx.fillRect(0, 0, surfaceCanvas.width, surfaceCanvas.height);
+
+            surfaceCtx.strokeStyle = gridColor;
+            surfaceCtx.lineWidth = 2;
+            let cx = surfaceCanvas.width / 2, cy = surfaceCanvas.height / 2;
+            for(let i = -6; i <= 6; i++) {
+                surfaceCtx.beginPath();
+                surfaceCtx.moveTo(cx + i * 90 - (player3D.x * 20) % 90, cy);
+                surfaceCtx.lineTo(cx + i * 350, surfaceCanvas.height);
+                surfaceCtx.stroke();
+            }
+
+            let objects3D = [
+                { id: 1, name: "Habitat Module", x: -3, z: 8, color: '#38bdf8' },
+                { id: 2, name: "Seismic Rig", x: 4, z: 12, color: '#10b981' },
+                { id: 3, name: "Rover Bay", x: 0, z: 18, color: '#facc15' }
+            ];
+
+            objects3D.forEach(obj => {
+                let dx = obj.x - player3D.x, dz = obj.z - player3D.z;
+                let rotX = dx * Math.cos(-player3D.angle) - dz * Math.sin(-player3D.angle);
+                let rotZ = dx * Math.sin(-player3D.angle) + dz * Math.cos(-player3D.angle);
+
+                if (rotZ > 0.1) {
+                    let screenX = cx + (rotX / rotZ) * 350;
+                    let screenY = cy + (2.0 / rotZ) * 350;
+                    let size = Math.max(15, 120 / rotZ);
+
+                    surfaceCtx.fillStyle = obj.color;
+                    surfaceCtx.fillRect(screenX - size/2, screenY - size, size, size);
+                    
+                    surfaceCtx.fillStyle = '#ffffff';
+                    surfaceCtx.font = '12px sans-serif';
+                    surfaceCtx.textAlign = 'center';
+                    let statusTxt = surfaceMissions[obj.id].done ? "✓ DEPLOYED" : "⚠️ BUILD NEEDED";
+                    surfaceCtx.fillText(`${obj.name} (${statusTxt})`, screenX, screenY - size - 8);
+                }
+            });
+
+            for(let i=1; i<=3; i++) {
+                let item = document.getElementById(`obj-${i}`);
+                let stat = document.getElementById(`stat-${i}`);
+                if (surfaceMissions[i].done) {
+                    stat.innerText = "Completed [100%]"; item.classList.add('done');
+                } else {
+                    stat.innerText = `Pending Parts`; item.classList.remove('done');
+                }
+            }
+
+            surfaceAnimationId = requestAnimationFrame(() => runSurfaceLoop(destName));
+        }
+
+        function openWorkbenchForClosestModule() {
+            let objects3D = [
+                { id: 1, name: "Habitat Module", x: -3, z: 8 },
+                { id: 2, name: "Seismic Rig", x: 4, z: 12 },
+                { id: 3, name: "Rover Bay", x: 0, z: 18 }
+            ];
+            let closest = null, minDist = 999;
+            objects3D.forEach(o => {
+                let dist = Math.hypot(player3D.x - o.x, player3D.z - o.z);
+                if (dist < minDist) { minDist = dist; closest = o; }
+            });
+
+            if (minDist < 4.0 && closest) {
+                if (surfaceMissions[closest.id].done) {
+                    showAlert(`✅ ${closest.name} is already fully operational!`);
+                    return;
+                }
+                activeWorkbenchModuleId = closest.id;
+                document.getElementById('workbench-title').innerText = `🔧 Engineering Workbench: ${closest.name}`;
+                
+                let grid = document.getElementById('workbench-parts-grid');
+                grid.innerHTML = rocketParts.map(p => `
+                    <div class="workbench-part-card" onclick="installPartAtWorkbench(${p.id})">
+                        <strong>${p.name}</strong><br><span style="color:#10b981; font-size:0.8rem;">Mass: ${p.mass}t</span>
+                    </div>
+                `).join('');
+                if (rocketParts.length === 0) {
+                    grid.innerHTML = `<div style="color:#f43f5e; grid-column:span 2;">⚠️ No parts on your rocket! Bring parts from VAB.</div>`;
+                }
+                document.getElementById('workbench-modal').style.display = 'flex';
+            } else {
+                showAlert("⚠️ Walk closer to a surface station using [WASD] and press [E]!");
+            }
+        }
+
+        function installPartAtWorkbench(partId) {
+            if (!activeWorkbenchModuleId) return;
+            surfaceMissions[activeWorkbenchModuleId].done = true;
+            document.getElementById('workbench-modal').style.display = 'none';
+            showAlert(`🎉 Successfully installed part and deployed ${surfaceMissions[activeWorkbenchModuleId].name}!`);
+
+            if (surfaceMissions[1].done && surfaceMissions[2].done && surfaceMissions[3].done) {
+                document.getElementById('surface-action-prompt').innerText = "🌟 All Surface Operations Complete! Return Home Unlocked!";
+            }
+        }
+
+        function closeWorkbench() {
+            document.getElementById('workbench-modal').style.display = 'none';
+        }
+
+        function returnHomeToEarth() {
+            if (!surfaceMissions[1].done || !surfaceMissions[2].done || !surfaceMissions[3].done) {
+                alert("⚠️ Complete all surface station installations before launching back home!");
+                return;
+            }
+            if (surfaceAnimationId) cancelAnimationFrame(surfaceAnimationId);
+            playerBalance += 25000;
+            document.getElementById('player-balance').innerText = playerBalance.toLocaleString();
+            alert("Successful return to Earth! Earned +25,000 Cosmic Craters reward.");
+            document.getElementById('home-toggle').checked = true;
+        }
+
+        function updateBlackboxReplay() {
+            document.getElementById('replay-alt').innerText = Math.round(currentAlt).toLocaleString() + " km";
+            document.getElementById('replay-vel').innerText = currentVel.toFixed(2) + " km/s";
+            document.getElementById('replay-status-text').innerText = "✓ Telemetry recorded successfully from last flight mission.";
+        }
+
+        function stopSimulation() { if (simInterval) clearInterval(simInterval); if (surfaceAnimationId) cancelAnimationFrame(surfaceAnimationId); }
+        function resetToVAB() { if (simInterval) clearInterval(simInterval); if (surfaceAnimationId) cancelAnimationFrame(surfaceAnimationId); document.getElementById('vab-toggle').checked = true; }
+    </script>
+</body>
+</html>

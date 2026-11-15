@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AstroForge</title>
+  <link href="https://googleapis.com" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: radial-gradient(circle at center, #0e1738 0%, #050814 100%);
+      color: #ffffff;
+      font-family: 'Orbitron', sans-serif;
+      text-align: center;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+      position: relative;
+    }
+    .stars {
+      position: fixed;
+      inset: 0;
+      background-image: 
+        radial-gradient(2px 2px at 20px 30px, #ffffff, transparent),
+        radial-gradient(2px 2px at 80px 120px, #00f0ff, transparent),
+        radial-gradient(2px 2px at 240px 180px, #9d4edd, transparent);
+      background-size: 300px 200px;
+      z-index: -1;
+      pointer-events: none;
+    }
+    .hud-frame {
+      position: fixed;
+      inset: 12px;
+      border: 1px solid rgba(0, 240, 255, 0.25);
+      border-radius: 14px;
+      pointer-events: none;
+    }
+    .fact-box {
+      position: fixed;
+      top: 20px;
+      right: 24px;
+      max-width: 260px;
+      background-color: rgba(13, 20, 44, 0.95);
+      border: 1px solid #00f0ff;
+      border-radius: 10px;
+      padding: 8px 12px;
+      text-align: right;
+      z-index: 5;
+    }
+    .fact-radio, .fact-slide { display: none; }
+    #f1:checked ~ .slide-1, #f2:checked ~ .slide-2, #f3:checked ~ .slide-3, #f4:checked ~ .slide-4 { display: block; }
+    .fact-text { font-size: 9px; color: #cbd5e1; line-height: 1.3; margin-bottom: 5px; }
+    .fact-btn { display: inline-block; border: 1px solid #9d4edd; color: #00f0ff; font-size: 9px; padding: 3px 8px; border-radius: 10px; cursor: pointer; }
+    .fact-done { font-size: 9px; color: #64748b; }
+    .badge {
+      background-color: rgba(0, 240, 255, 0.1);
+      color: #00f0ff;
+      border: 1px solid #00f0ff;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 11px;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+    h1 { color: #00f0ff; font-size: 46px; letter-spacing: 3px; margin-bottom: 6px; text-shadow: 0 0 20px rgba(0, 240, 255, 0.75); }
+    .subtitle { font-size: 13px; color: #cbd5e1; margin-bottom: 16px; }
+    .control-panel {
+      background-color: rgba(13, 20, 44, 0.9);
+      border: 1px solid rgba(0, 240, 255, 0.35);
+      border-radius: 14px;
+      padding: 14px 20px;
+      margin-bottom: 18px;
+      width: 100%;
+      max-width: 440px;
+    }
+    .minigame-tag { display: inline-block; background-color: rgba(157, 78, 221, 0.22); color: #e0aaff; border: 1px solid #9d4edd; font-size: 9px; padding: 3px 10px; border-radius: 8px; margin-bottom: 6px; }
+    .game-instruction { font-size: 11px; color: #00f0ff; margin-bottom: 8px; }
+    #catchCheck { display: none; }
+    .orbit-track { position: relative; width: 100%; height: 44px; background-color: #050814; border: 2px solid #1e2d5c; border-radius: 8px; overflow: hidden; margin-bottom: 6px; }
+    .moving-target {
+      position: absolute; top: 5px; left: 6px; width: 30px; height: 30px; border-radius: 50%;
+      background: radial-gradient(circle, #ffffff 10%, #9d4edd 60%, #5a189a 100%);
+      box-shadow: 0 0 14px #9d4edd; cursor: pointer;
+      animation: zipAcross 2.2s ease-in-out infinite alternate;
+    }
+    @keyframes zipAcross { from { left: 6px; } to { left: calc(100% - 36px); } }
+    .win-banner { display: none; width: 100%; height: 100%; line-height: 40px; color: #00ff88; font-size: 11px; font-weight: bold; cursor: pointer; background-color: rgba(0, 255, 136, 0.12); }
+    #catchCheck:checked ~ .orbit-track .moving-target { display: none; }
+    #catchCheck:checked ~ .orbit-track .win-banner { display: block; }
+    .minigame-note { font-size: 10px; color: #94a3b8; font-family: Arial, sans-serif; }
+
+    /* FIXED ROCKET BUTTON */
+    .space-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background-color: #000080;
+      color: #ffffff;
+      border: 3px solid #9d4edd;
+      padding: 14px 28px;
+      font-size: 17px;
+      font-weight: bold;
+      border-radius: 12px;
+      text-decoration: none;
+      box-shadow: 0 0 22px rgba(157, 78, 221, 0.6);
+      transition: transform 0.2s, background-color 0.2s;
+    }
+    .space-btn:hover { background-color: #191970; transform: scale(1.05); }
+  </style>
+</head>
+<body>
+  <div class="stars"></div>
+  <div class="hud-frame"></div>
+
+  <div class="fact-box">
+    <input type="radio" name="nasaFacts" id="f1" class="fact-radio" checked>
+    <input type="radio" name="nasaFacts" id="f2" class="fact-radio">
+    <input type="radio" name="nasaFacts" id="f3" class="fact-radio">
+    <input type="radio" name="nasaFacts" id="f4" class="fact-radio">
+    <div class="fact-slide slide-1"><div class="fact-text">NASA FACT (1/4): One day on Venus is longer than one year on Venus!</div><label for="f2" class="fact-btn">NEXT SPACE FACT</label></div>
+    <div class="fact-slide slide-2"><div class="fact-text">NASA FACT (2/4): Neutron stars can spin 600 times per second!</div><label for="f3" class="fact-btn">NEXT SPACE FACT</label></div>
+    <div class="fact-slide slide-3"><div class="fact-text">NASA FACT (3/4): Footprints on the Moon can last for millions of years!</div><label for="f4" class="fact-btn">NEXT SPACE FACT</label></div>
+    <div class="fact-slide slide-4"><div class="fact-text">NASA FACT (4/4): Olympus Mons on Mars is 3 times taller than Mount Everest!</div><span class="fact-done">ALL FACTS DISCOVERED</span></div>
+  </div>
+
+  <div class="badge">NASA SPACE APPS CHALLENGE 2026</div>
+  <h1>AstroForge</h1>
+  <p class="subtitle">Welcome to AstroForge, the best space game out there!</p>
+
+  <div class="control-panel">
+    <div class="minigame-tag">WARM-UP MINI-GAME</div>
+    <div class="game-instruction">CLICK THE MOVING ASTEROID ORB!</div>
+    <input type="checkbox" id="catchCheck">
+    <div class="orbit-track">
+      <label for="catchCheck" class="moving-target"></label>
+      <label for="catchCheck" class="win-banner">CLICKED! WANNA TRY AGAIN?</label>
+    </div>
+    <p class="minigame-note">Just a quick warm-up! Click the rocket button below to play the real AstroForge game.</p>
+  </div>
+
+  <a href="game.html" class="space-btn">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+      <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
+      <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/>
+      <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
+    </svg>
+    <span>Greetings, Space Commander!</span>
+  </a>
+</body>
+</html>
