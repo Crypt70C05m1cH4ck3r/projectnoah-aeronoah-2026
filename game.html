@@ -68,12 +68,11 @@
         .hint-btn { background: #334155; border: 2px solid #facc15; color: #facc15; padding: 8px 16px; border-radius: 6px; font-weight: 700; cursor: pointer; margin-top: 5px; width: fit-content; }
         .hint-btn:hover { background: #facc15; color: #000; }
         .container-difficulty { gap: 2rem; }
-        .nasa-api-status { background: rgba(56, 189, 248, 0.15); border: 2px solid #38bdf8; padding: 14px 20px; border-radius: 10px; font-size: 0.95rem; color: #38bdf8; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
-        .difficulty-list { display: flex; flex-direction: column; gap: 1.5rem; max-height: 48vh; overflow-y: auto; padding-right: 12px; }
+        .difficulty-list { display: flex; flex-direction: column; gap: 1.5rem; max-height: 54vh; overflow-y: auto; padding-right: 12px; }
         .diff-card { background: rgba(15, 23, 42, 0.9); border: 2px solid #334155; padding: 20px 24px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; gap: 20px; cursor: pointer; transition: 0.2s; }
         .diff-card:hover { border-color: #38bdf8; background: rgba(56, 189, 248, 0.25); box-shadow: 0 0 35px rgba(56, 189, 248, 0.6); }
         .diff-card.selected-card { background: rgba(16, 185, 129, 0.3); border-color: #10b981; box-shadow: 0 0 40px rgba(16, 185, 129, 0.7); }
-        .proceed-vab-btn { background: linear-gradient(135deg, #10b981, #38bdf8, #f43f5e); color: #fff; border: 2px solid #ffffff; padding: 20px; border-radius: 10px; font-size: 1.2rem; font-weight: 800; text-align: center; cursor: pointer; display: block; text-decoration: none; transition: 0.2s; margin-top: 1.5rem; box-shadow: 0 0 40px rgba(56, 189, 248, 0.7); }
+        .proceed-vab-btn { background: linear-gradient(135deg, #10b981, #38bdf8, #f43f5e); color: #fff; border: 2px solid #ffffff; padding: 20px; border-radius: 10px; font-size: 1.2rem; font-weight: 800; text-align: center; cursor: pointer; display: block; text-decoration: none; transition: 0.2s; margin-top: 2rem; box-shadow: 0 0 40px rgba(56, 189, 248, 0.7); }
         .proceed-vab-btn:hover { background: #ffffff; color: #000; box-shadow: 0 0 60px #ffffff; transform: scale(1.01); }
         
         .container-vab { gap: 1.5rem; }
@@ -152,18 +151,20 @@
         .action-sim-btn { background: #10b981; color: #000; border: 2px solid #ffffff; padding: 12px 24px; border-radius: 8px; font-weight: 800; cursor: pointer; box-shadow: 0 0 25px rgba(16,185,129,0.7); display: none; }
         .action-sim-btn:hover { background: #38bdf8; color: #fff; }
 
-        /* FIRST-PERSON 3D EXPLORATION & FIELD SHOP */
+        /* FIRST-PERSON 3D EXPLORATION & PARTS WORKBENCH MODAL */
         .container-explore { gap: 1rem; }
         .explore-viewport-wrap { position: relative; width: 100%; height: 600px; border: 3px solid #38bdf8; border-radius: 12px; overflow: hidden; background: #020617; box-shadow: inset 0 0 60px rgba(56,189,248,0.5); }
-        #surface-3d-canvas { width: 100%; height: 100%; display: block; cursor: crosshair; }
-        .explore-hud-topright { position: absolute; top: 16px; right: 16px; background: rgba(15, 23, 42, 0.95); border: 2px solid #38bdf8; padding: 14px 18px; border-radius: 10px; width: 340px; z-index: 20; box-shadow: 0 0 30px rgba(56, 189, 248, 0.6); display: flex; flex-direction: column; gap: 4px; max-height: 560px; overflow-y: auto; }
-        .explore-mission-item { font-size: 0.76rem; color: #cbd5e1; display: flex; justify-content: space-between; border-bottom: 1px solid #334155; padding-bottom: 3px; }
-        
-        /* FIELD SHOP & TRIVIA MODALS */
-        #field-shop-modal, #trivia-modal { position: absolute; inset: 0; background: rgba(2, 6, 23, 0.95); z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 30px; }
-        .modal-box { background: rgba(15, 23, 42, 0.98); border: 3px solid #38bdf8; border-radius: 16px; padding: 35px; width: 100%; max-width: 750px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 0 60px rgba(56, 189, 248, 0.7); text-align: center; max-height: 85vh; overflow-y: auto; }
-        .shop-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; text-align: left; }
-        .shop-item-card { background: #020617; border: 2px solid #334155; border-radius: 10px; padding: 15px; display: flex; flex-direction: column; gap: 8px; }
+        #surface-3d-canvas { width: 100%; height: 100%; display: block; }
+        .explore-hud-topright { position: absolute; top: 16px; right: 16px; background: rgba(15, 23, 42, 0.95); border: 2px solid #38bdf8; padding: 16px 20px; border-radius: 10px; width: 340px; z-index: 20; box-shadow: 0 0 30px rgba(56, 189, 248, 0.6); display: flex; flex-direction: column; gap: 10px; }
+        .explore-mission-item { font-size: 0.9rem; color: #cbd5e1; display: flex; flex-direction: column; gap: 4px; border-bottom: 1px solid #334155; padding-bottom: 8px; }
+        .explore-mission-item.done { color: #10b981; }
+
+        /* ENGINEERING WORKBENCH MODAL */
+        #workbench-modal { position: absolute; inset: 0; background: rgba(2, 6, 23, 0.92); z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 30px; }
+        .workbench-box { background: rgba(15, 23, 42, 0.98); border: 3px solid #38bdf8; border-radius: 16px; padding: 30px; width: 100%; max-width: 700px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 0 60px rgba(56, 189, 248, 0.7); }
+        .workbench-parts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; max-height: 250px; overflow-y: auto; }
+        .workbench-part-card { background: #020617; border: 2px solid #334155; border-radius: 10px; padding: 14px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s; }
+        .workbench-part-card:hover { border-color: #10b981; background: rgba(16,185,129,0.2); box-shadow: 0 0 20px rgba(16,185,129,0.5); }
 
         .container-contracts, .container-replay { gap: 2rem; }
         .contract-card { background: rgba(30, 41, 59, 0.9); border: 2px solid #334155; padding: 22px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
@@ -210,7 +211,7 @@
     <!-- SCREEN 1: HOME -->
     <div class="screen container-home">
         <canvas id="space-canvas"></canvas>
-        <h1>AeroNOAH</h1>
+        <h1>AeroNoah</h1>
         <div class="home-menu-content">
             <label for="quiz-toggle" class="btn" onclick="startCosmicQuiz()">
                 <span>🚀 Launch Quiz & Earn 150 Craters/Correct</span>
@@ -257,17 +258,12 @@
 
     <!-- SCREEN 3: DIFFICULTY SELECTION -->
     <div class="screen container-difficulty">
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #38bdf8; padding-bottom: 1.5rem; margin-bottom: 1.0rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #38bdf8; padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
             <h1>Mission Profile Selection (Strictly Unique Altitudes, Max 95,000 km)</h1>
             <label for="home-toggle" class="back-btn">⬅ Return to Menu</label>
         </div>
 
-        <div class="nasa-api-status" id="nasa-api-status-box">
-            <span>📡 NASA Open Data Status: Connected to NASA Horizons & Planetary Fact Sheet API</span>
-            <span id="api-data-badge" style="color: #10b981; font-weight: 700;">● Live Sync Active</span>
-        </div>
-
-        <div id="quiz-result-banner" style="background: rgba(16, 185, 129, 0.2); border: 2px solid #10b981; padding: 16px 22px; border-radius: 10px; margin-bottom: 1rem; display:none; font-size: 1.1rem; color: #fff;">
+        <div id="quiz-result-banner" style="background: rgba(16, 185, 129, 0.2); border: 2px solid #10b981; padding: 16px 22px; border-radius: 10px; margin-bottom: 1.5rem; display:none; font-size: 1.1rem; color: #fff;">
             Your difficulty is : <strong id="dynamic-difficulty-result" style="color:#38bdf8;">First-Looker (Tier 1)</strong>
         </div>
         
@@ -382,7 +378,7 @@
             </div>
 
             <div class="vab-panel">
-                <h3>3. Certified Component Inventory (Unique Procedural Shapes)</h3>
+                <h3>3. Certified Component Inventory (Unique Sci-Fi Procedural Parts)</h3>
                 <div class="parts-category-bar">
                     <div class="parts-tab-btn active-tab" onclick="switchTab('capsules', this)">Command Capsules</div>
                     <div class="parts-tab-btn" onclick="switchTab('fuels', this)">Fuel Tanks</div>
@@ -392,17 +388,18 @@
                 </div>
 
                 <div class="parts-panel-wrap">
+                    <!-- 8 Capsules -->
                     <div class="part-group group-capsules active-group" id="group-capsules">
                         <script>
                             const caps = [
-                                { id: "cap1", name: "Astra Command Pod", mass: 3, cost: 40000000, type: "capsule", style: "c1", c: ["#38bdf8", "#0f172a"] },
-                                { id: "cap2", name: "Vanguard Cockpit", mass: 4, cost: 50000000, type: "capsule", style: "c2", c: ["#818cf8", "#1e1b4b"] },
-                                { id: "cap3", name: "Orion Dome", mass: 5, cost: 65000000, type: "capsule", style: "c3", c: ["#10b981", "#022c22"] },
-                                { id: "cap4", name: "Zephyr Cabin", mass: 6, cost: 80000000, type: "capsule", style: "c4", c: ["#f43f5e", "#4c0519"] },
-                                { id: "cap5", name: "Apollo Core", mass: 7, cost: 100000000, type: "capsule", style: "c5", c: ["#fbbf24", "#451a03"] },
-                                { id: "cap6", name: "Hermes Bridge", mass: 8, cost: 125000000, type: "capsule", style: "c6", c: ["#c084fc", "#3b0764"] },
-                                { id: "cap7", name: "Horizon Dome", mass: 9, cost: 150000000, type: "capsule", style: "c7", c: ["#22d3ee", "#083344"] },
-                                { id: "cap8", name: "Odyssey Hub", mass: 12, cost: 200000000, type: "capsule", style: "c8", c: ["#f87171", "#450a0a"] }
+                                { id: "cap1", name: "Astra Command Pod", mass: 3, cost: 40000000, type: "capsule", style: "capsule1", c: ["#38bdf8", "#0f172a"] },
+                                { id: "cap2", name: "Vanguard Cockpit", mass: 4, cost: 50000000, type: "capsule", style: "capsule2", c: ["#818cf8", "#1e1b4b"] },
+                                { id: "cap3", name: "Orion Dome", mass: 5, cost: 65000000, type: "capsule", style: "capsule3", c: ["#10b981", "#022c22"] },
+                                { id: "cap4", name: "Zephyr Cabin", mass: 6, cost: 80000000, type: "capsule", style: "capsule4", c: ["#f43f5e", "#4c0519"] },
+                                { id: "cap5", name: "Apollo Core", mass: 7, cost: 100000000, type: "capsule", style: "capsule5", c: ["#fbbf24", "#451a03"] },
+                                { id: "cap6", name: "Hermes Bridge", mass: 8, cost: 125000000, type: "capsule", style: "capsule6", c: ["#c084fc", "#3b0764"] },
+                                { id: "cap7", name: "Horizon Dome", mass: 9, cost: 150000000, type: "capsule", style: "capsule7", c: ["#22d3ee", "#083344"] },
+                                { id: "cap8", name: "Odyssey Hub", mass: 12, cost: 200000000, type: "capsule", style: "capsule8", c: ["#f87171", "#450a0a"] }
                             ];
                             document.write(caps.map(c => `
                                 <div class="part-shop-item">
@@ -417,17 +414,18 @@
                         </script>
                     </div>
 
+                    <!-- 8 Fuel Tanks -->
                     <div class="part-group group-fuels" id="group-fuels">
                         <script>
                             const tanks = [
-                                { id: "tank1", name: "Titanium Cistern", mass: 10, cost: 30000000, type: "tank", style: "t1", c: ["#94a3b8", "#1e293b"] },
-                                { id: "tank2", name: "Carbon Fuel Pod", mass: 12, cost: 35000000, type: "tank", style: "t2", c: ["#334155", "#020617"] },
-                                { id: "tank3", name: "Cryogenic Drum", mass: 15, cost: 45000000, type: "tank", style: "t3", c: ["#f43f5e", "#2a080c"] },
-                                { id: "tank4", name: "Xenon Spherical Cell", mass: 18, cost: 55000000, type: "tank", style: "t4", c: ["#60a5fa", "#0f172a"] },
-                                { id: "tank5", name: "Oxygen Reservoir", mass: 22, cost: 70000000, type: "tank", style: "t5", c: ["#34d399", "#064e3b"] },
-                                { id: "tank6", name: "Hydrogen Vault", mass: 26, cost: 85000000, type: "tank", style: "t6", c: ["#f472b6", "#500724"] },
-                                { id: "tank7", name: "Plutonium Tank", mass: 30, cost: 100000000, type: "tank", style: "t7", c: ["#fbbf24", "#451a03"] },
-                                { id: "tank8", name: "Quantum Fuel Vault", mass: 38, cost: 130000000, type: "tank", style: "t8", c: ["#c084fc", "#3b0764"] }
+                                { id: "tank1", name: "Titanium Cistern", mass: 10, cost: 30000000, type: "tank", style: "tank1", c: ["#94a3b8", "#1e293b"] },
+                                { id: "tank2", name: "Carbon Fuel Pod", mass: 12, cost: 35000000, type: "tank", style: "tank2", c: ["#334155", "#020617"] },
+                                { id: "tank3", name: "Cryogenic Drum", mass: 15, cost: 45000000, type: "tank", style: "tank3", c: ["#f43f5e", "#2a080c"] },
+                                { id: "tank4", name: "Xenon Spherical Cell", mass: 18, cost: 55000000, type: "tank", style: "tank4", c: ["#60a5fa", "#0f172a"] },
+                                { id: "tank5", name: "Oxygen Reservoir", mass: 22, cost: 70000000, type: "tank", style: "tank5", c: ["#34d399", "#064e3b"] },
+                                { id: "tank6", name: "Hydrogen Vault", mass: 26, cost: 85000000, type: "tank", style: "tank6", c: ["#f472b6", "#500724"] },
+                                { id: "tank7", name: "Plutonium Tank", mass: 30, cost: 100000000, type: "tank", style: "tank7", c: ["#fbbf24", "#451a03"] },
+                                { id: "tank8", name: "Quantum Fuel Vault", mass: 38, cost: 130000000, type: "tank", style: "tank8", c: ["#c084fc", "#3b0764"] }
                             ];
                             document.write(tanks.map(t => `
                                 <div class="part-shop-item">
@@ -442,17 +440,18 @@
                         </script>
                     </div>
 
+                    <!-- 8 Engines -->
                     <div class="part-group group-engines" id="group-engines">
                         <script>
                             const engs = [
-                                { id: "eng1", name: "Merlin-1D", mass: 5, cost: 50000000, type: "engine", style: "e1", c: ["#f97316", "#431407"] },
-                                { id: "eng2", name: "Raptor V2", mass: 7, cost: 70000000, type: "engine", style: "e2", c: ["#f43f5e", "#4c0519"] },
-                                { id: "eng3", name: "Valkyrie Ion", mass: 9, cost: 95000000, type: "engine", style: "e3", c: ["#38bdf8", "#082f49"] },
-                                { id: "eng4", name: "Vector-S", mass: 12, cost: 120000000, type: "engine", style: "e4", c: ["#fb7185", "#4c0519"] },
-                                { id: "eng5", name: "Rhino Heavy", mass: 16, cost: 160000000, type: "engine", style: "e5", c: ["#facc15", "#422006"] },
-                                { id: "eng6", name: "Mainsail High-Thrust", mass: 20, cost: 200000000, type: "engine", style: "e6", c: ["#a78bfa", "#2e1065"] },
-                                { id: "eng7", name: "Supernova Thrust", mass: 25, cost: 260000000, type: "engine", style: "e7", c: ["#e11d48", "#4c0519"] },
-                                { id: "eng8", name: "Omni-Drive", mass: 32, cost: 340000000, type: "engine", style: "e8", c: ["#2dd4bf", "#042f2e"] }
+                                { id: "eng1", name: "Merlin-1D", mass: 5, cost: 50000000, type: "engine", style: "eng1", c: ["#f97316", "#431407"] },
+                                { id: "eng2", name: "Raptor V2", mass: 7, cost: 70000000, type: "engine", style: "eng2", c: ["#f43f5e", "#4c0519"] },
+                                { id: "eng3", name: "Valkyrie Ion", mass: 9, cost: 95000000, type: "engine", style: "eng3", c: ["#38bdf8", "#082f49"] },
+                                { id: "eng4", name: "Vector-S", mass: 12, cost: 120000000, type: "engine", style: "eng4", c: ["#fb7185", "#4c0519"] },
+                                { id: "eng5", name: "Rhino Heavy", mass: 16, cost: 160000000, type: "engine", style: "eng5", c: ["#facc15", "#422006"] },
+                                { id: "eng6", name: "Mainsail High-Thrust", mass: 20, cost: 200000000, type: "engine", style: "eng6", c: ["#a78bfa", "#2e1065"] },
+                                { id: "eng7", name: "Supernova Thrust", mass: 25, cost: 260000000, type: "engine", style: "eng7", c: ["#e11d48", "#4c0519"] },
+                                { id: "eng8", name: "Omni-Drive", mass: 32, cost: 340000000, type: "engine", style: "eng8", c: ["#2dd4bf", "#042f2e"] }
                             ];
                             document.write(engs.map(e => `
                                 <div class="part-shop-item">
@@ -467,17 +466,18 @@
                         </script>
                     </div>
 
+                    <!-- 8 Decouplers -->
                     <div class="part-group group-decouplers" id="group-decouplers">
                         <script>
                             const decouplers = [
-                                { id: "dec1", name: "Standard Stage Decoupler", mass: 1, cost: 12000000, type: "decoupler", style: "d1", c: ["#a855f7", "#3b0764"] },
-                                { id: "dec2", name: "Radial Separation Ring", mass: 2, cost: 18000000, type: "decoupler", style: "d2", c: ["#38bdf8", "#082f49"] },
-                                { id: "dec3", name: "Interstage Fairing Base", mass: 3, cost: 24000000, type: "decoupler", style: "d3", c: ["#10b981", "#022c22"] },
-                                { id: "dec4", name: "Pyrotechnic Bolt Ring", mass: 1, cost: 15000000, type: "decoupler", style: "d4", c: ["#f43f5e", "#4c0519"] },
-                                { id: "dec5", name: "Heavy Structural Separator", mass: 4, cost: 32000000, type: "decoupler", style: "d5", c: ["#f59e0b", "#451a03"] },
-                                { id: "dec6", name: "Quick-Release Clamp-O-Tron", mass: 2, cost: 20000000, type: "decoupler", style: "d6", c: ["#6366f1", "#1e1b4b"] },
-                                { id: "dec7", name: "Pneumatic Ejector Ring", mass: 3, cost: 28000000, type: "decoupler", style: "d7", c: ["#ec4899", "#500724"] },
-                                { id: "dec8", name: "Quantum Staging Separator", mass: 5, cost: 45000000, type: "decoupler", style: "d8", c: ["#14b8a6", "#042f2e"] }
+                                { id: "dec1", name: "Standard Stage Decoupler", mass: 1, cost: 12000000, type: "decoupler", style: "dec1", c: ["#a855f7", "#3b0764"] },
+                                { id: "dec2", name: "Radial Separation Ring", mass: 2, cost: 18000000, type: "decoupler", style: "dec2", c: ["#38bdf8", "#082f49"] },
+                                { id: "dec3", name: "Interstage Fairing Base", mass: 3, cost: 24000000, type: "decoupler", style: "dec3", c: ["#10b981", "#022c22"] },
+                                { id: "dec4", name: "Pyrotechnic Bolt Ring", mass: 1, cost: 15000000, type: "decoupler", style: "dec4", c: ["#f43f5e", "#4c0519"] },
+                                { id: "dec5", name: "Heavy Structural Separator", mass: 4, cost: 32000000, type: "decoupler", style: "dec5", c: ["#f59e0b", "#451a03"] },
+                                { id: "dec6", name: "Quick-Release Clamp-O-Tron", mass: 2, cost: 20000000, type: "decoupler", style: "dec6", c: ["#6366f1", "#1e1b4b"] },
+                                { id: "dec7", name: "Pneumatic Ejector Ring", mass: 3, cost: 28000000, type: "decoupler", style: "dec7", c: ["#ec4899", "#500724"] },
+                                { id: "dec8", name: "Quantum Staging Separator", mass: 5, cost: 45000000, type: "decoupler", style: "dec8", c: ["#14b8a6", "#042f2e"] }
                             ];
                             document.write(decouplers.map(d => `
                                 <div class="part-shop-item">
@@ -492,17 +492,18 @@
                         </script>
                     </div>
 
+                    <!-- 8 Avionics -->
                     <div class="part-group group-others" id="group-others">
                         <script>
                             const others = [
-                                { id: "oth1", name: "Thermal Blanket", mass: 1, cost: 10000000, type: "other", style: "o1", c: ["#fbbf24", "#451a03"] },
-                                { id: "oth2", name: "Solar Array Wing", mass: 2, cost: 18000000, type: "other", style: "o2", c: ["#3b82f6", "#1e3a8a"] },
-                                { id: "oth3", name: "Reaction Wheel", mass: 3, cost: 25000000, type: "other", style: "o3", c: ["#94a3b8", "#1e293b"] },
-                                { id: "oth4", name: "Parachute Pack", mass: 2, cost: 15000000, type: "other", style: "o4", c: ["#84cc16", "#1a2e05"] },
-                                { id: "oth5", name: "Landing Strut", mass: 4, cost: 30000000, type: "other", style: "o5", c: ["#e2e8f0", "#334155"] },
-                                { id: "oth6", name: "Radar Dish", mass: 2, cost: 20000000, type: "other", style: "o6", c: ["#f43f5e", "#4c0519"] },
-                                { id: "oth7", name: "Heat Shield", mass: 5, cost: 45000000, type: "other", style: "o7", c: ["#ef4444", "#450a0a"] },
-                                { id: "oth8", name: "Communication Relay", mass: 2, cost: 22000000, type: "other", style: "o8", c: ["#a855f7", "#3b0764"] }
+                                { id: "oth1", name: "Thermal Blanket", mass: 1, cost: 10000000, type: "other", style: "oth1", c: ["#fbbf24", "#451a03"] },
+                                { id: "oth2", name: "Solar Array Wing", mass: 2, cost: 18000000, type: "other", style: "oth2", c: ["#3b82f6", "#1e3a8a"] },
+                                { id: "oth3", name: "Reaction Wheel", mass: 3, cost: 25000000, type: "other", style: "oth3", c: ["#94a3b8", "#1e293b"] },
+                                { id: "oth4", name: "Parachute Pack", mass: 2, cost: 15000000, type: "other", style: "oth4", c: ["#84cc16", "#1a2e05"] },
+                                { id: "oth5", name: "Landing Strut", mass: 4, cost: 30000000, type: "other", style: "oth5", c: ["#e2e8f0", "#334155"] },
+                                { id: "oth6", name: "Radar Dish", mass: 2, cost: 20000000, type: "other", style: "oth6", c: ["#f43f5e", "#4c0519"] },
+                                { id: "oth7", name: "Heat Shield", mass: 5, cost: 45000000, type: "other", style: "oth7", c: ["#ef4444", "#450a0a"] },
+                                { id: "oth8", name: "Communication Relay", mass: 2, cost: 22000000, type: "other", style: "oth8", c: ["#a855f7", "#3b0764"] }
                             ];
                             document.write(others.map(o => `
                                 <div class="part-shop-item">
@@ -524,7 +525,7 @@
     <!-- SCREEN 5: FLIGHT SIMULATION -->
     <div class="screen container-flight">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #38bdf8; padding-bottom: 1.2rem;">
-            <h1>AeroNOAH Flight Control: <span id="flight-dest-title">Low Earth Orbit</span></h1>
+            <h1>AstroForge Flight Control: <span id="flight-dest-title">Low Earth Orbit</span></h1>
             <label for="vab-toggle" class="back-btn" onclick="stopSimulation()">Abort to VAB</label>
         </div>
 
@@ -560,77 +561,76 @@
         </div>
     </div>
 
-    <!-- SCREEN 6: FIRST-PERSON SURFACE EXPLORATION & 35 FEATURES & FIELD SHOP -->
-    <div class="screen container-explore">
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #38bdf8; padding-bottom: 1.2rem;">
-            <h1>1st-Person Surface Exploration: <span id="explore-target-name">Moon Surface</span></h1>
-            <div style="display:flex; gap:10px;">
-                <button class="back-btn" onclick="openFieldShop()" style="background:#10b981; border-color:#fff;">🛍️ Field Shop ([B])</button>
-                <label for="home-toggle" class="back-btn" onclick="returnHomeToEarth()">🏠 Launch & Return Home</label>
-            </div>
-        </div>
+    /* --- EXPLORE SURROUNDINGS & WORKBENCH STYLING --- */
+.container-explore { gap: 1rem; display: flex; flex-direction: column; }
+.explore-viewport-wrap { 
+    position: relative; 
+    width: 100%; 
+    height: 500px; 
+    border: 3px solid #38bdf8; 
+    border-radius: 12px; 
+    overflow: hidden; 
+    background: #020617; 
+    box-shadow: inset 0 0 60px rgba(56,189,248,0.5); 
+}
+#surface-3d-canvas { width: 100%; height: 100%; display: block; cursor: crosshair; }
 
-        <div class="explore-viewport-wrap">
-            <canvas id="surface-3d-canvas" onclick="handleCanvasClick(event)"></canvas>
-            
-            <!-- FIELD SHOP MODAL -->
-            <div id="field-shop-modal">
-                <div class="modal-box">
-                    <h2 style="color:#38bdf8;">🛍️ Planetary Surface Field Equipment Shop</h2>
-                    <p style="color:#cbd5e1; font-size:0.95rem;">Purchase advanced exploration tools using your Cosmic Craters:</p>
-                    <div class="shop-grid">
-                        <div class="shop-item-card">
-                            <strong>⚡ Diamond Drill Rig</strong>
-                            <span style="font-size:0.8rem; color:#10b981;">Excavate rare isotopes faster</span>
-                            <div class="price-tag" onclick="buyFieldTool('Diamond Drill Rig', 1000)">1,000 ☄️ Buy</div>
-                        </div>
-                        <div class="shop-item-card">
-                            <strong>🔭 Long-Range Radar Scope</strong>
-                            <span style="font-size:0.8rem; color:#10b981;">Reveals all scattered parts instantly</span>
-                            <div class="price-tag" onclick="buyFieldTool('Radar Scope', 2500)">2,500 ☄️ Buy</div>
-                        </div>
-                        <div class="shop-item-card">
-                            <strong>🛡️ Thermal Exosuit Shield</strong>
-                            <span style="font-size:0.8rem; color:#10b981;">Withstand extreme surface heat/cold</span>
-                            <div class="price-tag" onclick="buyFieldTool('Thermal Exosuit', 4000)">4,000 ☄️ Buy</div>
-                        </div>
-                        <div class="shop-item-card">
-                            <strong>🔋 Quantum Battery Pack</strong>
-                            <span style="font-size:0.8rem; color:#10b981;">Doubles visor battery duration</span>
-                            <div class="price-tag" onclick="buyFieldTool('Quantum Battery', 6000)">6,000 ☄️ Buy</div>
-                        </div>
-                    </div>
-                    <button class="back-btn" onclick="closeFieldShop()" style="align-self: center;">Close Field Shop</button>
-                </div>
-            </div>
+.explore-hud-topright { 
+    position: absolute; 
+    top: 16px; 
+    right: 16px; 
+    background: rgba(15, 23, 42, 0.95); 
+    border: 2px solid #38bdf8; 
+    padding: 14px 18px; 
+    border-radius: 10px; 
+    width: 340px; 
+    z-index: 20; 
+    box-shadow: 0 0 30px rgba(56, 189, 248, 0.6); 
+    display: flex; 
+    flex-direction: column; 
+    gap: 6px; 
+}
 
-            <!-- HABITAT TRIVIA MODAL -->
-            <div id="trivia-modal">
-                <div class="modal-box">
-                    <h2 style="color:#38bdf8;">⛺ Habitat Science Uplink Terminal</h2>
-                    <p id="trivia-question" style="font-size: 1.1rem; color: #fff; margin: 15px 0;">Loading Question...</p>
-                    <div id="trivia-options" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px;"></div>
-                    <div id="trivia-hint-display" style="color: #facc15; font-size: 0.95rem; font-style: italic; min-height: 25px;"></div>
-                    <button class="back-btn" onclick="closeTriviaModal()" style="align-self: center; margin-top: 10px;">Close Terminal</button>
-                </div>
-            </div>
+.explore-mission-item { 
+    font-size: 0.8rem; 
+    color: #cbd5e1; 
+    display: flex; 
+    justify-content: space-between; 
+    border-bottom: 1px solid #334155; 
+    padding-bottom: 4px; 
+}
 
-            <div class="explore-hud-topright">
-                <h3 style="color:#38bdf8; font-size:0.9rem; border-bottom:1px solid #38bdf8; padding-bottom:4px;">🧪 Chemicals (<span id="chem-count">0</span>/38) & Rover (<span id="rover-parts-count">0</span>/4)</h3>
-                <div style="font-size: 0.75rem; color: #94a3b8; max-height: 70px; overflow-y: auto; margin-bottom: 4px;" id="chemical-list-box">Left-click samples to discover 38 chemicals...</div>
-                
-                <h3 style="color:#38bdf8; font-size:0.9rem; border-bottom:1px solid #38bdf8; padding-bottom:4px; margin-top:4px;">🔥 35 Planetary Telemetry Features</h3>
-                <div style="max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px;" id="thirty-five-features-list">
-                    <!-- Populated dynamically via JS -->
-                </div>
-            </div>
+.explore-features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 10px;
+    max-height: 240px;
+    overflow-y: auto;
+    background: rgba(15, 23, 42, 0.9);
+    border: 2px solid #38bdf8;
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 10px;
+}
 
-            <div style="position: absolute; bottom: 15px; left: 15px; background: rgba(15,23,42,0.9); border: 2px solid #38bdf8; padding: 10px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: 700; color: #10b981;" id="surface-action-prompt">
-                Walk [WASD] to Habitat & press [E] | Press [B] for Field Shop | Left-Click samples & parts | Press [V] for Vision!
-            </div>
-        </div>
-    </div>
-
+.explore-feature-item {
+    background: #020617;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #cbd5e1;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.explore-feature-item:hover { 
+    border-color: #38bdf8; 
+    background: rgba(56, 189, 248, 0.2); 
+    color: #fff; 
+}
     <!-- SCREEN 7: CAREER MISSION CONTRACT HUB -->
     <div class="screen container-contracts">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #38bdf8; padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
@@ -667,7 +667,7 @@
     <div class="screen container-skins">
         <div class="shop-header-row">
             <div>
-                <h1>AeroNOAH Shop</h1>
+                <h1>AstroForge Shop</h1>
                 <div class="currency-display">Cosmic Reserves: <span id="player-balance">0</span> ☄️ Craters</div>
             </div>
             <label for="home-toggle" class="back-btn">⬅ Return to Menu</label>
@@ -681,20 +681,11 @@
 
         <div class="shop-content list-skins">
             <script>
-                const shopSkins = [
-                    { name: "Titanium Chrome Hull", price: 1000 },
-                    { name: "Gold Leaf Thermal Shield", price: 2500 },
-                    { name: "Obsidian Stealth Coating", price: 4000 },
-                    { name: "Neon Cyan Prism", price: 6000 },
-                    { name: "Crimson Plasma Wrap", price: 8500 },
-                    { name: "Emerald Carbon Weave", price: 11000 },
-                    { name: "Violet Aurora Finish", price: 15000 },
-                    { name: "Solar Flare Gold", price: 20000 }
-                ];
-                document.write(shopSkins.map(s => `
+                const shopSkins = ["Titanium Chrome Hull", "Gold Leaf Thermal Shield", "Obsidian Stealth Coating", "Neon Cyan Prism", "Crimson Plasma Wrap", "Emerald Carbon Weave", "Violet Aurora Finish", "Solar Flare Gold"];
+                document.write(shopSkins.map((s, i) => `
                     <div class="item-card">
-                        <div><strong>${s.name}</strong><br><span style="color:#cbd5e1; font-size:0.9rem;">Advanced aerodynamic airframe coating</span></div>
-                        <div class="price-tag" onclick="buyItem(${s.price}, '${s.name}')">${s.price.toLocaleString()} ☄️ Buy</div>
+                        <div><strong>${s}</strong><br><span style="color:#cbd5e1; font-size:0.9rem;">Advanced aerodynamic airframe coating</span></div>
+                        <div class="price-tag" onclick="buyItem(1500, '${s}')">1,500 ☄️ Buy</div>
                     </div>
                 `).join(''));
             </script>
@@ -702,18 +693,11 @@
 
         <div class="shop-content list-coaches">
             <script>
-                const shopCoaches = [
-                    { name: "Robot Commander Vex", price: 5000 },
-                    { name: "AI Flight Instructor Nova", price: 10000 },
-                    { name: "Veteran Captain Vance", price: 18000 },
-                    { name: "Quantum Navigator Iris", price: 28000 },
-                    { name: "Astrodynamics Expert Orion", price: 40000 },
-                    { name: "Senior Payload Officer Jax", price: 60000 }
-                ];
-                document.write(shopCoaches.map(c => `
+                const shopCoaches = ["Robot Commander Vex", "AI Flight Instructor Nova", "Veteran Captain Vance", "Quantum Navigator Iris", "Astrodynamics Expert Orion", "Senior Payload Officer Jax"];
+                document.write(shopCoaches.map((c, i) => `
                     <div class="item-card">
-                        <div><strong>${c.name}</strong><br><span style="color:#cbd5e1; font-size:0.9rem;">AI & Human Flight Director telemetry guidance</span></div>
-                        <div class="price-tag" onclick="buyItem(${c.price}, '${c.name}')">${c.price.toLocaleString()} ☄️ Hire</div>
+                        <div><strong>${c}</strong><br><span style="color:#cbd5e1; font-size:0.9rem;">AI & Human Flight Director telemetry guidance</span></div>
+                        <div class="price-tag" onclick="buyItem(3000, '${c}')">3,000 ☄️ Hire</div>
                     </div>
                 `).join(''));
             </script>
@@ -737,19 +721,6 @@
             banner.innerText = msg;
             banner.style.display = 'block';
             setTimeout(() => { banner.style.display = 'none'; }, 3000);
-        }
-
-        async function fetchLiveNASAData() {
-            try {
-                const response = await fetch('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY');
-                const data = await response.json();
-                document.getElementById('nasa-api-status-box').innerHTML = `
-                    <span>📡 NASA Open Data Live Sync: <strong>${data.title}</strong></span>
-                    <span style="color: #10b981; font-weight: 700;">● Live API Synced</span>
-                `;
-            } catch (err) {
-                console.log("Using cached NASA planetary fact sheets.");
-            }
         }
 
         const canvas = document.getElementById('space-canvas');
@@ -815,44 +786,18 @@
             ctx.lineWidth = 2.5;
 
             ctx.beginPath();
-            if (styleType.startsWith('c')) {
-                let variant = styleType.charCodeAt(1);
-                if (variant % 2 === 0) {
-                    ctx.moveTo(w*0.5, h*0.05); ctx.lineTo(w*0.85, h*0.85); ctx.lineTo(w*0.15, h*0.85); ctx.closePath();
-                    ctx.fill(); ctx.stroke();
-                    ctx.fillStyle = colorArray[0]; ctx.beginPath(); ctx.arc(w*0.5, h*0.5, w*0.15, 0, Math.PI*2); ctx.fill(); ctx.stroke();
-                } else {
-                    ctx.arc(w*0.5, h*0.5, w*0.35, Math.PI, 0, false); ctx.lineTo(w*0.85, h*0.85); ctx.lineTo(w*0.15, h*0.85); ctx.closePath();
-                    ctx.fill(); ctx.stroke();
-                    ctx.fillStyle = colorArray[0]; ctx.fillRect(w*0.35, h*0.35, w*0.3, h*0.25); ctx.stroke();
-                }
-            } else if (styleType.startsWith('t')) {
-                let variant = styleType.charCodeAt(1);
-                if (variant % 2 === 0) {
-                    ctx.roundRect(w*0.2, h*0.1, w*0.6, h*0.8, [12]); ctx.fill(); ctx.stroke();
-                    ctx.fillStyle = colorArray[0]; ctx.fillRect(w*0.3, h*0.25, w*0.4, h*0.15); ctx.fillRect(w*0.3, h*0.6, w*0.4, h*0.15);
-                } else {
-                    ctx.beginPath(); ctx.ellipse(w*0.5, h*0.5, w*0.38, h*0.4, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
-                    ctx.fillStyle = colorArray[0]; ctx.beginPath(); ctx.arc(w*0.5, h*0.5, w*0.18, 0, Math.PI*2); ctx.fill(); ctx.stroke();
-                }
-            } else if (styleType.startsWith('e')) {
-                let variant = styleType.charCodeAt(1);
-                if (variant % 2 === 0) {
-                    ctx.moveTo(w*0.35, h*0.1); ctx.lineTo(w*0.65, h*0.1); ctx.lineTo(w*0.9, h*0.9); ctx.lineTo(w*0.1, h*0.9); ctx.closePath();
-                    ctx.fill(); ctx.stroke();
-                    ctx.fillStyle = colorArray[0]; ctx.beginPath(); ctx.arc(w*0.5, h*0.5, w*0.15, 0, Math.PI*2); ctx.fill();
-                } else {
-                    ctx.moveTo(w*0.25, h*0.1); ctx.lineTo(w*0.75, h*0.1); ctx.quadraticCurveTo(w*0.95, h*0.5, w*0.9, h*0.9); ctx.lineTo(w*0.1, h*0.9); ctx.quadraticCurveTo(w*0.05, h*0.5, w*0.25, h*0.1); ctx.closePath();
-                    ctx.fill(); ctx.stroke();
-                    ctx.fillStyle = colorArray[0]; ctx.fillRect(w*0.35, h*0.35, w*0.3, h*0.3);
-                }
-            } else if (styleType.startsWith('d')) {
-                ctx.roundRect(w*0.15, h*0.3, w*0.7, h*0.4, [8]); ctx.fill(); ctx.stroke();
-                ctx.fillStyle = colorArray[0]; ctx.fillRect(w*0.3, h*0.42, w*0.4, h*0.16); ctx.stroke();
-            } else {
-                ctx.moveTo(w*0.2, h*0.2); ctx.lineTo(w*0.8, h*0.2); ctx.lineTo(w*0.8, h*0.8); ctx.lineTo(w*0.2, h*0.8); ctx.closePath();
+            if (styleType === 'capsule1') {
+                ctx.moveTo(w*0.5, h*0.05); ctx.lineTo(w*0.85, h*0.85); ctx.lineTo(w*0.15, h*0.85); ctx.closePath();
                 ctx.fill(); ctx.stroke();
-                ctx.fillStyle = colorArray[0]; ctx.beginPath(); ctx.arc(w*0.5, h*0.5, w*0.22, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#38bdf8'; ctx.beginPath(); ctx.arc(w*0.5, h*0.45, w*0.15, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+            } else if (styleType === 'tank1') {
+                ctx.roundRect(w*0.2, h*0.15, w*0.6, h*0.7, [6]); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = customAccentColor; ctx.fillRect(w*0.35, h*0.3, w*0.3, h*0.1); ctx.fillRect(w*0.35, h*0.6, w*0.3, h*0.1);
+            } else if (styleType === 'eng1') {
+                ctx.moveTo(w*0.3, h*0.1); ctx.lineTo(w*0.7, h*0.1); ctx.lineTo(w*0.85, h*0.9); ctx.lineTo(w*0.15, h*0.9); ctx.closePath(); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#f97316'; ctx.beginPath(); ctx.arc(w*0.5, h*0.5, w*0.12, 0, Math.PI*2); ctx.fill();
+            } else {
+                ctx.roundRect(w*0.15, h*0.25, w*0.7, h*0.5, [8]); ctx.fill(); ctx.stroke();
             }
             ctx.restore();
         }
@@ -870,16 +815,6 @@
             playerBalance -= cost; playerBalance += yieldAmt;
             document.getElementById('player-balance').innerText = playerBalance.toLocaleString();
             alert("Acquired +" + yieldAmt.toLocaleString() + " Craters!");
-        }
-
-        function openFieldShop() { document.getElementById('field-shop-modal').style.display = 'flex'; }
-        function closeFieldShop() { document.getElementById('field-shop-modal').style.display = 'none'; }
-        function buyFieldTool(toolName, price) {
-            if (playerBalance < price) { showAlert("⚠️ Insufficient Cosmic Reserves in Field Wallet!"); return; }
-            playerBalance -= price;
-            document.getElementById('player-balance').innerText = playerBalance.toLocaleString();
-            showAlert(`🛍️ Purchased ${toolName}! Field advantage active.`);
-            closeFieldShop();
         }
 
         const cosmosQuiz = [
@@ -962,31 +897,21 @@
         let reachedCheckpoints = {};
         
         let surfaceCanvas, surfaceCtx;
-        let player3D = { x: 0, z: 2, angle: 0, yVel: 0, isJumping: false, specialVision: false };
+        let player3D = { x: 0, z: 5, angle: 0 };
+        // COD-style interactive parts engineering missions
+        let surfaceMissions = { 
+            1: { phase: 1, name: "Habitat Erection", reqType: "tank" }, 
+            2: { phase: 2, name: "Seismic Drilling", reqType: "other" }, 
+            3: { phase: 3, name: "Rover Calibration", reqType: "engine" } 
+        };
+        let activeWorkbenchModuleId = null;
         let surfaceAnimationId = null;
-
-        const masterChemicals = [
-            "Silicon Dioxide", "Iron Oxide", "Water Ice", "Methane Clathrate", "Sulfuric Acid", 
-            "Olivine", "Pyroxene", "Hematite", "Perchlorates", "Carbon Dioxide Ice", 
-            "Tholins", "Ammonia", "Magnesium Sulfate", "Sodium Chloride", "Calcium Carbonate", 
-            "Titanium Ore", "Platinum", "Gold", "Lithium", "Neon Gas", 
-            "Nitrogen Ice", "Argon", "Helium-3", "Potassium", "Aluminum Oxide", 
-            "Copper Ore", "Nickel", "Cobalt", "Zinc", "Sulfur", 
-            "Phosphorus", "Graphite", "Silicate Dust", "Halite", "Gypsum", 
-            "Borax", "Zircon", "Quartz"
-        ];
-        let discoveredChemicals = [];
-        let surfaceSamples = [];
-        let worldRoverParts = [];
-        let collectedRoverPartsCount = 0;
-        let habitatUnlocked = false;
 
         const allPartsList = [...caps, ...tanks, ...engs, ...decouplers, ...others];
 
         window.addEventListener('DOMContentLoaded', () => {
             initSpaceCanvas(); animateSpace();
             initParallaxCanvas();
-            fetchLiveNASAData();
             setInterval(spawnShootingStar, 2200); setInterval(spawnComet, 9000);
 
             allPartsList.forEach(p => {
@@ -1200,17 +1125,8 @@
                 e.preventDefault();
             }
             if (document.getElementById('explore-toggle').checked) {
-                if (e.code === 'KeyE') { checkHabitatInteraction(); e.preventDefault(); }
-                if (e.code === 'KeyB') { openFieldShop(); e.preventDefault(); }
-                if (e.code === 'KeyV') {
-                    player3D.specialVision = !player3D.specialVision;
-                    document.getElementById('vision-status').innerText = player3D.specialVision ? "🟢 Active (Visor ON)" : "🔴 Offline";
-                    document.getElementById('vision-status').style.color = player3D.specialVision ? "#10b981" : "#facc15";
-                    e.preventDefault();
-                }
-                if (e.code === 'Space' && !player3D.isJumping) {
-                    player3D.yVel = 0.25;
-                    player3D.isJumping = true;
+                if (e.code === 'KeyE') {
+                    openWorkbenchForClosestModule();
                     e.preventDefault();
                 }
             }
@@ -1323,58 +1239,14 @@
             if (simInterval) clearInterval(simInterval);
             let destObj = missions[selectedDestinationTier - 1];
             document.getElementById('explore-target-name').innerText = destObj.dest;
-            
-            discoveredChemicals = [];
-            document.getElementById('chem-count').innerText = "0";
-            document.getElementById('chemical-list-box').innerText = "Left-click samples to discover 38 chemicals...";
-            
-            habitatUnlocked = false;
-
-            surfaceSamples = [];
-            for(let i=0; i<38; i++) {
-                surfaceSamples.push({
-                    id: i,
-                    name: masterChemicals[i],
-                    x: (Math.random() - 0.5) * 40,
-                    z: Math.random() * 32 + 4,
-                    collected: false
-                });
-            }
-
-            worldRoverParts = [
-                { id: 1, name: "Heavy All-Terrain Wheels", x: -9, z: 15, collected: false },
-                { id: 2, name: "Foldable Solar Array", x: 10, z: 19, collected: false },
-                { id: 3, name: "Diamond Core Drill", x: -6, z: 25, collected: false },
-                { id: 4, name: "Robotic Sample Arm", x: 7, z: 29, collected: false }
-            ];
-            collectedRoverPartsCount = 0;
-            document.getElementById('rover-parts-count').innerText = "0";
-
-            player3D = { x: 0, z: 2, angle: 0, yVel: 0, isJumping: false, specialVision: false };
+            surfaceMissions = { 
+                1: { phase: 1, name: "Habitat Erection", done: false }, 
+                2: { phase: 2, name: "Seismic Drilling", done: false }, 
+                3: { phase: 3, name: "Rover Calibration", done: false } 
+            };
+            player3D = { x: 0, z: 5, angle: 0 };
             document.getElementById('explore-toggle').checked = true;
             initSurface3DCanvas(destObj.dest);
-            populate35Features(destObj.dest);
-        }
-
-        function populate35Features(destName) {
-            const listContainer = document.getElementById('thirty-five-features-list');
-            let features = [
-                "1. Atmospheric Density", "2. Surface Temperature", "3. Radiation Flux", "4. Gravity Constant",
-                "5. Solar Illumination", "6. Terrain Roughness", "7. Seismic Activity", "8. Magnetic Dipole",
-                "9. Horizon Curvature", "10. Dust Storm Status", "11. Subsurface Ice", "12. Habitat Integrity",
-                "13. Rig Alignment", "14. Rover Assembly", "15. Chemical Reserve", "16. Visor Optic Mode",
-                "17. Scanner RSSI", "18. Comms Link", "19. Oxygen Reserves", "20. Thermal Stability",
-                "21. Regolith PH", "22. Crustal Pressure", "23. Solar Wind Speed", "24. Ionosphere Charge",
-                "25. Ejecta Rate", "26. Crater Density", "27. Albedo Index", "28. Spectral Signature",
-                "29. Gas Chromatograph", "30. Mass Spectrometer", "31. Core Rig Torque", "32. Power Grid Load",
-                "33. Battery Voltage", "34. CPU Core Temp", "35. Omniversal Sync"
-            ];
-            listContainer.innerHTML = features.map((feat, idx) => `
-                <div class="explore-mission-item">
-                    <span>${feat}</span>
-                    <span style="color:${idx < 15 ? '#10b981' : '#38bdf8'};" id="feat-val-${idx+1}">${idx === 11 ? (habitatUnlocked ? 'Operational' : 'Locked [Press E]') : 'Nominal'}</span>
-                </div>
-            `).join('');
         }
 
         function initSurface3DCanvas(destinationName) {
@@ -1392,242 +1264,140 @@
             if (keysPressed['KeyA'] || keysPressed['Left']) player3D.angle -= 0.04;
             if (keysPressed['KeyD'] || keysPressed['Right']) player3D.angle += 0.04;
 
-            if (player3D.isJumping) {
-                player3D.yVel -= 0.015;
-                if (player3D.yVel <= 0) player3D.isJumping = false;
-            }
-
             surfaceCtx.clearRect(0, 0, surfaceCanvas.width, surfaceCanvas.height);
 
+            // UNIQUE PLANETARY SURROUNDINGS
             let grad = surfaceCtx.createLinearGradient(0, 0, 0, surfaceCanvas.height);
             let gridColor = 'rgba(56, 189, 248, 0.25)';
-            let lowerSky = '#020617';
 
             if (destName.toLowerCase().includes('mars')) {
-                grad.addColorStop(0, '#7c2d12'); grad.addColorStop(0.4, '#c2410c'); grad.addColorStop(1, '#291107');
-                lowerSky = '#9a3412'; gridColor = 'rgba(249, 115, 22, 0.6)';
+                grad.addColorStop(0, '#7c2d12'); grad.addColorStop(0.5, '#9a3412'); grad.addColorStop(1, '#431407');
+                gridColor = 'rgba(249, 115, 22, 0.4)';
             } else if (destName.toLowerCase().includes('moon')) {
-                grad.addColorStop(0, '#000000'); grad.addColorStop(0.4, '#0f172a'); grad.addColorStop(1, '#1e293b');
-                lowerSky = '#09090b'; gridColor = 'rgba(255, 255, 255, 0.35)';
+                grad.addColorStop(0, '#09090b'); grad.addColorStop(0.5, '#18181b'); grad.addColorStop(1, '#27272a');
+                gridColor = 'rgba(255, 255, 255, 0.25)';
             } else if (destName.toLowerCase().includes('venus')) {
-                grad.addColorStop(0, '#b45309'); grad.addColorStop(0.4, '#eab308'); grad.addColorStop(1, '#451a03');
-                lowerSky = '#d97706'; gridColor = 'rgba(250, 204, 21, 0.6)';
-            } else if (destName.toLowerCase().includes('jupiter') || destName.toLowerCase().includes('io')) {
-                grad.addColorStop(0, '#312e81'); grad.addColorStop(0.4, '#581c87'); grad.addColorStop(1, '#0f172a');
-                lowerSky = '#4c1d95'; gridColor = 'rgba(168, 85, 247, 0.6)';
-            } else if (destName.toLowerCase().includes('saturn')) {
-                grad.addColorStop(0, '#1e1b4b'); grad.addColorStop(0.4, '#312e81'); grad.addColorStop(1, '#09090b');
-                lowerSky = '#3730a3'; gridColor = 'rgba(129, 140, 248, 0.6)';
+                grad.addColorStop(0, '#ca8a04'); grad.addColorStop(0.5, '#854d0e'); grad.addColorStop(1, '#422006');
+                gridColor = 'rgba(250, 204, 21, 0.4)';
+            } else if (destName.toLowerCase().includes('saturn') || destName.toLowerCase().includes('jupiter')) {
+                grad.addColorStop(0, '#0369a1'); grad.addColorStop(0.5, '#1e1b4b'); grad.addColorStop(1, '#020617');
+                gridColor = 'rgba(168, 85, 247, 0.45)';
             } else {
-                grad.addColorStop(0, '#0369a1'); grad.addColorStop(0.4, '#0284c7'); grad.addColorStop(1, '#0f172a');
-                lowerSky = '#0284c7'; gridColor = 'rgba(56, 189, 248, 0.6)';
+                grad.addColorStop(0, '#020617'); grad.addColorStop(0.5, '#1e293b'); grad.addColorStop(1, '#334155');
             }
 
             surfaceCtx.fillStyle = grad;
             surfaceCtx.fillRect(0, 0, surfaceCanvas.width, surfaceCanvas.height);
 
-            surfaceCtx.fillStyle = lowerSky;
-            surfaceCtx.beginPath();
-            surfaceCtx.moveTo(0, surfaceCanvas.height / 2);
-            for(let x = 0; x <= surfaceCanvas.width; x += 40) {
-                let hOffset = Math.sin(x * 0.01 + player3D.x * 0.1) * 20;
-                surfaceCtx.lineTo(x, surfaceCanvas.height / 2 + hOffset);
-            }
-            surfaceCtx.lineTo(surfaceCanvas.width, surfaceCanvas.height);
-            surfaceCtx.lineTo(0, surfaceCanvas.height);
-            surfaceCtx.fill();
-
             surfaceCtx.strokeStyle = gridColor;
-            surfaceCtx.lineWidth = 2.5;
+            surfaceCtx.lineWidth = 2;
             let cx = surfaceCanvas.width / 2, cy = surfaceCanvas.height / 2;
-            for(let i = -8; i <= 8; i++) {
+            for(let i = -6; i <= 6; i++) {
                 surfaceCtx.beginPath();
                 surfaceCtx.moveTo(cx + i * 90 - (player3D.x * 20) % 90, cy);
-                surfaceCtx.lineTo(cx + i * 400, surfaceCanvas.height);
+                surfaceCtx.lineTo(cx + i * 350, surfaceCanvas.height);
                 surfaceCtx.stroke();
             }
 
-            // Habitat Module
-            let habX = 0, habZ = 10;
-            let dxH = habX - player3D.x, dzH = habZ - player3D.z;
-            let rotXH = dxH * Math.cos(-player3D.angle) - dzH * Math.sin(-player3D.angle);
-            let rotZH = dxH * Math.sin(-player3D.angle) + dzH * Math.cos(-player3D.angle);
-            if (rotZH > 0.1) {
-                let screenX = cx + (rotXH / rotZH) * 350;
-                let screenY = cy + (2.0 / rotZH) * 350 - (player3D.isJumping ? 40 : 0);
-                let size = Math.max(20, 140 / rotZH);
+            let objects3D = [
+                { id: 1, name: "Habitat Module", x: -3, z: 8, color: '#38bdf8' },
+                { id: 2, name: "Seismic Rig", x: 4, z: 12, color: '#10b981' },
+                { id: 3, name: "Rover Bay", x: 0, z: 18, color: '#facc15' }
+            ];
 
-                surfaceCtx.fillStyle = habitatUnlocked ? '#10b981' : '#38bdf8';
-                surfaceCtx.fillRect(screenX - size/2, screenY - size, size, size);
-                surfaceCtx.fillStyle = '#ffffff';
-                surfaceCtx.font = 'bold 12px sans-serif';
-                surfaceCtx.textAlign = 'center';
-                surfaceCtx.fillText(habitatUnlocked ? "⛺ Habitat [OPERATIONAL]" : "⛺ Habitat Module [Press E]", screenX, screenY - size - 8);
+            objects3D.forEach(obj => {
+                let dx = obj.x - player3D.x, dz = obj.z - player3D.z;
+                let rotX = dx * Math.cos(-player3D.angle) - dz * Math.sin(-player3D.angle);
+                let rotZ = dx * Math.sin(-player3D.angle) + dz * Math.cos(-player3D.angle);
+
+                if (rotZ > 0.1) {
+                    let screenX = cx + (rotX / rotZ) * 350;
+                    let screenY = cy + (2.0 / rotZ) * 350;
+                    let size = Math.max(15, 120 / rotZ);
+
+                    surfaceCtx.fillStyle = obj.color;
+                    surfaceCtx.fillRect(screenX - size/2, screenY - size, size, size);
+                    
+                    surfaceCtx.fillStyle = '#ffffff';
+                    surfaceCtx.font = '12px sans-serif';
+                    surfaceCtx.textAlign = 'center';
+                    let statusTxt = surfaceMissions[obj.id].done ? "✓ DEPLOYED" : "⚠️ BUILD NEEDED";
+                    surfaceCtx.fillText(`${obj.name} (${statusTxt})`, screenX, screenY - size - 8);
+                }
+            });
+
+            for(let i=1; i<=3; i++) {
+                let item = document.getElementById(`obj-${i}`);
+                let stat = document.getElementById(`stat-${i}`);
+                if (surfaceMissions[i].done) {
+                    stat.innerText = "Completed [100%]"; item.classList.add('done');
+                } else {
+                    stat.innerText = `Pending Parts`; item.classList.remove('done');
+                }
             }
-
-            // Scattered Rover Parts
-            worldRoverParts.forEach(part => {
-                if (!part.collected) {
-                    let dx = part.x - player3D.x, dz = part.z - player3D.z;
-                    let rotX = dx * Math.cos(-player3D.angle) - dz * Math.sin(-player3D.angle);
-                    let rotZ = dx * Math.sin(-player3D.angle) + dz * Math.cos(-player3D.angle);
-
-                    if (rotZ > 0.1) {
-                        let screenX = cx + (rotX / rotZ) * 350;
-                        let screenY = cy + (2.0 / rotZ) * 350;
-
-                        if (player3D.specialVision || Math.hypot(dx, dz) < 6.0) {
-                            surfaceCtx.fillStyle = '#facc15';
-                            surfaceCtx.fillRect(screenX - 12, screenY - 25, 24, 24);
-                            surfaceCtx.strokeStyle = '#ffffff';
-                            surfaceCtx.strokeRect(screenX - 12, screenY - 25, 24, 24);
-
-                            surfaceCtx.fillStyle = '#facc15';
-                            surfaceCtx.font = 'bold 11px sans-serif';
-                            surfaceCtx.textAlign = 'center';
-                            surfaceCtx.fillText(`🔧 ${part.name} [Left-Click]`, screenX, screenY - 35);
-                        }
-                    }
-                }
-            });
-
-            // Surface Samples (Chemicals)
-            let closestSampleDist = 999;
-            surfaceSamples.forEach(sample => {
-                let dx = sample.x - player3D.x, dz = sample.z - player3D.z;
-                let dist = Math.hypot(dx, dz);
-                if (!sample.collected && dist < closestSampleDist) closestSampleDist = dist;
-
-                if (!sample.collected) {
-                    let rotX = dx * Math.cos(-player3D.angle) - dz * Math.sin(-player3D.angle);
-                    let rotZ = dx * Math.sin(-player3D.angle) + dz * Math.cos(-player3D.angle);
-
-                    if (rotZ > 0.1) {
-                        let screenX = cx + (rotX / rotZ) * 350;
-                        let screenY = cy + (2.0 / rotZ) * 350;
-
-                        if (player3D.specialVision || dist < 5.0) {
-                            surfaceCtx.fillStyle = '#38bdf8';
-                            surfaceCtx.beginPath();
-                            surfaceCtx.arc(screenX, screenY - 15, Math.max(5, 20 / rotZ), 0, Math.PI * 2);
-                            surfaceCtx.fill();
-                            surfaceCtx.strokeStyle = '#ffffff';
-                            surfaceCtx.stroke();
-
-                            surfaceCtx.fillStyle = '#38bdf8';
-                            surfaceCtx.font = 'bold 11px sans-serif';
-                            surfaceCtx.textAlign = 'center';
-                            surfaceCtx.fillText(`🧪 ${sample.name}`, screenX, screenY - 28);
-                        }
-                    }
-                }
-            });
-
-            let hintText = "Explore terrain & Left-Click items to collect.";
-            if (closestSampleDist < 4.0) hintText = "🎯 Chemical sample nearby! Left-Click to collect!";
-            document.getElementById('scanner-hint').innerText = hintText;
 
             surfaceAnimationId = requestAnimationFrame(() => runSurfaceLoop(destName));
         }
 
-        function handleCanvasClick(event) {
-            const rect = surfaceCanvas.getBoundingClientRect();
-            const mouseX = event.clientX - rect.left;
-            const mouseY = event.clientY - rect.top;
-            const cx = surfaceCanvas.width / 2;
-            const cy = surfaceCanvas.height / 2;
-
-            surfaceSamples.forEach(sample => {
-                if (!sample.collected) {
-                    let dx = sample.x - player3D.x, dz = sample.z - player3D.z;
-                    let rotX = dx * Math.cos(-player3D.angle) - dz * Math.sin(-player3D.angle);
-                    let rotZ = dx * Math.sin(-player3D.angle) + dz * Math.cos(-player3D.angle);
-                    if (rotZ > 0.1) {
-                        let screenX = cx + (rotX / rotZ) * 350;
-                        let screenY = cy + (2.0 / rotZ) * 350;
-                        if (Math.hypot(mouseX - screenX, mouseY - (screenY - 15)) < 25 && Math.hypot(dx, dz) < 8.0) {
-                            sample.collected = true;
-                            discoveredChemicals.push(sample.name);
-                            document.getElementById('chem-count').innerText = discoveredChemicals.length;
-                            document.getElementById('chemical-list-box').innerText = discoveredChemicals.join(', ');
-                            showAlert(`🧪 Collected Chemical: ${sample.name}! (+200 Craters)`);
-                            playerBalance += 200;
-                            document.getElementById('player-balance').innerText = playerBalance.toLocaleString();
-                        }
-                    }
-                }
+        function openWorkbenchForClosestModule() {
+            let objects3D = [
+                { id: 1, name: "Habitat Module", x: -3, z: 8 },
+                { id: 2, name: "Seismic Rig", x: 4, z: 12 },
+                { id: 3, name: "Rover Bay", x: 0, z: 18 }
+            ];
+            let closest = null, minDist = 999;
+            objects3D.forEach(o => {
+                let dist = Math.hypot(player3D.x - o.x, player3D.z - o.z);
+                if (dist < minDist) { minDist = dist; closest = o; }
             });
 
-            worldRoverParts.forEach((part, idx) => {
-                if (!part.collected) {
-                    let dx = part.x - player3D.x, dz = part.z - player3D.z;
-                    let rotX = dx * Math.cos(-player3D.angle) - dz * Math.sin(-player3D.angle);
-                    let rotZ = dx * Math.sin(-player3D.angle) + dz * Math.cos(-player3D.angle);
-                    if (rotZ > 0.1) {
-                        let screenX = cx + (rotX / rotZ) * 350;
-                        let screenY = cy + (2.0 / rotZ) * 350;
-                        if (Math.hypot(mouseX - screenX, mouseY - (screenY - 25)) < 30 && Math.hypot(dx, dz) < 8.0) {
-                            part.collected = true;
-                            collectedRoverPartsCount++;
-                            document.getElementById('rover-parts-count').innerText = collectedRoverPartsCount;
-                            showAlert(`🔧 Assembled Rover Part: ${part.name}!`);
-                            playerBalance += 1000;
-                            document.getElementById('player-balance').innerText = playerBalance.toLocaleString();
-                        }
-                    }
-                }
-            });
-        }
-
-        const habitatTriviaQuestions = [
-            { q: "What is the primary constituent of Mars's thin atmosphere?", opts: ["Carbon Dioxide", "Oxygen", "Nitrogen", "Methane"], ans: 0, hint: "Dry ice is frozen form of this." },
-            { q: "Which celestial body is known for having cryogenic ice geysers shooting water vapor?", opts: ["Venus", "Europa (Jupiter's Moon)", "Mercury", "Io"], ans: 1, hint: "Jovian icy moon." },
-            { q: "What chemical compound is responsible for the rusty red color of Martian regolith?", opts: ["Iron Oxide (Rust)", "Copper Sulfate", "Sulfur Dioxide", "Silicon Carbide"], ans: 0, hint: "Oxidized iron." }
-        ];
-
-        function checkHabitatInteraction() {
-            let dist = Math.hypot(player3D.x - 0, player3D.z - 10);
-            if (dist < 4.0) {
-                if (habitatUnlocked) {
-                    showAlert("⛺ Habitat is already fully operational!");
+            if (minDist < 4.0 && closest) {
+                if (surfaceMissions[closest.id].done) {
+                    showAlert(`✅ ${closest.name} is already fully operational!`);
                     return;
                 }
-                let qObj = habitatTriviaQuestions[Math.floor(Math.random() * habitatTriviaQuestions.length)];
-                document.getElementById('trivia-question').innerText = qObj.q;
-                document.getElementById('trivia-hint-display').innerText = "";
-                let optsDiv = document.getElementById('trivia-options');
-                optsDiv.innerHTML = qObj.opts.map((opt, idx) => `
-                    <button class="quiz-option-btn" onclick="answerTrivia(${idx}, ${qObj.ans})">${String.fromCharCode(65 + idx)}. ${opt}</button>
+                activeWorkbenchModuleId = closest.id;
+                document.getElementById('workbench-title').innerText = `🔧 Engineering Workbench: ${closest.name}`;
+                
+                let grid = document.getElementById('workbench-parts-grid');
+                grid.innerHTML = rocketParts.map(p => `
+                    <div class="workbench-part-card" onclick="installPartAtWorkbench(${p.id})">
+                        <strong>${p.name}</strong><br><span style="color:#10b981; font-size:0.8rem;">Mass: ${p.mass}t</span>
+                    </div>
                 `).join('');
-                document.getElementById('trivia-modal').style.display = 'flex';
+                if (rocketParts.length === 0) {
+                    grid.innerHTML = `<div style="color:#f43f5e; grid-column:span 2;">⚠️ No parts on your rocket! Bring parts from VAB.</div>`;
+                }
+                document.getElementById('workbench-modal').style.display = 'flex';
             } else {
-                showAlert("⚠️ Walk closer to the Habitat Module using [WASD] and press [E]!");
+                showAlert("⚠️ Walk closer to a surface station using [WASD] and press [E]!");
             }
         }
 
-        function answerTrivia(selected, correct) {
-            if (selected === correct) {
-                habitatUnlocked = true;
-                let habStatElem = document.getElementById('feat-val-12');
-                if (habStatElem) habStatElem.innerText = "Operational";
-                document.getElementById('trivia-modal').style.display = 'none';
-                showAlert("🎉 Correct! Habitat erected & GPS radar hint unlocked for scattered rover parts!");
-            } else {
-                document.getElementById('trivia-hint-display').innerText = "💡 Hint: Think about planetary geology and atmospheric composition!";
+        function installPartAtWorkbench(partId) {
+            if (!activeWorkbenchModuleId) return;
+            surfaceMissions[activeWorkbenchModuleId].done = true;
+            document.getElementById('workbench-modal').style.display = 'none';
+            showAlert(`🎉 Successfully installed part and deployed ${surfaceMissions[activeWorkbenchModuleId].name}!`);
+
+            if (surfaceMissions[1].done && surfaceMissions[2].done && surfaceMissions[3].done) {
+                document.getElementById('surface-action-prompt').innerText = "🌟 All Surface Operations Complete! Return Home Unlocked!";
             }
         }
 
-        function closeTriviaModal() { document.getElementById('trivia-modal').style.display = 'none'; }
+        function closeWorkbench() {
+            document.getElementById('workbench-modal').style.display = 'none';
+        }
 
         function returnHomeToEarth() {
-            if (!habitatUnlocked || collectedRoverPartsCount < 4 || discoveredChemicals.length < 10) {
-                alert("⚠️ Unlock Habitat via trivia, collect all 4 scattered rover parts, and discover at least 10 chemicals before returning home!");
+            if (!surfaceMissions[1].done || !surfaceMissions[2].done || !surfaceMissions[3].done) {
+                alert("⚠️ Complete all surface station installations before launching back home!");
                 return;
             }
             if (surfaceAnimationId) cancelAnimationFrame(surfaceAnimationId);
-            playerBalance += 35000;
+            playerBalance += 25000;
             document.getElementById('player-balance').innerText = playerBalance.toLocaleString();
-            alert("Successful return to Earth! Earned +35,000 Cosmic Craters reward.");
+            alert("Successful return to Earth! Earned +25,000 Cosmic Craters reward.");
             document.getElementById('home-toggle').checked = true;
         }
 
