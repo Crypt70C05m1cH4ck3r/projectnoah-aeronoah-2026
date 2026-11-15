@@ -116,66 +116,49 @@
   <div class="stars"></div>
   <div class="hud-frame"></div>
 
+  <!-- FACT BOX CONTAINER -->
   <div class="fact-box">
-    <style>
-    /* 1. Hide all radio buttons */
-    .fact-radio {
-        display: none;
-    }
+    <!-- Radio Inputs -->
+    <input type="radio" name="nasaFacts" id="f1" class="fact-radio" checked>
+    <input type="radio" name="nasaFacts" id="f2" class="fact-radio">
+    <input type="radio" name="nasaFacts" id="f3" class="fact-radio">
+    <input type="radio" name="nasaFacts" id="f4" class="fact-radio">
+    <input type="radio" name="nasaFacts" id="f5" class="fact-radio">
 
-    /* 2. Hide all fact slides by default */
-    .fact-slide {
-        display: none;
-    }
+    <!-- Slide 1 -->
+    <div class="fact-slide slide-1">
+        <div class="fact-text">NASA FACT (1/5): One day on Venus is longer than one year on Venus!</div>
+        <label for="f2" class="fact-btn">NEXT SPACE FACT</label>
+    </div>
 
-    /* 3. Show each slide when its matching radio button is checked */
-    #f1:checked ~ .slide-1,
-    #f2:checked ~ .slide-2,
-    #f3:checked ~ .slide-3,
-    #f4:checked ~ .slide-4,
-    #f5:checked ~ .slide-5 {
-        display: block;
-    }
-</style>
+    <!-- Slide 2 -->
+    <div class="fact-slide slide-2">
+        <div class="fact-text">NASA FACT (2/5): Neutron stars can spin 600 times per second!</div>
+        <label for="f3" class="fact-btn">NEXT SPACE FACT</label>
+    </div>
 
-<!-- Radio Inputs -->
-<input type="radio" name="nasaFacts" id="f1" class="fact-radio" checked>
-<input type="radio" name="nasaFacts" id="f2" class="fact-radio">
-<input type="radio" name="nasaFacts" id="f3" class="fact-radio">
-<input type="radio" name="nasaFacts" id="f4" class="fact-radio">
-<input type="radio" name="nasaFacts" id="f5" class="fact-radio">
+    <!-- Slide 3 -->
+    <div class="fact-slide slide-3">
+        <div class="fact-text">NASA FACT (3/5): Footprints on the Moon can last for millions of years!</div>
+        <label for="f4" class="fact-btn">NEXT SPACE FACT</label>
+    </div>
 
-<!-- Slide 1 -->
-<div class="fact-slide slide-1">
-    <div class="fact-text">NASA FACT (1/5): One day on Venus is longer than one year on Venus!</div>
-    <label for="f2" class="fact-btn">NEXT SPACE FACT</label>
-</div>
+    <!-- Slide 4 -->
+    <div class="fact-slide slide-4">
+        <div class="fact-text">NASA FACT (4/5): Olympus Mons on Mars is 3 times taller than Mount Everest!</div>
+        <label for="f5" class="fact-btn">NEXT SPACE FACT</label>
+    </div>
 
-<!-- Slide 2 -->
-<div class="fact-slide slide-2">
-    <div class="fact-text">NASA FACT (2/5): Neutron stars can spin 600 times per second!</div>
-    <label for="f3" class="fact-btn">NEXT SPACE FACT</label>
-</div>
+    <!-- Slide 5 -->
+    <div class="fact-slide slide-5">
+        <div class="fact-text">NASA FACT (5/5): One teaspoon of a neutron star weighs about the same as all human beings on Earth combined!</div>
+        <span class="fact-done">ALL FACTS DISCOVERED</span>
+    </div>
+  </div>
+  <!-- END OF FACT BOX -->
 
-<!-- Slide 3 -->
-<div class="fact-slide slide-3">
-    <div class="fact-text">NASA FACT (3/5): Footprints on the Moon can last for millions of years!</div>
-    <label for="f4" class="fact-btn">NEXT SPACE FACT</label>
-</div>
-
-<!-- Slide 4 -->
-<div class="fact-slide slide-4">
-    <div class="fact-text">NASA FACT (4/5): Olympus Mons on Mars is 3 times taller than Mount Everest!</div>
-    <label for="f5" class="fact-btn">NEXT SPACE FACT</label>
-</div>
-
-<!-- Slide 5 -->
-<div class="fact-slide slide-5">
-    <div class="fact-text">NASA FACT (5/5): One teaspoon of a neutron star weighs about the same as all human beings on Earth combined!</div>
-    <span class="fact-done">ALL FACTS DISCOVERED</span>
-</div>
-
-<div class="badge">NASA SPACE APPS CHALLENGE 2026</div>
+  <!-- MAIN PAGE CONTENT (Now safely outside the fact box) -->
+  <div class="badge">NASA SPACE APPS CHALLENGE 2026</div>
   <h1>AeroNOAH</h1>
   <p class="subtitle">Welcome to AeroNOAH, the best space game out there!</p>
 
