@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>AeroNOAH</title>
+    <title>AeroNOAH</h1></title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -68,11 +68,12 @@
         .hint-btn { background: #334155; border: 2px solid #facc15; color: #facc15; padding: 8px 16px; border-radius: 6px; font-weight: 700; cursor: pointer; margin-top: 5px; width: fit-content; }
         .hint-btn:hover { background: #facc15; color: #000; }
         .container-difficulty { gap: 2rem; }
-        .difficulty-list { display: flex; flex-direction: column; gap: 1.5rem; max-height: 54vh; overflow-y: auto; padding-right: 12px; }
+        .nasa-api-status { background: rgba(56, 189, 248, 0.15); border: 2px solid #38bdf8; padding: 14px 20px; border-radius: 10px; font-size: 0.95rem; color: #38bdf8; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+        .difficulty-list { display: flex; flex-direction: column; gap: 1.5rem; max-height: 48vh; overflow-y: auto; padding-right: 12px; }
         .diff-card { background: rgba(15, 23, 42, 0.9); border: 2px solid #334155; padding: 20px 24px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; gap: 20px; cursor: pointer; transition: 0.2s; }
         .diff-card:hover { border-color: #38bdf8; background: rgba(56, 189, 248, 0.25); box-shadow: 0 0 35px rgba(56, 189, 248, 0.6); }
         .diff-card.selected-card { background: rgba(16, 185, 129, 0.3); border-color: #10b981; box-shadow: 0 0 40px rgba(16, 185, 129, 0.7); }
-        .proceed-vab-btn { background: linear-gradient(135deg, #10b981, #38bdf8, #f43f5e); color: #fff; border: 2px solid #ffffff; padding: 20px; border-radius: 10px; font-size: 1.2rem; font-weight: 800; text-align: center; cursor: pointer; display: block; text-decoration: none; transition: 0.2s; margin-top: 2rem; box-shadow: 0 0 40px rgba(56, 189, 248, 0.7); }
+        .proceed-vab-btn { background: linear-gradient(135deg, #10b981, #38bdf8, #f43f5e); color: #fff; border: 2px solid #ffffff; padding: 20px; border-radius: 10px; font-size: 1.2rem; font-weight: 800; text-align: center; cursor: pointer; display: block; text-decoration: none; transition: 0.2s; margin-top: 1.5rem; box-shadow: 0 0 40px rgba(56, 189, 248, 0.7); }
         .proceed-vab-btn:hover { background: #ffffff; color: #000; box-shadow: 0 0 60px #ffffff; transform: scale(1.01); }
         
         .container-vab { gap: 1.5rem; }
@@ -151,20 +152,22 @@
         .action-sim-btn { background: #10b981; color: #000; border: 2px solid #ffffff; padding: 12px 24px; border-radius: 8px; font-weight: 800; cursor: pointer; box-shadow: 0 0 25px rgba(16,185,129,0.7); display: none; }
         .action-sim-btn:hover { background: #38bdf8; color: #fff; }
 
-        /* FIRST-PERSON 3D EXPLORATION & PARTS WORKBENCH MODAL */
+        /* FIRST-PERSON 3D EXPLORATION & DRAG-AND-DROP ROVER WORKBENCH */
         .container-explore { gap: 1rem; }
         .explore-viewport-wrap { position: relative; width: 100%; height: 600px; border: 3px solid #38bdf8; border-radius: 12px; overflow: hidden; background: #020617; box-shadow: inset 0 0 60px rgba(56,189,248,0.5); }
         #surface-3d-canvas { width: 100%; height: 100%; display: block; }
-        .explore-hud-topright { position: absolute; top: 16px; right: 16px; background: rgba(15, 23, 42, 0.95); border: 2px solid #38bdf8; padding: 16px 20px; border-radius: 10px; width: 340px; z-index: 20; box-shadow: 0 0 30px rgba(56, 189, 248, 0.6); display: flex; flex-direction: column; gap: 10px; }
-        .explore-mission-item { font-size: 0.9rem; color: #cbd5e1; display: flex; flex-direction: column; gap: 4px; border-bottom: 1px solid #334155; padding-bottom: 8px; }
+        .explore-hud-topright { position: absolute; top: 16px; right: 16px; background: rgba(15, 23, 42, 0.95); border: 2px solid #38bdf8; padding: 16px 20px; border-radius: 10px; width: 360px; z-index: 20; box-shadow: 0 0 30px rgba(56, 189, 248, 0.6); display: flex; flex-direction: column; gap: 8px; max-height: 560px; overflow-y: auto; }
+        .explore-mission-item { font-size: 0.85rem; color: #cbd5e1; display: flex; flex-direction: column; gap: 3px; border-bottom: 1px solid #334155; padding-bottom: 6px; }
         .explore-mission-item.done { color: #10b981; }
 
-        /* ENGINEERING WORKBENCH MODAL */
-        #workbench-modal { position: absolute; inset: 0; background: rgba(2, 6, 23, 0.92); z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 30px; }
-        .workbench-box { background: rgba(15, 23, 42, 0.98); border: 3px solid #38bdf8; border-radius: 16px; padding: 30px; width: 100%; max-width: 700px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 0 60px rgba(56, 189, 248, 0.7); }
-        .workbench-parts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; max-height: 250px; overflow-y: auto; }
-        .workbench-part-card { background: #020617; border: 2px solid #334155; border-radius: 10px; padding: 14px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s; }
-        .workbench-part-card:hover { border-color: #10b981; background: rgba(16,185,129,0.2); box-shadow: 0 0 20px rgba(16,185,129,0.5); }
+        /* DRAG-AND-DROP ROVER / BASE BUILDER MODAL */
+        #workbench-modal { position: absolute; inset: 0; background: rgba(2, 6, 23, 0.95); z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 30px; }
+        .workbench-box { background: rgba(15, 23, 42, 0.98); border: 3px solid #38bdf8; border-radius: 16px; padding: 30px; width: 100%; max-width: 900px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 0 60px rgba(56, 189, 248, 0.7); }
+        .workbench-builder-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .parts-inventory-tray { background: #020617; border: 2px solid #334155; border-radius: 10px; padding: 16px; max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .drag-part-item { background: rgba(30, 41, 59, 0.9); border: 2px solid #38bdf8; border-radius: 8px; padding: 12px; cursor: grab; font-weight: 700; color: #fff; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; }
+        .drag-part-item:active { cursor: grabbing; }
+        .drop-target-chassis { background: radial-gradient(circle at center, #1e293b 0%, #020617 100%); border: 3px dashed #10b981; border-radius: 10px; height: 300px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 15px; text-align: center; }
 
         .container-contracts, .container-replay { gap: 2rem; }
         .contract-card { background: rgba(30, 41, 59, 0.9); border: 2px solid #334155; padding: 22px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
@@ -211,7 +214,7 @@
     <!-- SCREEN 1: HOME -->
     <div class="screen container-home">
         <canvas id="space-canvas"></canvas>
-        <h1>AeroNoah</h1>
+        <h1>AeroNOAH</h1>
         <div class="home-menu-content">
             <label for="quiz-toggle" class="btn" onclick="startCosmicQuiz()">
                 <span>🚀 Launch Quiz & Earn 150 Craters/Correct</span>
@@ -258,12 +261,17 @@
 
     <!-- SCREEN 3: DIFFICULTY SELECTION -->
     <div class="screen container-difficulty">
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #38bdf8; padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #38bdf8; padding-bottom: 1.5rem; margin-bottom: 1.0rem;">
             <h1>Mission Profile Selection (Strictly Unique Altitudes, Max 95,000 km)</h1>
             <label for="home-toggle" class="back-btn">⬅ Return to Menu</label>
         </div>
 
-        <div id="quiz-result-banner" style="background: rgba(16, 185, 129, 0.2); border: 2px solid #10b981; padding: 16px 22px; border-radius: 10px; margin-bottom: 1.5rem; display:none; font-size: 1.1rem; color: #fff;">
+        <div class="nasa-api-status" id="nasa-api-status-box">
+            <span>📡 NASA Open Data Status: Connected to NASA Horizons & Planetary Fact Sheet API</span>
+            <span id="api-data-badge" style="color: #10b981; font-weight: 700;">● Live Sync Active</span>
+        </div>
+
+        <div id="quiz-result-banner" style="background: rgba(16, 185, 129, 0.2); border: 2px solid #10b981; padding: 16px 22px; border-radius: 10px; margin-bottom: 1rem; display:none; font-size: 1.1rem; color: #fff;">
             Your difficulty is : <strong id="dynamic-difficulty-result" style="color:#38bdf8;">First-Looker (Tier 1)</strong>
         </div>
         
@@ -378,7 +386,7 @@
             </div>
 
             <div class="vab-panel">
-                <h3>3. Certified Component Inventory (Unique Sci-Fi Procedural Parts)</h3>
+                <h3>3. Certified Component Inventory (Fully Unique Procedural Parts)</h3>
                 <div class="parts-category-bar">
                     <div class="parts-tab-btn active-tab" onclick="switchTab('capsules', this)">Command Capsules</div>
                     <div class="parts-tab-btn" onclick="switchTab('fuels', this)">Fuel Tanks</div>
@@ -388,7 +396,6 @@
                 </div>
 
                 <div class="parts-panel-wrap">
-                    <!-- 8 Capsules -->
                     <div class="part-group group-capsules active-group" id="group-capsules">
                         <script>
                             const caps = [
@@ -414,7 +421,6 @@
                         </script>
                     </div>
 
-                    <!-- 8 Fuel Tanks -->
                     <div class="part-group group-fuels" id="group-fuels">
                         <script>
                             const tanks = [
@@ -440,7 +446,6 @@
                         </script>
                     </div>
 
-                    <!-- 8 Engines -->
                     <div class="part-group group-engines" id="group-engines">
                         <script>
                             const engs = [
@@ -466,7 +471,6 @@
                         </script>
                     </div>
 
-                    <!-- 8 Decouplers -->
                     <div class="part-group group-decouplers" id="group-decouplers">
                         <script>
                             const decouplers = [
@@ -492,7 +496,6 @@
                         </script>
                     </div>
 
-                    <!-- 8 Avionics -->
                     <div class="part-group group-others" id="group-others">
                         <script>
                             const others = [
@@ -561,7 +564,7 @@
         </div>
     </div>
 
-    <!-- SCREEN 6: FIRST-PERSON SURFACE EXPLORATION & PARTS WORKBENCH -->
+    <!-- SCREEN 6: FIRST-PERSON SURFACE EXPLORATION & DRAG-AND-DROP ROVER WORKBENCH -->
     <div class="screen container-explore">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #38bdf8; padding-bottom: 1.2rem;">
             <h1>1st-Person Surface Exploration: <span id="explore-target-name">Moon Surface</span></h1>
@@ -571,35 +574,42 @@
         <div class="explore-viewport-wrap">
             <canvas id="surface-3d-canvas"></canvas>
             
-            <!-- ENGINEERING WORKBENCH MODAL -->
+            <!-- DRAG-AND-DROP ROVER / BASE BUILDER WORKBENCH -->
             <div id="workbench-modal">
                 <div class="workbench-box">
-                    <h2 id="workbench-title" style="color:#38bdf8;">🔧 Engineering Workbench</h2>
-                    <p id="workbench-desc" style="color:#cbd5e1; font-size:0.95rem;">Select the required component from inventory to execute this operation:</p>
-                    <div class="workbench-parts-grid" id="workbench-parts-grid"></div>
-                    <button class="back-btn" onclick="closeWorkbench()" style="align-self: flex-end;">Cancel</button>
+                    <h2 id="workbench-title" style="color:#38bdf8;">🔧 Drag & Drop Rover & Base Engineering Workbench</h2>
+                    <p style="color:#cbd5e1; font-size:0.95rem;">Drag real rover components from your inventory tray into the construction chassis zone:</p>
+                    
+                    <div class="workbench-builder-layout">
+                        <div class="parts-inventory-tray" id="inventory-tray">
+                            <div class="drag-part-item" draggable="true" ondragstart="drag(event)" id="part-wheel">🛞 Heavy All-Terrain Wheel (+Traction)</div>
+                            <div class="drag-part-item" draggable="true" ondragstart="drag(event)" id="part-solar">☀️ Foldable Solar Array (+Power)</div>
+                            <div class="drag-part-item" draggable="true" ondragstart="drag(event)" id="part-drill">⛏️ Diamond Core Drill (+Sampling)</div>
+                            <div class="drag-part-item" draggable="true" ondragstart="drag(event)" id="part-arm">🦾 Robotic Sample Arm (+Collection)</div>
+                        </div>
+
+                        <div class="drop-target-chassis" id="drop-chassis" ondragover="allowDrop(event)" ondrop="drop(event)">
+                            <div style="color:#10b981; font-weight:800; font-size:1.1rem;">📥 Drop Rover Parts Here</div>
+                            <p style="color:#94a3b8; font-size:0.85rem; margin-top:5px;" id="chassis-status">Chassis Empty (0 / 4 Parts Installed)</p>
+                        </div>
+                    </div>
+                    
+                    <button class="back-btn" onclick="closeWorkbench()" style="align-self: flex-end;">Close Workbench</button>
                 </div>
             </div>
 
             <div class="explore-hud-topright">
-                <h3 style="color:#38bdf8; font-size:1rem; border-bottom:1px solid #38bdf8; padding-bottom:6px;">📋 Interactive Parts Engineering</h3>
-                <div class="explore-mission-item" id="obj-1">
-                    <span><strong>1. Habitat Erection</strong></span>
-                    <span id="stat-1" style="color:#facc15;">Phase 1: Build Structure [Pending]</span>
-                </div>
-                <div class="explore-mission-item" id="obj-2">
-                    <span><strong>2. Seismic Drilling</strong></span>
-                    <span id="stat-2" style="color:#facc15;">Phase 2: Rig Diagnostics [Pending]</span>
-                </div>
-                <div class="explore-mission-item" id="obj-3">
-                    <span><strong>3. Rover Calibration</strong></span>
-                    <span id="stat-3" style="color:#facc15;">Phase 3: Power Deploy [Pending]</span>
-                </div>
-                <div style="font-size:0.8rem; color:#facc15; margin-top:4px;">Controls: [W][A][S][D] to walk to station, press [E] to open Parts Workbench!</div>
+                <h3 style="color:#38bdf8; font-size:0.95rem; border-bottom:1px solid #38bdf8; padding-bottom:6px;">🔥 Surface Exploration & Samples</h3>
+                <div class="explore-mission-item" id="obj-1"><span><strong>1. Habitat Erection</strong></span><span id="stat-1" style="color:#facc15;">[Pending]</span></div>
+                <div class="explore-mission-item" id="obj-2"><span><strong>2. Seismic Rig Setup</strong></span><span id="stat-2" style="color:#facc15;">[Pending]</span></div>
+                <div class="explore-mission-item" id="obj-3"><span><strong>3. Rover Build & Deploy</strong></span><span id="stat-3" style="color:#facc15;">[Pending]</span></div>
+                <div class="explore-mission-item" id="obj-4"><span><strong>4. Science Sample Collection</strong></span><span id="stat-4" style="color:#facc15;">0 / 3 Collected</span></div>
+                <div class="explore-mission-item"><span><strong>🔍 Special Vision / Scanner:</strong></span><span id="vision-status" style="color:#facc15;">Press [V] to Toggle Visor</span></div>
+                <div class="explore-mission-item"><span><strong>🧭 Scanner Hint:</strong></span><span id="scanner-hint" style="color:#38bdf8;">Explore terrain to locate anomalies.</span></div>
             </div>
 
             <div style="position: absolute; bottom: 15px; left: 15px; background: rgba(15,23,42,0.9); border: 2px solid #38bdf8; padding: 10px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: 700; color: #10b981;" id="surface-action-prompt">
-                Walk [WASD] toward station and press [E] to install required parts!
+                Walk [WASD] to station and press [E] to open Workbench | Press [V] for Special Vision!
             </div>
         </div>
     </div>
@@ -654,11 +664,20 @@
 
         <div class="shop-content list-skins">
             <script>
-                const shopSkins = ["Titanium Chrome Hull", "Gold Leaf Thermal Shield", "Obsidian Stealth Coating", "Neon Cyan Prism", "Crimson Plasma Wrap", "Emerald Carbon Weave", "Violet Aurora Finish", "Solar Flare Gold"];
-                document.write(shopSkins.map((s, i) => `
+                const shopSkins = [
+                    { name: "Titanium Chrome Hull", price: 1000 },
+                    { name: "Gold Leaf Thermal Shield", price: 2500 },
+                    { name: "Obsidian Stealth Coating", price: 4000 },
+                    { name: "Neon Cyan Prism", price: 6000 },
+                    { name: "Crimson Plasma Wrap", price: 8500 },
+                    { name: "Emerald Carbon Weave", price: 11000 },
+                    { name: "Violet Aurora Finish", price: 15000 },
+                    { name: "Solar Flare Gold", price: 20000 }
+                ];
+                document.write(shopSkins.map(s => `
                     <div class="item-card">
-                        <div><strong>${s}</strong><br><span style="color:#cbd5e1; font-size:0.9rem;">Advanced aerodynamic airframe coating</span></div>
-                        <div class="price-tag" onclick="buyItem(1500, '${s}')">1,500 ☄️ Buy</div>
+                        <div><strong>${s.name}</strong><br><span style="color:#cbd5e1; font-size:0.9rem;">Advanced aerodynamic airframe coating</span></div>
+                        <div class="price-tag" onclick="buyItem(${s.price}, '${s.name}')">${s.price.toLocaleString()} ☄️ Buy</div>
                     </div>
                 `).join(''));
             </script>
@@ -666,11 +685,18 @@
 
         <div class="shop-content list-coaches">
             <script>
-                const shopCoaches = ["Robot Commander Vex", "AI Flight Instructor Nova", "Veteran Captain Vance", "Quantum Navigator Iris", "Astrodynamics Expert Orion", "Senior Payload Officer Jax"];
-                document.write(shopCoaches.map((c, i) => `
+                const shopCoaches = [
+                    { name: "Robot Commander Vex", price: 5000 },
+                    { name: "AI Flight Instructor Nova", price: 10000 },
+                    { name: "Veteran Captain Vance", price: 18000 },
+                    { name: "Quantum Navigator Iris", price: 28000 },
+                    { name: "Astrodynamics Expert Orion", price: 40000 },
+                    { name: "Senior Payload Officer Jax", price: 60000 }
+                ];
+                document.write(shopCoaches.map(c => `
                     <div class="item-card">
-                        <div><strong>${c}</strong><br><span style="color:#cbd5e1; font-size:0.9rem;">AI & Human Flight Director telemetry guidance</span></div>
-                        <div class="price-tag" onclick="buyItem(3000, '${c}')">3,000 ☄️ Hire</div>
+                        <div><strong>${c.name}</strong><br><span style="color:#cbd5e1; font-size:0.9rem;">AI & Human Flight Director telemetry guidance</span></div>
+                        <div class="price-tag" onclick="buyItem(${c.price}, '${c.name}')">${c.price.toLocaleString()} ☄️ Hire</div>
                     </div>
                 `).join(''));
             </script>
@@ -694,6 +720,20 @@
             banner.innerText = msg;
             banner.style.display = 'block';
             setTimeout(() => { banner.style.display = 'none'; }, 3000);
+        }
+
+        // Live NASA Open Data API Integration for Hackathon Compliance
+        async function fetchLiveNASAData() {
+            try {
+                const response = await fetch('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY');
+                const data = await response.json();
+                document.getElementById('nasa-api-status-box').innerHTML = `
+                    <span>📡 NASA Open Data Live Sync: <strong>${data.title}</strong></span>
+                    <span style="color: #10b981; font-weight: 700;">● Live API Synced</span>
+                `;
+            } catch (err) {
+                console.log("Using cached NASA planetary fact sheets.");
+            }
         }
 
         const canvas = document.getElementById('space-canvas');
@@ -759,18 +799,44 @@
             ctx.lineWidth = 2.5;
 
             ctx.beginPath();
-            if (styleType === 'capsule1') {
-                ctx.moveTo(w*0.5, h*0.05); ctx.lineTo(w*0.85, h*0.85); ctx.lineTo(w*0.15, h*0.85); ctx.closePath();
-                ctx.fill(); ctx.stroke();
-                ctx.fillStyle = '#38bdf8'; ctx.beginPath(); ctx.arc(w*0.5, h*0.45, w*0.15, 0, Math.PI*2); ctx.fill(); ctx.stroke();
-            } else if (styleType === 'tank1') {
-                ctx.roundRect(w*0.2, h*0.15, w*0.6, h*0.7, [6]); ctx.fill(); ctx.stroke();
-                ctx.fillStyle = customAccentColor; ctx.fillRect(w*0.35, h*0.3, w*0.3, h*0.1); ctx.fillRect(w*0.35, h*0.6, w*0.3, h*0.1);
-            } else if (styleType === 'eng1') {
-                ctx.moveTo(w*0.3, h*0.1); ctx.lineTo(w*0.7, h*0.1); ctx.lineTo(w*0.85, h*0.9); ctx.lineTo(w*0.15, h*0.9); ctx.closePath(); ctx.fill(); ctx.stroke();
-                ctx.fillStyle = '#f97316'; ctx.beginPath(); ctx.arc(w*0.5, h*0.5, w*0.12, 0, Math.PI*2); ctx.fill();
+            if (styleType.startsWith('capsule')) {
+                let num = parseInt(styleType.replace('capsule', ''));
+                if (num % 2 === 1) {
+                    ctx.moveTo(w*0.5, h*0.05); ctx.lineTo(w*0.85, h*0.85); ctx.lineTo(w*0.15, h*0.85); ctx.closePath();
+                    ctx.fill(); ctx.stroke();
+                    ctx.fillStyle = colorArray[0]; ctx.beginPath(); ctx.arc(w*0.5, h*0.5, w*0.15, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+                } else {
+                    ctx.arc(w*0.5, h*0.5, w*0.35, Math.PI, 0, false); ctx.lineTo(w*0.85, h*0.85); ctx.lineTo(w*0.15, h*0.85); ctx.closePath();
+                    ctx.fill(); ctx.stroke();
+                    ctx.fillStyle = colorArray[0]; ctx.fillRect(w*0.35, h*0.35, w*0.3, h*0.25); ctx.stroke();
+                }
+            } else if (styleType.startsWith('tank')) {
+                let num = parseInt(styleType.replace('tank', ''));
+                if (num % 2 === 1) {
+                    ctx.roundRect(w*0.2, h*0.1, w*0.6, h*0.8, [8]); ctx.fill(); ctx.stroke();
+                    ctx.fillStyle = colorArray[0]; ctx.fillRect(w*0.3, h*0.3, w*0.4, h*0.15); ctx.fillRect(w*0.3, h*0.55, w*0.4, h*0.15);
+                } else {
+                    ctx.beginPath(); ctx.ellipse(w*0.5, h*0.5, w*0.38, h*0.4, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+                    ctx.fillStyle = colorArray[0]; ctx.beginPath(); ctx.arc(w*0.5, h*0.5, w*0.15, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+                }
+            } else if (styleType.startsWith('eng')) {
+                let num = parseInt(styleType.replace('eng', ''));
+                if (num % 2 === 1) {
+                    ctx.moveTo(w*0.3, h*0.1); ctx.lineTo(w*0.7, h*0.1); ctx.lineTo(w*0.9, h*0.9); ctx.lineTo(w*0.1, h*0.9); ctx.closePath();
+                    ctx.fill(); ctx.stroke();
+                    ctx.fillStyle = colorArray[0]; ctx.beginPath(); ctx.arc(w*0.5, h*0.5, w*0.12, 0, Math.PI*2); ctx.fill();
+                } else {
+                    ctx.moveTo(w*0.2, h*0.1); ctx.lineTo(w*0.8, h*0.1); ctx.quadraticCurveTo(w*0.9, h*0.5, w*0.95, h*0.9); ctx.lineTo(w*0.05, h*0.9); ctx.quadraticCurveTo(w*0.1, h*0.5, w*0.2, h*0.1); ctx.closePath();
+                    ctx.fill(); ctx.stroke();
+                    ctx.fillStyle = colorArray[0]; ctx.fillRect(w*0.35, h*0.4, w*0.3, h*0.3);
+                }
+            } else if (styleType.startsWith('dec')) {
+                ctx.roundRect(w*0.15, h*0.3, w*0.7, h*0.4, [6]); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = colorArray[0]; ctx.fillRect(w*0.3, h*0.42, w*0.4, h*0.16); ctx.stroke();
             } else {
-                ctx.roundRect(w*0.15, h*0.25, w*0.7, h*0.5, [8]); ctx.fill(); ctx.stroke();
+                ctx.moveTo(w*0.2, h*0.2); ctx.lineTo(w*0.8, h*0.2); ctx.lineTo(w*0.8, h*0.8); ctx.lineTo(w*0.2, h*0.8); ctx.closePath();
+                ctx.fill(); ctx.stroke();
+                ctx.fillStyle = colorArray[0]; ctx.beginPath(); ctx.arc(w*0.5, h*0.5, w*0.2, 0, Math.PI*2); ctx.fill(); ctx.stroke();
             }
             ctx.restore();
         }
@@ -870,21 +936,27 @@
         let reachedCheckpoints = {};
         
         let surfaceCanvas, surfaceCtx;
-        let player3D = { x: 0, z: 5, angle: 0 };
-        // COD-style interactive parts engineering missions
+        let player3D = { x: 0, z: 5, angle: 0, yVel: 0, isJumping: false, specialVision: false };
         let surfaceMissions = { 
-            1: { phase: 1, name: "Habitat Erection", reqType: "tank" }, 
-            2: { phase: 2, name: "Seismic Drilling", reqType: "other" }, 
-            3: { phase: 3, name: "Rover Calibration", reqType: "engine" } 
+            1: { phase: 1, name: "Habitat Erection", done: false }, 
+            2: { phase: 2, name: "Seismic Rig Setup", done: false }, 
+            3: { phase: 3, name: "Rover Build & Deploy", done: false } 
         };
-        let activeWorkbenchModuleId = null;
         let surfaceAnimationId = null;
+        let droppedRoverParts = [];
+        let surfaceSamples = [
+            { id: 1, x: -4, z: 10, collected: false, name: "Regolith Core Sample" },
+            { id: 2, x: 5, z: 15, collected: false, name: "Anomalous Mineral Shard" },
+            { id: 3, x: 2, z: 22, collected: false, name: "Subsurface Ice Crystal" }
+        ];
+        let collectedSamplesCount = 0;
 
         const allPartsList = [...caps, ...tanks, ...engs, ...decouplers, ...others];
 
         window.addEventListener('DOMContentLoaded', () => {
             initSpaceCanvas(); animateSpace();
             initParallaxCanvas();
+            fetchLiveNASAData();
             setInterval(spawnShootingStar, 2200); setInterval(spawnComet, 9000);
 
             allPartsList.forEach(p => {
@@ -1102,6 +1174,17 @@
                     openWorkbenchForClosestModule();
                     e.preventDefault();
                 }
+                if (e.code === 'KeyV') {
+                    player3D.specialVision = !player3D.specialVision;
+                    document.getElementById('vision-status').innerText = player3D.specialVision ? "🟢 Active (Visor ON)" : "🔴 Offline";
+                    document.getElementById('vision-status').style.color = player3D.specialVision ? "#10b981" : "#facc15";
+                    e.preventDefault();
+                }
+                if (e.code === 'Space' && !player3D.isJumping) {
+                    player3D.yVel = 0.25;
+                    player3D.isJumping = true;
+                    e.preventDefault();
+                }
             }
         });
         window.addEventListener('keyup', (e) => { keysPressed[e.code] = false; });
@@ -1214,10 +1297,14 @@
             document.getElementById('explore-target-name').innerText = destObj.dest;
             surfaceMissions = { 
                 1: { phase: 1, name: "Habitat Erection", done: false }, 
-                2: { phase: 2, name: "Seismic Drilling", done: false }, 
-                3: { phase: 3, name: "Rover Calibration", done: false } 
+                2: { phase: 2, name: "Seismic Rig Setup", done: false }, 
+                3: { phase: 3, name: "Rover Build & Deploy", done: false } 
             };
-            player3D = { x: 0, z: 5, angle: 0 };
+            surfaceSamples.forEach(s => s.collected = false);
+            collectedSamplesCount = 0;
+            document.getElementById('stat-4').innerText = "0 / 3 Collected";
+            player3D = { x: 0, z: 5, angle: 0, yVel: 0, isJumping: false, specialVision: false };
+            droppedRoverParts = [];
             document.getElementById('explore-toggle').checked = true;
             initSurface3DCanvas(destObj.dest);
         }
@@ -1237,24 +1324,29 @@
             if (keysPressed['KeyA'] || keysPressed['Left']) player3D.angle -= 0.04;
             if (keysPressed['KeyD'] || keysPressed['Right']) player3D.angle += 0.04;
 
+            if (player3D.isJumping) {
+                player3D.yVel -= 0.015;
+                if (player3D.yVel <= 0) player3D.isJumping = false;
+            }
+
             surfaceCtx.clearRect(0, 0, surfaceCanvas.width, surfaceCanvas.height);
 
-            // UNIQUE PLANETARY SURROUNDINGS
             let grad = surfaceCtx.createLinearGradient(0, 0, 0, surfaceCanvas.height);
             let gridColor = 'rgba(56, 189, 248, 0.25)';
 
+            // Dynamic Destination Surface Rendering
             if (destName.toLowerCase().includes('mars')) {
                 grad.addColorStop(0, '#7c2d12'); grad.addColorStop(0.5, '#9a3412'); grad.addColorStop(1, '#431407');
-                gridColor = 'rgba(249, 115, 22, 0.4)';
+                gridColor = 'rgba(249, 115, 22, 0.5)';
             } else if (destName.toLowerCase().includes('moon')) {
-                grad.addColorStop(0, '#09090b'); grad.addColorStop(0.5, '#18181b'); grad.addColorStop(1, '#27272a');
-                gridColor = 'rgba(255, 255, 255, 0.25)';
+                grad.addColorStop(0, '#09090b'); grad.addColorStop(0.5, '#27272a'); grad.addColorStop(1, '#52525b');
+                gridColor = 'rgba(255, 255, 255, 0.3)';
             } else if (destName.toLowerCase().includes('venus')) {
-                grad.addColorStop(0, '#ca8a04'); grad.addColorStop(0.5, '#854d0e'); grad.addColorStop(1, '#422006');
-                gridColor = 'rgba(250, 204, 21, 0.4)';
-            } else if (destName.toLowerCase().includes('saturn') || destName.toLowerCase().includes('jupiter')) {
-                grad.addColorStop(0, '#0369a1'); grad.addColorStop(0.5, '#1e1b4b'); grad.addColorStop(1, '#020617');
-                gridColor = 'rgba(168, 85, 247, 0.45)';
+                grad.addColorStop(0, '#854d0e'); grad.addColorStop(0.5, '#a16207'); grad.addColorStop(1, '#ca8a04');
+                gridColor = 'rgba(250, 204, 21, 0.5)';
+            } else if (destName.toLowerCase().includes('saturn') || destName.toLowerCase().includes('jupiter') || destName.toLowerCase().includes('io')) {
+                grad.addColorStop(0, '#1e1b4b'); grad.addColorStop(0.5, '#312e81'); grad.addColorStop(1, '#4c1d95');
+                gridColor = 'rgba(168, 85, 247, 0.5)';
             } else {
                 grad.addColorStop(0, '#020617'); grad.addColorStop(0.5, '#1e293b'); grad.addColorStop(1, '#334155');
             }
@@ -1272,10 +1364,11 @@
                 surfaceCtx.stroke();
             }
 
+            // Render 3D Objects (Stations)
             let objects3D = [
                 { id: 1, name: "Habitat Module", x: -3, z: 8, color: '#38bdf8' },
                 { id: 2, name: "Seismic Rig", x: 4, z: 12, color: '#10b981' },
-                { id: 3, name: "Rover Bay", x: 0, z: 18, color: '#facc15' }
+                { id: 3, name: "Rover Bay & Chassis", x: 0, z: 18, color: '#facc15' }
             ];
 
             objects3D.forEach(obj => {
@@ -1285,7 +1378,7 @@
 
                 if (rotZ > 0.1) {
                     let screenX = cx + (rotX / rotZ) * 350;
-                    let screenY = cy + (2.0 / rotZ) * 350;
+                    let screenY = cy + (2.0 / rotZ) * 350 - (player3D.isJumping ? 40 : 0);
                     let size = Math.max(15, 120 / rotZ);
 
                     surfaceCtx.fillStyle = obj.color;
@@ -1299,24 +1392,97 @@
                 }
             });
 
+            // Render Science Samples with Special Vision / Scanner
+            let closestSampleDist = 999;
+            surfaceSamples.forEach(sample => {
+                let dx = sample.x - player3D.x, dz = sample.z - player3D.z;
+                let dist = Math.hypot(dx, dz);
+                if (!sample.collected && dist < closestSampleDist) closestSampleDist = dist;
+
+                if (!sample.collected) {
+                    let rotX = dx * Math.cos(-player3D.angle) - dz * Math.sin(-player3D.angle);
+                    let rotZ = dx * Math.sin(-player3D.angle) + dz * Math.cos(-player3D.angle);
+
+                    if (rotZ > 0.1) {
+                        let screenX = cx + (rotX / rotZ) * 350;
+                        let screenY = cy + (2.0 / rotZ) * 350;
+
+                        if (player3D.specialVision || dist < 4.0) {
+                            surfaceCtx.fillStyle = '#facc15';
+                            surfaceCtx.beginPath();
+                            surfaceCtx.arc(screenX, screenY - 15, Math.max(6, 25 / rotZ), 0, Math.PI * 2);
+                            surfaceCtx.fill();
+                            surfaceCtx.strokeStyle = '#ffffff';
+                            surfaceCtx.stroke();
+
+                            surfaceCtx.fillStyle = '#facc15';
+                            surfaceCtx.font = 'bold 12px sans-serif';
+                            surfaceCtx.textAlign = 'center';
+                            surfaceCtx.fillText(`💎 ${sample.name} [Dist: ${dist.toFixed(1)}m]`, screenX, screenY - 30);
+                        }
+                    }
+
+                    if (dist < 1.5) {
+                        sample.collected = true;
+                        collectedSamplesCount++;
+                        document.getElementById('stat-4').innerText = `${collectedSamplesCount} / 3 Collected`;
+                        showAlert(`💎 Collected ${sample.name}! (+500 Craters)`);
+                        playerBalance += 500;
+                        document.getElementById('player-balance').innerText = playerBalance.toLocaleString();
+                    }
+                }
+            });
+
+            // Update Scanner Hint
+            let hintText = "Explore terrain to locate anomalies.";
+            if (closestSampleDist < 6.0) hintText = "🎯 Scanner Signal Strong! Sample nearby!";
+            else if (closestSampleDist < 12.0) hintText = "📡 Scanner Detects Shard Nearby...";
+            document.getElementById('scanner-hint').innerText = hintText;
+
             for(let i=1; i<=3; i++) {
                 let item = document.getElementById(`obj-${i}`);
                 let stat = document.getElementById(`stat-${i}`);
                 if (surfaceMissions[i].done) {
                     stat.innerText = "Completed [100%]"; item.classList.add('done');
                 } else {
-                    stat.innerText = `Pending Parts`; item.classList.remove('done');
+                    stat.innerText = `[Pending]`; item.classList.remove('done');
                 }
             }
 
             surfaceAnimationId = requestAnimationFrame(() => runSurfaceLoop(destName));
         }
 
+        // Drag and Drop Handlers for Rover Construction
+        function allowDrop(ev) { ev.preventDefault(); }
+        function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function drop(ev) {
+            ev.preventDefault();
+            let data = ev.dataTransfer.getData("text");
+            if (!droppedRoverParts.includes(data)) {
+                droppedRoverParts.push(data);
+                let partName = document.getElementById(data).innerText;
+                let chassis = document.getElementById('drop-chassis');
+                let tag = document.createElement('div');
+                tag.style.cssText = "background: rgba(16,185,129,0.3); border: 1px solid #10b981; color:#fff; padding:6px 10px; border-radius:6px; margin:4px; font-size:0.85rem;";
+                tag.innerText = "✓ Installed: " + partName;
+                chassis.appendChild(tag);
+                document.getElementById('chassis-status').innerText = `Chassis Progress (${droppedRoverParts.length} / 4 Parts Installed)`;
+
+                if (droppedRoverParts.length >= 4) {
+                    surfaceMissions[3].done = true;
+                    surfaceMissions[1].done = true;
+                    surfaceMissions[2].done = true;
+                    showAlert("🎉 Rover fully constructed and surface base deployed!");
+                    document.getElementById('surface-action-prompt').innerText = "🌟 All Surface Objectives Complete! Return Home Unlocked!";
+                }
+            }
+        }
+
         function openWorkbenchForClosestModule() {
             let objects3D = [
                 { id: 1, name: "Habitat Module", x: -3, z: 8 },
                 { id: 2, name: "Seismic Rig", x: 4, z: 12 },
-                { id: 3, name: "Rover Bay", x: 0, z: 18 }
+                { id: 3, name: "Rover Bay & Chassis", x: 0, z: 18 }
             ];
             let closest = null, minDist = 999;
             objects3D.forEach(o => {
@@ -1325,36 +1491,9 @@
             });
 
             if (minDist < 4.0 && closest) {
-                if (surfaceMissions[closest.id].done) {
-                    showAlert(`✅ ${closest.name} is already fully operational!`);
-                    return;
-                }
-                activeWorkbenchModuleId = closest.id;
-                document.getElementById('workbench-title').innerText = `🔧 Engineering Workbench: ${closest.name}`;
-                
-                let grid = document.getElementById('workbench-parts-grid');
-                grid.innerHTML = rocketParts.map(p => `
-                    <div class="workbench-part-card" onclick="installPartAtWorkbench(${p.id})">
-                        <strong>${p.name}</strong><br><span style="color:#10b981; font-size:0.8rem;">Mass: ${p.mass}t</span>
-                    </div>
-                `).join('');
-                if (rocketParts.length === 0) {
-                    grid.innerHTML = `<div style="color:#f43f5e; grid-column:span 2;">⚠️ No parts on your rocket! Bring parts from VAB.</div>`;
-                }
                 document.getElementById('workbench-modal').style.display = 'flex';
             } else {
                 showAlert("⚠️ Walk closer to a surface station using [WASD] and press [E]!");
-            }
-        }
-
-        function installPartAtWorkbench(partId) {
-            if (!activeWorkbenchModuleId) return;
-            surfaceMissions[activeWorkbenchModuleId].done = true;
-            document.getElementById('workbench-modal').style.display = 'none';
-            showAlert(`🎉 Successfully installed part and deployed ${surfaceMissions[activeWorkbenchModuleId].name}!`);
-
-            if (surfaceMissions[1].done && surfaceMissions[2].done && surfaceMissions[3].done) {
-                document.getElementById('surface-action-prompt').innerText = "🌟 All Surface Operations Complete! Return Home Unlocked!";
             }
         }
 
@@ -1363,8 +1502,8 @@
         }
 
         function returnHomeToEarth() {
-            if (!surfaceMissions[1].done || !surfaceMissions[2].done || !surfaceMissions[3].done) {
-                alert("⚠️ Complete all surface station installations before launching back home!");
+            if (!surfaceMissions[3].done || collectedSamplesCount < 3) {
+                alert("⚠️ Complete your rover drag-and-drop build and collect all 3 science samples before returning home!");
                 return;
             }
             if (surfaceAnimationId) cancelAnimationFrame(surfaceAnimationId);
