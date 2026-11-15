@@ -18,6 +18,7 @@
       align-items: center;
       padding: 15px;
       position: relative;
+      width: 100%;
     }
     .stars {
       position: fixed;
@@ -38,7 +39,7 @@
       pointer-events: none;
     }
     
-    /* Fact Box fixed cleanly in the top right */
+    /* Fact Box tucked cleanly in the top right */
     .fact-box {
       position: fixed;
       top: 20px;
@@ -53,11 +54,8 @@
       box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
     }
     .fact-radio { display: none; }
-    
-    /* Hide all slides by default */
     .fact-slide { display: none; }
     
-    /* Show only the active slide */
     #f1:checked ~ .slide-1, 
     #f2:checked ~ .slide-2, 
     #f3:checked ~ .slide-3, 
@@ -70,6 +68,16 @@
     .fact-btn { display: inline-block; border: 1px solid #9d4edd; color: #00f0ff; font-size: 10px; padding: 4px 10px; border-radius: 8px; cursor: pointer; background: rgba(157, 78, 221, 0.1); }
     .fact-btn:hover { background: rgba(157, 78, 221, 0.3); }
     .fact-done { font-size: 10px; color: #00ff88; font-weight: bold; }
+
+    /* Main content wrapper to keep everything centered */
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      max-width: 600px;
+    }
 
     .badge {
       background-color: rgba(0, 240, 255, 0.1);
@@ -165,30 +173,32 @@
     </div>
   </div>
 
-  <!-- MAIN PAGE CONTENT -->
-  <div class="badge">NASA SPACE APPS CHALLENGE 2026</div>
-  <h1>AeroNOAH</h1>
-  <p class="subtitle">Welcome to AeroNOAH, the best space game out there!</p>
+  <!-- MAIN PAGE CONTENT (Wrapped and perfectly centered) -->
+  <div class="main-content">
+    <div class="badge">NASA SPACE APPS CHALLENGE 2026</div>
+    <h1>AeroNOAH</h1>
+    <p class="subtitle">Welcome to AeroNOAH, the best space game out there!</p>
 
-  <div class="control-panel">
-    <div class="minigame-tag">WARM-UP MINI-GAME</div>
-    <div class="game-instruction">CLICK THE MOVING ASTEROID ORB!</div>
-    <input type="checkbox" id="catchCheck">
-    <div class="orbit-track">
-      <label for="catchCheck" class="moving-target"></label>
-      <label for="catchCheck" class="win-banner">CLICKED! WANNA TRY AGAIN?</label>
+    <div class="control-panel">
+      <div class="minigame-tag">WARM-UP MINI-GAME</div>
+      <div class="game-instruction">CLICK THE MOVING ASTEROID ORB!</div>
+      <input type="checkbox" id="catchCheck">
+      <div class="orbit-track">
+        <label for="catchCheck" class="moving-target"></label>
+        <label for="catchCheck" class="win-banner">CLICKED! WANNA TRY AGAIN?</label>
+      </div>
+      <p class="minigame-note">Just a quick warm-up! Click the rocket button below to play the real AeroNOAH game.</p>
     </div>
-    <p class="minigame-note">Just a quick warm-up! Click the rocket button below to play the real AeroNOAH game.</p>
-  </div>
 
-  <a href="game.html" class="space-btn">
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
-      <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
-      <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/>
-      <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
-    </svg>
-    <span>Greetings, Space Commander!</span>
-  </a>
+    <a href="game.html" class="space-btn">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/>
+        <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>
+        <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/>
+        <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
+      </svg>
+      <span>Greetings, Space Commander!</span>
+    </a>
+  </div>
 </body>
 </html>
