@@ -25,7 +25,7 @@
         }
         .screen {
             display: none; width: 96vw; max-width: 1400px; min-height: 90vh;
-            background: rgba(2, 6, 23, 0.99); border: 4px solid #38bdf8; border-radius: 20px;
+            background: rgba(2, 6, 23, 0.78); border: 4px solid #38bdf8; border-radius: 20px;
             animation: hyperVibrantPulse 3s infinite ease-in-out; padding: 40px;
             flex-direction: column; justify-content: flex-start; position: relative; overflow-y: auto;
         }
@@ -58,6 +58,7 @@
             font-size: 0.95rem; font-weight: 700; transition: 0.2s; box-shadow: 0 0 20px rgba(244, 63, 94, 0.4);
         }
         .back-btn:hover { background: #f43f5e; border-color: #ffffff; color: #000; box-shadow: 0 0 35px #f43f5e; }
+        #bg-comets { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
         #space-canvas { position: absolute; inset: 0; pointer-events: none; z-index: 1; border-radius: 16px; }
         .home-menu-content { position: relative; z-index: 5; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-grow: 1; gap: 1rem; width: 100%; max-width: 600px; margin: 0 auto; }
         .container-quiz { gap: 1.5rem; }
@@ -415,8 +416,9 @@
     </style>
 </head>
 <body>
+    <canvas id="bg-comets" aria-hidden="true"></canvas>
 
-    <div id="notification-banner">âš ï¸ HYPE OVERLOAD!</div>
+    <div id="notification-banner">⚠️ HYPE OVERLOAD!</div>
 
     <input type="radio" name="screen" id="home-toggle" checked>
     <input type="radio" name="screen" id="quiz-toggle">
@@ -438,24 +440,24 @@
         <h1>AeroNOAH</h1>
         <div class="home-menu-content">
             <label for="quiz-toggle" class="btn" onclick="startCosmicQuiz()">
-                <span>ðŸš€ Launch Quiz & Earn 150 Craters/Correct</span>
-                <span>âž”</span>
+                <span>🚀 Launch Quiz & Earn 150 Craters/Correct</span>
+                <span>➔</span>
             </label>
             <label for="difficulty-toggle" class="btn">
-                <span>âš¡ Manual Override & Mission Selection</span>
-                <span>âž”</span>
+                <span>⚡ Manual Override & Mission Selection</span>
+                <span>➔</span>
             </label>
             <label for="contracts-toggle" class="btn">
-                <span>ðŸ“‹ Career Mission Contract Hub</span>
-                <span>âž”</span>
+                <span>📋 Career Mission Contract Hub</span>
+                <span>➔</span>
             </label>
             <label for="replay-toggle" class="btn">
-                <span>ðŸ“ˆ Flight Telemetry Blackbox Replay</span>
-                <span>âž”</span>
+                <span>📈 Flight Telemetry Blackbox Replay</span>
+                <span>➔</span>
             </label>
             <label for="skins-toggle" class="btn">
-                <span>ðŸ›°ï¸ Shop</span>
-                <span>âž”</span>
+                <span>🛰️ Shop</span>
+                <span>➔</span>
             </label>
         </div>
     </div>
@@ -464,13 +466,13 @@
     <div class="screen container-quiz">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #38bdf8; padding-bottom: 1.2rem;">
             <h1>Cosmic Aptitude Exam (<span id="quiz-q-num">1</span>/15)</h1>
-            <label for="difficulty-toggle" class="back-btn">Skip to Manual Selection âž”</label>
+            <label for="difficulty-toggle" class="back-btn">Skip to Manual Selection ➔</label>
         </div>
         <div class="quiz-box">
             <h2 id="quiz-question-title" style="color:#38bdf8; font-size:1.4rem;">Loading Question...</h2>
             <div class="quiz-options-grid" id="quiz-options-container"></div>
             <div>
-                <button class="hint-btn" onclick="showQuizHint()">ðŸ’¡ Get Hint</button>
+                <button class="hint-btn" onclick="showQuizHint()">💡 Get Hint</button>
                 <div id="quiz-hint-box" style="margin-top: 8px; color: #facc15; font-size: 0.95rem; font-style: italic;"></div>
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; color:#cbd5e1; font-weight:700;">
@@ -484,12 +486,12 @@
     <div class="screen container-difficulty">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #38bdf8; padding-bottom: 1.5rem; margin-bottom: 1.0rem;">
             <h1>Mission Profile Selection (Strictly Unique Altitudes, Max 95,000 km)</h1>
-            <label for="home-toggle" class="back-btn">â¬… Return to Menu</label>
+            <label for="home-toggle" class="back-btn">⬅ Return to Menu</label>
         </div>
 
         <div class="nasa-api-status" id="nasa-api-status-box">
-            <span>ðŸ“¡ NASA Open Data Status: Connected to NASA Horizons & Planetary Fact Sheet API</span>
-            <span id="api-data-badge" style="color: #10b981; font-weight: 700;">â— Live Sync Active</span>
+            <span>📡 NASA Open Data Status: Connected to NASA Horizons & Planetary Fact Sheet API</span>
+            <span id="api-data-badge" style="color: #10b981; font-weight: 700;">● Live Sync Active</span>
         </div>
 
         <div id="quiz-result-banner" style="background: rgba(16, 185, 129, 0.2); border: 2px solid #10b981; padding: 16px 22px; border-radius: 10px; margin-bottom: 1rem; display:none; font-size: 1.1rem; color: #fff;">
@@ -525,24 +527,24 @@
                     <div class="diff-card ${m.tier === 1 ? 'selected-card' : ''}" id="rank-card-${m.tier}" onclick="selectDifficulty(${m.tier})">
                         <div class="diff-info">
                             <h3>${m.rank}</h3>
-                            <p>Destination: <strong>${m.dest} (Tier ${m.tier})</strong> â€” ${m.desc}<br><span style="color:#38bdf8; font-size:0.85rem;">Target Altitude: ${m.alt.toLocaleString()} km</span></p>
+                            <p>Destination: <strong>${m.dest} (Tier ${m.tier})</strong> — ${m.desc}<br><span style="color:#38bdf8; font-size:0.85rem;">Target Altitude: ${m.alt.toLocaleString()} km</span></p>
                         </div>
                         <div style="color:#ffffff; font-size:0.95rem; font-weight:700; white-space:nowrap; text-align:right;">
                             Budget: ${m.budget}<br><br>
-                            <span style="font-size:0.85rem; color:#10b981;" id="rank-status-${m.tier}">${m.tier === 1 ? 'âœ“ Active Profile' : 'Select Profile âž”'}</span>
+                            <span style="font-size:0.85rem; color:#10b981;" id="rank-status-${m.tier}">${m.tier === 1 ? '✓ Active Profile' : 'Select Profile ➔'}</span>
                         </div>
                     </div>
                 `).join(''));
             </script>
         </div>
-        <label for="vab-toggle" class="proceed-vab-btn" onclick="prepareVAB()">ðŸš€ Proceed to Vehicle Assembly Building (VAB) âž”</label>
+        <label for="vab-toggle" class="proceed-vab-btn" onclick="prepareVAB()">🚀 Proceed to Vehicle Assembly Building (VAB) ➔</label>
     </div>
 
     <!-- SCREEN 4: VAB ROCKET BUILDER -->
     <div class="screen container-vab">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #38bdf8; padding-bottom: 1.2rem; margin-bottom: 1.0rem;">
             <h1>Vehicle Assembly Building (VAB)</h1>
-            <label for="difficulty-toggle" class="back-btn">â¬… Modify Mission Profile</label>
+            <label for="difficulty-toggle" class="back-btn">⬅ Modify Mission Profile</label>
         </div>
 
         <div class="vab-hud">
@@ -559,7 +561,7 @@
                 <h3>1. Mission Destination, Transportation System & Alloy Parameters</h3>
                 <div class="config-grid">
                     <div class="config-item">
-                        <label for="cfg-destination-pick">ðŸŽ¯ Destination Pick (Locked above your difficulty):</label>
+                        <label for="cfg-destination-pick">🎯 Destination Pick (Locked above your difficulty):</label>
                         <select id="cfg-destination-pick" onchange="updateDestinationPick()">
                             <script>
                                 document.write(missions.map(m => `<option value="${m.tier}" id="dest-opt-${m.tier}">${m.rank}: ${m.dest}</option>`).join(''));
@@ -567,7 +569,7 @@
                         </select>
                     </div>
                     <div class="config-item">
-                        <label for="cfg-transport">ðŸš€ Transportation System Drive:</label>
+                        <label for="cfg-transport">🚀 Transportation System Drive:</label>
                         <select id="cfg-transport" onchange="updateConfiguration()">
                             <option value="Chemical" data-cost="50000000" data-mult="1.0">Chemical Rocket Stage ($50M)</option>
                             <option value="Ion" data-cost="120000000" data-mult="1.2">Ion Propulsion Drive ($120M)</option>
@@ -576,7 +578,7 @@
                         </select>
                     </div>
                     <div class="config-item">
-                        <label for="cfg-material">ðŸ—ï¸ Structural Material Alloy:</label>
+                        <label for="cfg-material">🏗️ Structural Material Alloy:</label>
                         <select id="cfg-material" onchange="updateConfiguration()">
                             <option value="Aluminum" data-cost="10000000" data-mult="1.0">Aerospace Aluminum ($10M / 1x Mass)</option>
                             <option value="Titanium" data-cost="25000000" data-mult="1.2">Reinforced Titanium ($25M / 1.2x Mass)</option>
@@ -589,20 +591,20 @@
                         <input type="range" id="cfg-crew" min="1" max="50" value="1" oninput="updateConfiguration()">
                     </div>
                     <div class="config-item">
-                        <label for="cfg-paint">ðŸŽ¨ Airframe Paint Accent:</label>
+                        <label for="cfg-paint">🎨 Airframe Paint Accent:</label>
                         <input type="color" id="cfg-paint" value="#38bdf8" style="height:40px; cursor:pointer;" onchange="updateConfiguration()">
                     </div>
                 </div>
             </div>
 
             <div class="vab-panel">
-                <h3>2. Assembly Stand (Scroll vertically to view entire stack, click part to select, use [â†‘â†“] to reorder stack, [â†â†’] to position X, [R] to rotate, [Backspace] to delete)</h3>
+                <h3>2. Assembly Stand (Scroll vertically to view entire stack, click part to select, use [↑↓] to reorder stack, [←→] to position X, [R] to rotate, [Backspace] to delete)</h3>
                 <div class="visualizer-canvas" id="canvas-area">
                     <div class="empty-canvas-msg" id="empty-msg">Assembly stand is empty. Add unlimited components below!</div>
                 </div>
                 <div class="launch-action-bar">
-                    <button class="rotate-btn-vab" onclick="rotateSelectedPart()">ðŸ”„ Rotate Selected ([R])</button>
-                    <button class="launch-btn" onclick="attemptLaunch()">ðŸš€ Initialize Omniversal Launch Sequence</button>
+                    <button class="rotate-btn-vab" onclick="rotateSelectedPart()">🔄 Rotate Selected ([R])</button>
+                    <button class="launch-btn" onclick="attemptLaunch()">🚀 Initialize Omniversal Launch Sequence</button>
                 </div>
             </div>
 
@@ -774,6 +776,8 @@
                 <button type="button" data-flight-camera="chase" aria-pressed="true">Chase</button>
                 <button type="button" data-flight-camera="side" aria-pressed="false">Side</button>
                 <button type="button" data-flight-camera="tower" aria-pressed="false">Launchpad</button>
+                <button type="button" data-flight-camera="orbit" aria-pressed="false">Orbit</button>
+                <button type="button" data-flight-camera="low" aria-pressed="false">Low angle</button>
             </div>
             <canvas id="flight-parallax-canvas"></canvas>
             <div class="launch-tower" id="flight-launch-tower"></div>
@@ -798,22 +802,22 @@
         </div>
 
         <div class="flight-touch-controls" id="flight-touch-controls" role="group" aria-label="On-screen flight controls">
-            <button type="button" data-flight-hold="left" aria-label="Steer left">â† Left</button>
-            <button type="button" data-flight-hold="thrust" aria-label="Hold for thrust">â†‘ Thrust</button>
-            <button type="button" data-flight-hold="right" aria-label="Steer right">Right â†’</button>
+            <button type="button" data-flight-hold="left" aria-label="Steer left">← Left</button>
+            <button type="button" data-flight-hold="thrust" aria-label="Hold for thrust">↑ Thrust</button>
+            <button type="button" data-flight-hold="right" aria-label="Steer right">Right →</button>
             <button type="button" id="flight-touch-stage">Stage</button>
         </div>
 
         <div class="flight-status-box">
             <div class="flight-key-legend" id="flight-key-legend" aria-label="Keyboard shortcuts">
-                <span><kbd>W</kbd> / <kbd>â†‘</kbd> Thrust</span>
-                <span><kbd>A</kbd> <kbd>D</kbd> / <kbd>â†</kbd> <kbd>â†’</kbd> Steer</span>
+                <span><kbd>W</kbd> / <kbd>↑</kbd> Thrust</span>
+                <span><kbd>A</kbd> <kbd>D</kbd> / <kbd>←</kbd> <kbd>→</kbd> Steer</span>
                 <span><kbd>Space</kbd> Stage</span>
-                <span><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> Cameras</span>
+                <span><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> <kbd>5</kbd> Cameras</span>
             </div>
-            <div id="sim-status-msg">Hold [W] / [â†‘] to ignite, [â†][â†’] or [A][D] to tilt/steer rocket nose (Sticky Tilt), [SPACEBAR] to stage!</div>
+            <div id="sim-status-msg">Hold [W] / [↑] to ignite, [←][→] or [A][D] to tilt/steer rocket nose (Sticky Tilt), [SPACEBAR] to stage!</div>
             <div style="display:flex; gap:10px;">
-                <button class="action-sim-btn" id="explore-dest-btn" onclick="goToSurfaceExploration()">ðŸ”­ Explore Surrounding (Surface Mission)</button>
+                <button class="action-sim-btn" id="explore-dest-btn" onclick="goToSurfaceExploration()">🔭 Explore Surrounding (Surface Mission)</button>
                 <button class="try-again-btn" id="try-again-btn" onclick="resetToVAB()">Return to VAB</button>
             </div>
         </div>
@@ -823,16 +827,16 @@
     <div class="screen container-explore">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #38bdf8; padding-bottom: 1.2rem;">
             <h1>1st-Person Surface Exploration: <span id="explore-target-name">Moon Surface</span></h1>
-            <button type="button" class="back-btn" onclick="returnHomeToEarth()">ðŸ  Launch & Return Home</button>
+            <button type="button" class="back-btn" onclick="returnHomeToEarth()">🏠 Launch & Return Home</button>
         </div>
 
         <div class="explore-viewport-wrap">
             <canvas id="surface-3d-canvas" onclick="handleCanvasClick(event)" tabindex="0" aria-label="First-person surface view" aria-describedby="surface-action-prompt"></canvas>
             <div class="field-overlay" aria-label="Expedition instruments">
                 <div class="field-data" id="field-instruments">
-                    <span id="field-compass">N 000Â°</span>
-                    <span id="field-coords">X 0.0 Â· Z 2.0</span><br>
-                    <span id="field-suit">BOOST 100% Â· EVA 00:00</span>
+                    <span id="field-compass">N 000°</span>
+                    <span id="field-coords">X 0.0 · Z 2.0</span><br>
+                    <span id="field-suit">BOOST 100% · EVA 00:00</span>
                 </div>
                 <div class="field-radar" id="field-radar">
                     <canvas id="field-map" width="152" height="152" role="img" aria-label="Minimap showing your position, explored sectors, and tracked locations"></canvas>
@@ -847,11 +851,11 @@
             <div class="field-pad" id="field-pad" hidden>
                 <p class="field-data field-pad-label">Hold to move. Tap Jump to hop.</p>
                 <button type="button" class="field-button" data-field-hold="KeyQ" aria-label="Strafe left">Q</button>
-                <button type="button" class="field-button" data-field-hold="KeyW" aria-label="Move forward">â†‘</button>
+                <button type="button" class="field-button" data-field-hold="KeyW" aria-label="Move forward">↑</button>
                 <button type="button" class="field-button" data-field-hold="KeyR" aria-label="Strafe right">R</button>
-                <button type="button" class="field-button" data-field-hold="KeyA" aria-label="Turn left">â†</button>
-                <button type="button" class="field-button" data-field-hold="KeyS" aria-label="Move backward">â†“</button>
-                <button type="button" class="field-button" data-field-hold="KeyD" aria-label="Turn right">â†’</button>
+                <button type="button" class="field-button" data-field-hold="KeyA" aria-label="Turn left">←</button>
+                <button type="button" class="field-button" data-field-hold="KeyS" aria-label="Move backward">↓</button>
+                <button type="button" class="field-button" data-field-hold="KeyD" aria-label="Turn right">→</button>
                 <button type="button" class="field-button" data-field-action="jump">Jump</button>
                 <button type="button" class="field-button" data-field-action="visor">Visor</button>
                 <button type="button" class="field-button" data-field-action="interact" aria-label="Interact with nearby object">Use</button>
@@ -860,7 +864,7 @@
             <!-- HABITAT TRIVIA MODAL -->
             <div id="trivia-modal">
                 <div class="trivia-box">
-                    <h2 style="color:#38bdf8;">â›º Habitat Science Uplink Terminal</h2>
+                    <h2 style="color:#38bdf8;">⛺ Habitat Science Uplink Terminal</h2>
                     <p id="trivia-question" style="font-size: 1.1rem; color: #fff; margin: 15px 0;">Loading Question...</p>
                     <div id="trivia-options" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px;"></div>
                     <div id="trivia-hint-display" style="color: #facc15; font-size: 0.95rem; font-style: italic; min-height: 25px;"></div>
@@ -869,16 +873,16 @@
             </div>
 
             <div class="explore-hud-topright">
-                <h3 style="color:#38bdf8; font-size:0.95rem; border-bottom:1px solid #38bdf8; padding-bottom:6px;">ðŸ§ª Chemical & Mineral Catalog (<span id="chem-count">0</span>/38)</h3>
+                <h3 style="color:#38bdf8; font-size:0.95rem; border-bottom:1px solid #38bdf8; padding-bottom:6px;">🧪 Chemical & Mineral Catalog (<span id="chem-count">0</span>/38)</h3>
                 <div style="font-size: 0.78rem; color: #94a3b8; max-height: 120px; overflow-y: auto; margin-bottom: 8px;" id="chemical-list-box">Explore and left-click samples to discover 38 chemicals...</div>
                 
-                <h3 style="color:#38bdf8; font-size:0.95rem; border-bottom:1px solid #38bdf8; padding-bottom:6px; margin-top:6px;">ðŸšœ Scattered Rover Parts (<span id="rover-parts-count">0</span>/4)</h3>
+                <h3 style="color:#38bdf8; font-size:0.95rem; border-bottom:1px solid #38bdf8; padding-bottom:6px; margin-top:6px;">🚜 Scattered Rover Parts (<span id="rover-parts-count">0</span>/4)</h3>
                 <div class="explore-mission-item"><span>1. Heavy All-Terrain Wheels</span><span id="rp-1" style="color:#facc15;">[Scattered]</span></div>
                 <div class="explore-mission-item"><span>2. Foldable Solar Array</span><span id="rp-2" style="color:#facc15;">[Scattered]</span></div>
                 <div class="explore-mission-item"><span>3. Diamond Core Drill</span><span id="rp-3" style="color:#facc15;">[Scattered]</span></div>
                 <div class="explore-mission-item"><span>4. Robotic Sample Arm</span><span id="rp-4" style="color:#facc15;">[Scattered]</span></div>
                 
-                <h3 style="color:#38bdf8; font-size:0.95rem; border-bottom:1px solid #38bdf8; padding-bottom:6px; margin-top:6px;">â›º Base Erection & Visor</h3>
+                <h3 style="color:#38bdf8; font-size:0.95rem; border-bottom:1px solid #38bdf8; padding-bottom:6px; margin-top:6px;">⛺ Base Erection & Visor</h3>
                 <div class="explore-mission-item"><span>Habitat Status</span><span id="hab-status" style="color:#facc15;">[Locked - Press E]</span></div>
                 <div class="explore-mission-item"><span>Special Vision Visor [V]</span><span id="vision-status" style="color:#facc15;">[Press V]</span></div>
                 <div class="explore-mission-item"><span>Scanner Hint</span><span style="color:#38bdf8;" id="scanner-hint">Explore terrain</span></div>
@@ -900,7 +904,7 @@
                     <button type="button" class="field-button" data-field-action="interact">Interact [E]</button>
                 </div>
             </div>
-            <p class="field-help" id="field-control-help">WASD move Â· â†/â†’ or drag to look Â· Q/R also strafe Â· Space jump Â· Shift sprint Â· B boost Â· V visor Â· M map. Bonus activities donâ€™t affect the return-home requirements.</p>
+            <p class="field-help" id="field-control-help">WASD move · ←/→ or drag to look · Q/R also strafe · Space jump · Shift sprint · B boost · V visor · M map. Bonus activities don’t affect the return-home requirements.</p>
             <p class="field-help field-console-status" id="field-console-status" hidden></p>
             <div class="field-tabs" role="tablist" aria-label="Field console sections">
                 <button id="field-tab-move" type="button" class="field-button" role="tab" aria-controls="field-panel-move" aria-selected="true" data-field-tab="move">Navigation</button>
@@ -941,7 +945,7 @@
                                 <option value="part">Nearest rover part</option><option value="habitat">Habitat</option><option value="lander">Landing site</option><option value="landmark">Unsurveyed landmark</option><option value="expedition">Expedition target</option>
                             </select>
                         </label>
-                        <p class="field-help" id="field-survey">0/4 landmarks surveyed Â· 0/110 sectors mapped</p>
+                        <p class="field-help" id="field-survey">0/4 landmarks surveyed · 0/110 sectors mapped</p>
                     </div>
                 </div>
             </div>
@@ -1085,7 +1089,7 @@
                     <div class="field-card">
                         <h3>Expedition flag &amp; patch</h3>
                         <p class="field-help" id="world-patch"></p>
-                        <div id="world-earned" class="world-patch" role="status" hidden><span aria-hidden="true">âœ¦</span><strong id="world-patch-title"></strong></div>
+                        <div id="world-earned" class="world-patch" role="status" hidden><span aria-hidden="true">✦</span><strong id="world-patch-title"></strong></div>
                         <div class="field-row">
                             <button type="button" class="field-button" data-field-action="worldflag">Plant flag here</button>
                             <button type="button" class="field-button" data-field-action="worldflagguide">Guide me to flag</button>
@@ -1094,7 +1098,7 @@
                     </div>
                 </div>
                 <p class="field-help world-legend"><span class="world-mark" style="--mark:#f6d481">Active stop</span><span class="world-mark" style="--mark:#9af5e1">Scout drone</span><span class="world-mark" style="--mark:#ffab6c">Supply cache</span><span class="world-mark" style="--mark:#ffb5c4">Flag</span></p>
-                <p class="field-help">At a stop or cache, press E on a keyboard or tap Use on the touch pad. These bonus activities donâ€™t change the return-home requirements.</p>
+                <p class="field-help">At a stop or cache, press E on a keyboard or tap Use on the touch pad. These bonus activities don’t change the return-home requirements.</p>
             </section>
         </section>
     </div>
@@ -1103,7 +1107,7 @@
     <div class="screen container-contracts">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #38bdf8; padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
             <h1>Career Mission Contract Hub</h1>
-            <label for="home-toggle" class="back-btn">â¬… Return to Menu</label>
+            <label for="home-toggle" class="back-btn">⬅ Return to Menu</label>
         </div>
         <div style="display:flex; flex-direction:column; gap:1rem; overflow-y:auto; max-height:60vh;">
             <div class="contract-card">
@@ -1121,7 +1125,7 @@
     <div class="screen container-replay">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #38bdf8; padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
             <h1>Flight Telemetry Blackbox Debrief</h1>
-            <label for="home-toggle" class="back-btn">â¬… Return to Menu</label>
+            <label for="home-toggle" class="back-btn">⬅ Return to Menu</label>
         </div>
         <div style="background: rgba(15,23,42,0.9); border: 2px solid #38bdf8; padding: 30px; border-radius: 12px; display:flex; flex-direction:column; gap:15px; font-size:1.1rem;">
             <div>Last Flight Peak Altitude: <strong id="replay-alt" style="color:#10b981;">0 km</strong></div>
@@ -1136,9 +1140,9 @@
         <div class="shop-header-row">
             <div>
                 <h1>AeroNOAH Shop</h1>
-                <div class="currency-display">Cosmic Reserves: <span id="player-balance">0</span> â˜„ï¸ Craters</div>
+                <div class="currency-display">Cosmic Reserves: <span id="player-balance">0</span> ☄️ Craters</div>
             </div>
-            <label for="home-toggle" class="back-btn">â¬… Return to Menu</label>
+            <label for="home-toggle" class="back-btn">⬅ Return to Menu</label>
         </div>
 
         <div class="shop-tabs-row">
@@ -1162,7 +1166,7 @@
                 document.write(shopSkins.map(s => `
                     <div class="item-card">
                         <div><strong>${s.name}</strong><br><span style="color:#cbd5e1; font-size:0.9rem;">Advanced aerodynamic airframe coating</span></div>
-                        <div class="price-tag" onclick="buyItem(${s.price}, '${s.name}')">${s.price.toLocaleString()} â˜„ï¸ Buy</div>
+                        <div class="price-tag" onclick="buyItem(${s.price}, '${s.name}')">${s.price.toLocaleString()} ☄️ Buy</div>
                     </div>
                 `).join(''));
             </script>
@@ -1181,7 +1185,7 @@
                 document.write(shopCoaches.map(c => `
                     <div class="item-card">
                         <div><strong>${c.name}</strong><br><span style="color:#cbd5e1; font-size:0.9rem;">AI & Human Flight Director telemetry guidance</span></div>
-                        <div class="price-tag" onclick="buyItem(${c.price}, '${c.name}')">${c.price.toLocaleString()} â˜„ï¸ Hire</div>
+                        <div class="price-tag" onclick="buyItem(${c.price}, '${c.name}')">${c.price.toLocaleString()} ☄️ Hire</div>
                     </div>
                 `).join(''));
             </script>
@@ -1189,12 +1193,12 @@
 
         <div class="shop-content list-craters">
             <div class="item-card">
-                <div><strong>Quantum Data Cache (+25,000 Craters)</strong><br><span style="color:#cbd5e1; font-size:0.9rem;">Cost: 1,500 â˜„ï¸ Craters</span></div>
-                <div class="price-tag" onclick="buyCache(25000, 1500)">1,500 â˜„ï¸ Purchase</div>
+                <div><strong>Quantum Data Cache (+25,000 Craters)</strong><br><span style="color:#cbd5e1; font-size:0.9rem;">Cost: 1,500 ☄️ Craters</span></div>
+                <div class="price-tag" onclick="buyCache(25000, 1500)">1,500 ☄️ Purchase</div>
             </div>
             <div class="item-card">
-                <div><strong>Omniversal Mega Bundle (+100,000 Craters)</strong><br><span style="color:#cbd5e1; font-size:0.9rem;">Cost: 5,000 â˜„ï¸ Craters</span></div>
-                <div class="price-tag" onclick="buyCache(100000, 5000)">5,000 â˜„ï¸ Purchase</div>
+                <div><strong>Omniversal Mega Bundle (+100,000 Craters)</strong><br><span style="color:#cbd5e1; font-size:0.9rem;">Cost: 5,000 ☄️ Craters</span></div>
+                <div class="price-tag" onclick="buyCache(100000, 5000)">5,000 ☄️ Purchase</div>
             </div>
         </div>
     </div>
@@ -1212,8 +1216,8 @@
                 const response = await fetch('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY');
                 const data = await response.json();
                 document.getElementById('nasa-api-status-box').innerHTML = `
-                    <span>ðŸ“¡ NASA Open Data Live Sync: <strong>${data.title}</strong></span>
-                    <span style="color: #10b981; font-weight: 700;">â— Live API Synced</span>
+                    <span>📡 NASA Open Data Live Sync: <strong>${data.title}</strong></span>
+                    <span style="color: #10b981; font-weight: 700;">● Live API Synced</span>
                 `;
             } catch (err) {
                 console.log("Using cached NASA planetary fact sheets.");
@@ -1272,7 +1276,7 @@
 
         let customAccentColor = '#38bdf8';
         function drawUniquePartShape(ctx, w, h, styleType, colorArray, rotation = 0) {
-            if(Number(styleType.slice(1))>=9){flight3D.drawComponent(ctx,w,h,styleType,colorArray,rotation);return;}
+            flight3D.drawComponent(ctx,w,h,styleType,colorArray,rotation);return;
             ctx.save();
             ctx.clearRect(0, 0, w, h);
             ctx.translate(w/2, h/2);
@@ -1328,36 +1332,27 @@
 
         let playerBalance = 0;
         function buyItem(price, itemName) {
-            if (playerBalance < price) { showAlert("âš ï¸ Not enough Cosmic Craters!"); return; }
+            if (playerBalance < price) { showAlert("⚠️ Not enough Cosmic Craters!"); return; }
             playerBalance -= price;
             document.getElementById('player-balance').innerText = playerBalance.toLocaleString();
             alert("Successfully purchased " + itemName + "!");
         }
 
         function buyCache(yieldAmt, cost) {
-            if (playerBalance < cost) { showAlert("âš ï¸ Insufficient Cosmic Reserves!"); return; }
+            if (playerBalance < cost) { showAlert("⚠️ Insufficient Cosmic Reserves!"); return; }
             playerBalance -= cost; playerBalance += yieldAmt;
             document.getElementById('player-balance').innerText = playerBalance.toLocaleString();
             alert("Acquired +" + yieldAmt.toLocaleString() + " Craters!");
         }
 
         const cosmosQuiz = [
-    { q: "What is the primary gas composing stellar cores during main sequence fusion?", opts: ["Hydrogen", "Helium", "Oxygen", "Nitrogen"], ans: 0, hint: "Lightest element." },
-    { q: "Which planet in our solar system has the most extreme volcanic activity?", opts: ["Mars", "Io (Jupiter's Moon)", "Venus", "Mercury"], ans: 1, hint: "Volcanic moon." },
-    { q: "What is the event horizon of a black hole?", opts: ["Accretion center", "Point of no return where light cannot escape", "Magnetic pole", "Neutron site"], ans: 1, hint: "Point of no return." },
-    { q: "Approximately how long does light take to travel from the Sun to Earth?", opts: ["8 seconds", "8 minutes", "8 hours", "8 days"], ans: 1, hint: "Five hundred seconds." },
-    { q: "Which galaxy is on a direct collision course with our Milky Way?", opts: ["Sombrero", "Andromeda", "Triangulum", "Magellanic Cloud"], ans: 1, hint: "Princess in the sky." },
-    { q: "Which planet is known as the Red Planet?", opts: ["Venus", "Mars", "Jupiter", "Saturn"], ans: 1, hint: "Rusty surface." },
-    { q: "What is the largest planet in our solar system?", opts: ["Saturn", "Neptune", "Jupiter", "Uranus"], ans: 2, hint: "Gas giant king." },
-    { q: "Which planet has the most prominent ring system?", opts: ["Jupiter", "Saturn", "Neptune", "Mars"], ans: 1, hint: "Beautiful icy rings." },
-    { q: "What force keeps planets in orbit around the Sun?", opts: ["Magnetism", "Friction", "Gravity", "Radiation"], ans: 2, hint: "Attraction between masses." },
-    { q: "Which object orbits Earth and causes ocean tides?", opts: ["The Sun", "Mars", "The Moon", "Venus"], ans: 2, hint: "Our natural satellite." },
-    { q: "What is a light-year a measure of?", opts: ["Time", "Distance", "Brightness", "Temperature"], ans: 1, hint: "How far light travels in one year." },
-    { q: "Which planet is closest to the Sun?", opts: ["Venus", "Earth", "Mercury", "Mars"], ans: 2, hint: "Smallest inner planet." },
-    { q: "What is the Sun mainly made of?", opts: ["Rock and iron", "Hydrogen and helium", "Carbon and oxygen", "Water and ice"], ans: 1, hint: "Two lightest elements." },
-    { q: "Which spacecraft carried the first humans to land on the Moon?", opts: ["Apollo 11", "Voyager 1", "Hubble", "Curiosity"], ans: 0, hint: "1969 lunar landing." },
-    { q: "What is a shooting star usually?", opts: ["A star falling from orbit", "A meteor burning in Earth's atmosphere", "A planet entering the atmosphere", "A comet crashing into the Moon"], ans: 1, hint: "Small space rock streak." }
-];
+            { q: "What is the primary gas composing stellar cores during main sequence fusion?", opts: ["Hydrogen", "Helium", "Oxygen", "Nitrogen"], ans: 0, hint: "Lightest element." },
+            { q: "Which planet in our solar system has the most extreme volcanic activity?", opts: ["Mars", "Io (Jupiter's Moon)", "Venus", "Mercury"], ans: 1, hint: "Volcanic moon." },
+            { q: "What is the event horizon of a black hole?", opts: ["Accretion center", "Point of no return where light cannot escape", "Magnetic pole", "Neutron site"], ans: 1, hint: "Point of no return." },
+            { q: "Approximately how long does light take to travel from the Sun to Earth?", opts: ["8 seconds", "8 minutes", "8 hours", "8 days"], ans: 1, hint: "Five hundred seconds." },
+            { q: "Which galaxy is on a direct collision course with our Milky Way?", opts: ["Sombrero", "Andromeda", "Triangulum", "Magellanic Cloud"], ans: 1, hint: "Princess in the sky." }
+        ];
+
         let currentQuizIndex = 0, quizCorrectScore = 0;
         let unlockedDifficultyTier = 1;
 
@@ -1400,16 +1395,16 @@
                 quizCorrectScore++; playerBalance += 150;
                 document.getElementById('player-balance').innerText = playerBalance.toLocaleString();
                 document.getElementById('quiz-feedback').style.color = '#10b981';
-                document.getElementById('quiz-feedback').innerText = 'âœ“ Correct (+150 Craters)!';
+                document.getElementById('quiz-feedback').innerText = '✓ Correct (+150 Craters)!';
             } else {
                 document.getElementById('quiz-feedback').style.color = '#f43f5e';
-                document.getElementById('quiz-feedback').innerText = `âœ— Incorrect! Answer: ${qObj.opts[qObj.ans]}`;
+                document.getElementById('quiz-feedback').innerText = `✗ Incorrect! Answer: ${qObj.opts[qObj.ans]}`;
             }
             setTimeout(() => { currentQuizIndex++; loadQuizQuestion(); }, 1000);
         }
 
         function acceptContract(targetTier, reward) {
-            if (targetTier > unlockedDifficultyTier) { alert(`âš ï¸ Requires tier ${targetTier}!`); return; }
+            if (targetTier > unlockedDifficultyTier) { alert(`⚠️ Requires tier ${targetTier}!`); return; }
             selectDifficulty(targetTier);
             document.getElementById('vab-toggle').checked = true;
             alert(`Contract Accepted! Build rocket for Tier ${targetTier} (+${reward.toLocaleString()} Craters)`);
@@ -1471,7 +1466,7 @@
                 let opt = document.getElementById(`dest-opt-${m.tier}`);
                 if (opt) {
                     if (m.tier > selectedDifficultyTier) {
-                        opt.disabled = true; opt.innerText = `${m.rank}: ${m.dest} (ðŸ”’ Locked)`;
+                        opt.disabled = true; opt.innerText = `${m.rank}: ${m.dest} (🔒 Locked)`;
                     } else {
                         opt.disabled = false; opt.innerText = `${m.rank}: ${m.dest} (${m.alt.toLocaleString()} km)`;
                     }
@@ -1491,8 +1486,8 @@
                 const card = document.getElementById(`rank-card-${i}`);
                 const status = document.getElementById(`rank-status-${i}`);
                 if (card && status) {
-                    if (i === tierNum) { card.classList.add('selected-card'); status.innerText = 'âœ“ Active Profile'; }
-                    else { card.classList.remove('selected-card'); status.innerText = i <= unlockedDifficultyTier ? 'Select âž”' : 'ðŸ”’ Locked'; }
+                    if (i === tierNum) { card.classList.add('selected-card'); status.innerText = '✓ Active Profile'; }
+                    else { card.classList.remove('selected-card'); status.innerText = i <= unlockedDifficultyTier ? 'Select ➔' : '🔒 Locked'; }
                 }
             }
         }
@@ -1500,7 +1495,7 @@
         function updateDestinationPick() {
             let val = parseInt(document.getElementById('cfg-destination-pick').value);
             if (val > selectedDifficultyTier) {
-                showAlert(`âš ï¸ Exceeds current difficulty tier!`);
+                showAlert(`⚠️ Exceeds current difficulty tier!`);
                 document.getElementById('cfg-destination-pick').value = selectedDifficultyTier;
                 selectedDestinationTier = selectedDifficultyTier;
                 return;
@@ -1616,7 +1611,7 @@
                             <canvas id="canvas-node-${p.id}" width="45" height="45"></canvas>
                             <div style="font-size:0.75rem; line-height:1.2;"><strong>${p.name}</strong><br><span style="color:#10b981;">${(p.mass * materialMultiplier).toFixed(1)}t</span></div>
                         </div>
-                        <button class="remove-node-btn" onclick="removePart(${p.id}, ${p.cost}, event)">Ã—</button>
+                        <button class="remove-node-btn" onclick="removePart(${p.id}, ${p.cost}, event)">×</button>
                     `;
                     node.style.transform = `translateX(${p.x || 0}px)`;
                     stackInner.appendChild(node);
@@ -1665,7 +1660,7 @@
                 }
                 if (e.code === 'KeyV') {
                     player3D.specialVision = !player3D.specialVision;
-                    document.getElementById('vision-status').innerText = player3D.specialVision ? "ðŸŸ¢ Active (Visor ON)" : "ðŸ”´ Offline";
+                    document.getElementById('vision-status').innerText = player3D.specialVision ? "🟢 Active (Visor ON)" : "🔴 Offline";
                     document.getElementById('vision-status').style.color = player3D.specialVision ? "#10b981" : "#facc15";
                     e.preventDefault();
                 }
@@ -1907,6 +1902,73 @@
                 }
             }
 
+            function variantHull(batch,style,accent,dark,h,r){
+                const metal='#b9c7cf',steel='#7a8e9b',lightMetal='#dce3e3';
+                const N=Math.max(1,parseInt(style.slice(1),10)||1), cat=style[0];
+                const k=N%4, m=N>4?1:0;
+                const tube=(points,colors,n=18)=>lathe(batch,points,colors,n);
+                const strip=(a,p,color,glow=0)=>face(batch,p.map(q=>facing(q,a)),color,glow);
+                const round=(color,x,y,z,w,l,d)=>box(batch,x,y,z,w,l,d,color);
+                const ring=(n,fn)=>{for(let i=0;i<n;i++)fn(i*tau/n,i);};
+                function offsetTube(x,z,points,colors,n=14){
+                    const sec=[];lathe(sec,points,colors,n);
+                    for(const p of sec)batch.push({...p,v:p.v.map(([a,b,c])=>[a+x,b,c+z])});
+                }
+                if(cat==='c'){
+                    tube([[[0,r*.81],[.06,r],[h*.30,r],[h*.53,r],[h*.77,r*.83],[h*.91,r*.35],[h,0]],
+                          [[0,r*.12],[h*.25,r*.85],[h*.5,r],[h*.8,r*.9],[h*.93,r*.5],[h,0]],
+                          [[0,r*.7],[h*.2,r*.95],[h*.6,r*.95],[h*.82,r*1.08],[h,r*.92]],
+                          [[0,r*.9],[h*.4,r*1.02],[h*.7,r*.94],[h,r*.42]]][k],[dark,accent,metal,lightMetal,metal,'#d4dbda'],24);
+                    ring(m?6:4,a=>{const w=m?.085:.12,z=r*1.012,y0=h*(k===3?.2:.36);
+                        strip(a,[[-w,y0,z],[w,y0,z],[w*.77,y0+h*.19,z*.998],[-w*.77,y0+h*.19,z*.998]],'#1b344a',.89);
+                        strip(a,[[-w*.73,y0+.03,z+.004],[w*.73,y0+.03,z+.004],[w*.6,y0+h*.1,z+.005],[-w*.6,y0+h*.1,z+.005]],accent,.83);});
+                    if(k===2)ring(3,a=>strip(a,[[-.05,h*.05,r*1.0],[.05,h*.05,r*1.0],[.05,h*.02,r*1.25],[-.05,h*.02,r*1.25]],dark));
+                    if(m)round(steel,0,h+.07,0,.03,.14,.03);
+                } else if(cat==='t'){
+                    const body=[
+                        [[0,r*.76],[.07,r*.85],[h-.065,r*.85],[h,r*.75]],
+                        [[0,0],[h*.16,r*.72],[h*.3,r],[h*.7,r],[h*.84,r*.72],[h,0]],
+                        [[0,r*.8],[h*.3,r],[h*.45,r*.82],[h*.6,r],[h,r*.8]],
+                        [[0,r*.85],[.06,r*1.02],[h-.06,r*1.02],[h,r*.85]]][k];
+                    tube(body,[dark,accent,steel,lightMetal,metal,accent],22);
+                    const hoops=m?5:3;
+                    for(let i=0;i<hoops;i++){const y=h*(.14+.72*i/(hoops-1));tube([[y,r*1.01],[y+.03,r*1.03]],[k===3?accent:steel],22);}
+                    if(k===2)ring(4,a=>strip(a,[[-.05,h*.3,r*1.01],[.05,h*.3,r*1.01],[.05,h*.62,r*1.01],[-.05,h*.62,r*1.01]],accent));
+                } else if(cat==='e'){
+                    const pos=[[[0,0]],[[-.26,0],[.26,0]],[[-.22,-.22],[.22,-.22],[-.22,.22],[.22,.22]],[[0,0]]][k];
+                    tube([[h*.46,r*.76],[h*.58,r],[h*.73,r],[h*.88,r*.84],[h,r*.83]],[steel,accent,dark,metal]);
+                    for(const [x,z] of pos){
+                        const rr=pos.length===1?.39:pos.length===2?.24:.16;
+                        offsetTube(x,z,[[0,rr],[.075,rr],[h*.27,rr*.71],[h*.45,rr*.5],[h*.58,rr*.71]],[steel,'#a17d65','#566778',accent]);
+                        offsetTube(x,z,[[0,rr*.86],[.10,rr*.72],[.11,0]],[dark,'#1c283a']);
+                    }
+                    ring([3,0,0,4][k]+m*2,a=>strip(a,[[0,h*.64,r],[0,h*.50,r*1.45],[0,h*.74,r*1.13],[0,h*.86,r]],accent));
+                    if(k===3)tube([[h*.4,r*1.02],[h*.45,r*1.1],[h*.5,r*1.02]],[accent],22);
+                } else if(cat==='d'){
+                    tube([[0,r*.9],[.055,r],[.09,r],[.10,r*.73],[h-.10,r*.73],[h-.09,r],[h-.055,r],[h,r*.9]],[steel,accent,dark,steel,dark,accent,steel]);
+                    if(k===0)ring(m?12:8,(a,i)=>{const b=i%2?.12:-.12;strip(a,[[-.033,.075,r*.995],[.033,.075,r*.995],[.033+b,h-.075,r*.995],[-.033+b,h-.075,r*.995]],i%3===0?accent:metal);});
+                    else if(k===1){tube([[h*.5-.02,r*1.02],[h*.5+.02,r*1.02]],[dark],22);ring(m?6:4,a=>round(metal,Math.cos(a)*r*1.04,h*.5,Math.sin(a)*r*1.04,.05,.05,.05));}
+                    else if(k===2)ring(m?10:6,a=>strip(a,[[-.02,.03,r*1.0],[.02,.03,r*1.0],[.02,h-.03,r*1.0],[-.02,h-.03,r*1.0]],steel));
+                    else {tube([[h*.44,r*1.02],[h*.56,r*1.02]],[accent],22);ring(m?5:3,a=>strip(a,[[-.03,h*.5-.04,r*.7],[.03,h*.5-.04,r*.7],[.03,h*.5+.04,r*1.0],[-.03,h*.5+.04,r*1.0]],steel));}
+                } else {
+                    tube([[0,r*.74],[.06,r*.88],[h-.06,r*.88],[h,r*.74]],[metal,dark,steel]);
+                    if(k===0){
+                        round(steel,0,h*.45,r*.85,.048,.37,.048);
+                        offsetTube(0,r*.86,[[h*.52,0],[h*.62,.18],[h*.70,.26],[h*.73,.26],[h*.69,.18],[h*.58,0]],[steel,metal,accent,metal,dark]);
+                        round(accent,0,h*.77,r*.86,.038,.15,.038);
+                    } else if(k===1){
+                        const w=.2+m*.08;
+                        ring(m?4:3,a=>{strip(a,[[-w,h*.22,r*1.02],[w,h*.22,r*1.02],[w,h*.82,r*1.02],[-w,h*.82,r*1.02]],'#1e3a8a');
+                            strip(a,[[-w,h*.5,r*1.03],[w,h*.5,r*1.03],[w,h*.53,r*1.03],[-w,h*.53,r*1.03]],accent);});
+                    } else if(k===2){
+                        round(steel,0,h*.5,r*.9,.05,h*.9,.05);
+                        ring(m?3:2,a=>round(accent,Math.cos(a)*r*1.05,h*.5,Math.sin(a)*r*1.05,.16,.22,.16));
+                    } else {
+                        ring(m?5:3,a=>round(steel,Math.cos(a)*r*.85,h*.5,Math.sin(a)*r*.85,.045,h*.9,.045));
+                        tube([[h*.9,r*.95],[h*.95,r*.95]],[accent],18);
+                    }
+                }
+            }
             let cloudPainting;
             function drawCloudPainting(w,h,blend){
                 if(blend>.84)return;
@@ -1953,7 +2015,7 @@
                     const r=.49+Math.min(.12,variation*.016);
                     const h=variation>=8?({c9:1.12,c10:1.49,t9:1.31,t10:1.64,e9:.93,e10:1.16,d9:.32,d10:.37,o9:.55,o10:.67,o11:.51,o12:.72})[part.style]:type==='tank'?1.38+variation*.037:type==='engine'?1.04:type==='capsule'?1.32:type==='decoupler'?.27:.58;
                     const section=[];
-                    if(variation>=8)newHull(section,part.style,accent,secondary,h,r);
+                    if(true)(variation>=8?newHull:variantHull)(section,part.style,accent,secondary,h,r);
                     else if(type==='capsule')capsule(section,'#c4d5dd',accent,h,r);
                     else if(type==='engine'){
                         lathe(section,[[0,.39],[.14,r*.84],[.39,r*.57],[.56,r*.64],[.69,r],[.9,r],[h,r*.95]],
@@ -2014,7 +2076,7 @@
                 const extra=Math.max(0,total-5)*1.46;
                 const y=t.y, x=t.x;
                 let pos, target;
-                if(mode==='side'){
+                if(mode==='orbit'){const a=timestamp*.00018,R=(compact?11:9)*factor+extra*.6;pos=[x+Math.sin(a)*R,y+total*.55+2.2,Math.cos(a)*R];target=[x*.79,y+total*.46,0];}else if(mode==='low'){pos=[x*.6+1.4,.35,6.4*factor+extra*.5];target=[x*.79,y+total*.82,0];}else if(mode==='side'){
                     pos=[x+8.6*factor+extra,y+total*.63+1.9,-4.0*factor-extra*.3];
                     target=[x,y+total*.52,0];
                 } else if(mode==='tower'){
@@ -2191,7 +2253,7 @@
         const cockpitKeyboard=(()=>{
             const toggle=document.getElementById('launch-toggle');
             const movement=new Set(['KeyW','KeyA','KeyD','ArrowUp','ArrowLeft','ArrowRight']);
-            const cameraKeys={Digit1:'chase',Digit2:'side',Digit3:'tower',Numpad1:'chase',Numpad2:'side',Numpad3:'tower'};
+            const cameraKeys={Digit1:'chase',Digit2:'side',Digit3:'tower',Numpad1:'chase',Numpad2:'side',Numpad3:'tower',Digit4:'orbit',Digit5:'low',Numpad4:'orbit',Numpad5:'low'};
             let live=false;
             function clear(){for(const key of movement)keysPressed[key]=false;}
             function finish(){live=false;clear();}
@@ -2223,13 +2285,13 @@
                     flight3D.stage(removedParts);
                     partsSpentAmount = Math.max(0, partsSpentAmount - removedParts.reduce((acc, p) => acc + p.cost, 0));
                     renderFlightRocketStack(); updateConfiguration();
-                    document.getElementById('sim-status-msg').innerText = `âš¡ STAGING EVENT SUCCESSFUL!`;
+                    document.getElementById('sim-status-msg').innerText = `⚡ STAGING EVENT SUCCESSFUL!`;
                 }
         }
 
         function attemptLaunch() {
             if (!rocketParts.some(p => p.type === 'engine') || !rocketParts.some(p => p.type === 'tank') || !rocketParts.some(p => p.type === 'capsule')) {
-                alert("âš ï¸ Rocket requires 1 Capsule, 1 Tank, and 1 Engine!"); return;
+                alert("⚠️ Rocket requires 1 Capsule, 1 Tank, and 1 Engine!"); return;
             }
             renderFlightRocketStack();
             document.getElementById('launch-toggle').checked = true;
@@ -2267,7 +2329,7 @@
                         document.getElementById('exhaust-sprite').style.display = 'block';
                     } else {
                         engineOn = false; document.getElementById('exhaust-sprite').style.display = 'none';
-                        document.getElementById('sim-status-msg').innerText = "âš ï¸ PROPELLANT DEPLETED! Ballistic Coasting...";
+                        document.getElementById('sim-status-msg').innerText = "⚠️ PROPELLANT DEPLETED! Ballistic Coasting...";
                     }
                 } else {
                     engineOn = false; document.getElementById('exhaust-sprite').style.display = 'none';
@@ -2282,7 +2344,7 @@
                     if (currentAlt >= cpAlt && !reachedCheckpoints[t]) {
                         reachedCheckpoints[t] = true; playerBalance += t * 150;
                         document.getElementById('player-balance').innerText = playerBalance.toLocaleString();
-                        showAlert(`ðŸŽ¯ Milestone Reached (${missions[t-1].dest}): +${t * 150} Craters!`);
+                        showAlert(`🎯 Milestone Reached (${missions[t-1].dest}): +${t * 150} Craters!`);
                     }
                 }
 
@@ -2316,7 +2378,7 @@
                     cockpitKeyboard.finish();
                     flight3D.finish();
                     document.getElementById('exhaust-sprite').style.display = 'none';
-                    document.getElementById('sim-status-msg').innerText = "ðŸŽ‰ DESTINATION REACHED! Engage surface investigations.";
+                    document.getElementById('sim-status-msg').innerText = "🎉 DESTINATION REACHED! Engage surface investigations.";
                     document.getElementById('explore-dest-btn').style.display = 'inline-block';
                     updateBlackboxReplay();
                 }
@@ -2393,7 +2455,7 @@
             let dist = Math.hypot(player3D.x - 0, player3D.z - 10);
             if (dist < 4.0) {
                 if (habitatUnlocked) {
-                    showAlert("â›º Habitat is already fully operational!");
+                    showAlert("⛺ Habitat is already fully operational!");
                     return;
                 }
                 let qObj = habitatTriviaQuestions[Math.floor(Math.random() * habitatTriviaQuestions.length)];
@@ -2405,19 +2467,19 @@
                 `).join('');
                 document.getElementById('trivia-modal').style.display = 'flex';
             } else {
-                showAlert("âš ï¸ Walk closer to the Habitat Module using [WASD] and press [E]!");
+                showAlert("⚠️ Walk closer to the Habitat Module using [WASD] and press [E]!");
             }
         }
 
         function answerTrivia(selected, correct) {
             if (selected === correct) {
                 habitatUnlocked = true;
-                document.getElementById('hab-status').innerText = "[Deployed âœ“]";
+                document.getElementById('hab-status').innerText = "[Deployed ✓]";
                 document.getElementById('hab-status').style.color = "#10b981";
                 document.getElementById('trivia-modal').style.display = 'none';
-                showAlert("ðŸŽ‰ Correct! Habitat erected & radar hint unlocked for scattered rover parts!");
+                showAlert("🎉 Correct! Habitat erected & radar hint unlocked for scattered rover parts!");
             } else {
-                document.getElementById('trivia-hint-display').innerText = "ðŸ’¡ Hint: Think about planetary geology and atmospheric composition!";
+                document.getElementById('trivia-hint-display').innerText = "💡 Hint: Think about planetary geology and atmospheric composition!";
             }
         }
 
@@ -3173,20 +3235,20 @@
                 ['Orbital Watch','Work from an orbital service deck above the blue limb of Earth.','Orbital night / day','Sunrise Photometer','Deck Magnetometer','Earth Limb Camera','Horizon Array','panel','limb glow',18,'telemetry coupler'],
                 ['Dayside Recon','From the orbit platform, look for impact scars along the sunlit half of Mercury.','Glare from the inner Sun','Glare Baffle','Basin Imager','Terminator Scope','Solar Shade','panel','radiant load',48,'reflective foil'],
                 ['Cloudline Sounding','The aerial deck skims a layered ochre cloudscape. All fieldwork stays above the clouds.','Amber aerosol haze','Haze Sampler','Cloud Altimeter','Wind Mast','Aerostat Dock','mast','aerosol index',39,'sealed filter'],
-                ['Lunar Traverse','The Moon has a dark sky, gray regolith, deep shadows and prominent impact craters.','Hard sunlight Â· long shadows','Echo Crater','Dust Fan','Basalt Outcrop','Farwatch Rim','crater','regolith reflectance',11,'lunar sample sleeve'],
+                ['Lunar Traverse','The Moon has a dark sky, gray regolith, deep shadows and prominent impact craters.','Hard sunlight · long shadows','Echo Crater','Dust Fan','Basalt Outcrop','Farwatch Rim','crater','regolith reflectance',11,'lunar sample sleeve'],
                 ['Red Planet Overpass','The survey platform looks down on the Martian limb and its rust-red basins.','Sunlit orbital pass','Limb Photometer','Polar Imager','Basin Scope','Uplink Array','panel','limb scattering',25,'orbital imaging chip'],
-                ['Red Dust Transect','Walk between rust-red mesas and wind-shaped dunes. Look for dust trails against the far ridge.','Dry Â· drifting dust','Dust Drift','Ironstone Mesa','Wind-cut Arch','Red Basin','mesa','dust opacity',46,'abrasion shield'],
+                ['Red Dust Transect','Walk between rust-red mesas and wind-shaped dunes. Look for dust trails against the far ridge.','Dry · drifting dust','Dust Drift','Ironstone Mesa','Wind-cut Arch','Red Basin','mesa','dust opacity',46,'abrasion shield'],
                 ['Boulder Watch','Use a station deck surrounded by irregular asteroid fragments. There is no shared solid surface.','Scattered rocky fragments','Gravel Collector','Boulder Scope','Debris Beacon','Shadow Array','rock','fragment count',31,'impact plate'],
                 ['Cloud Belt Crossing','The survey deck sits above striped cloud belts and a large simulated storm vortex.','Layered storms below','Belt Anemometer','Vortex Scope','Ammonia Sampler','Storm Beacon','mast','wind index',71,'cloud-rated probe'],
-                ['Sulfur Fieldwork','Yellow plains, sulfur deposits and plumes frame this volcanic traverse.','Volcanic haze Â· warm vents','Sulfur Vent','Golden Ridge','Caldera Wall','Plume Bluff','vent','thermal contrast',56,'heat-resistant sleeve'],
-                ['Ice Vault Expedition','Explore an imagined cavern in Europaâ€™s ice, with blue walls, frost and long fractures.','Cold vault Â· drifting frost','Blue Ice Chimney','Frost Buttress','Tidal Crack','Crystal Vault','ice','ice backscatter',61,'cryogenic seal'],
+                ['Sulfur Fieldwork','Yellow plains, sulfur deposits and plumes frame this volcanic traverse.','Volcanic haze · warm vents','Sulfur Vent','Golden Ridge','Caldera Wall','Plume Bluff','vent','thermal contrast',56,'heat-resistant sleeve'],
+                ['Ice Vault Expedition','Explore an imagined cavern in Europa’s ice, with blue walls, frost and long fractures.','Cold vault · drifting frost','Blue Ice Chimney','Frost Buttress','Tidal Crack','Crystal Vault','ice','ice backscatter',61,'cryogenic seal'],
                 ['Ring Crossing','Work from a flight deck with Saturn and its bands of ring particles overhead.','Fine ring debris','Ring Camera','Ice Particle Trap','Cassini Gap Scope','Shepherd Beacon','panel','particle flux',45,'ring dust cartridge'],
-                ['Methane Shore','An amber haze hangs above dark liquid and dunes. The lake is part of the local scenery.','Orange haze Â· hydrocarbon lake','Shoreline Sounder','Amber Dune','Methane Inlet','Haze Ridge','shore','lake echo',29,'hydrocarbon sampler'],
-                ['Tilted Sky Tour','The missionâ€™s Ice Fields are shown as ice-cloud layers below a floating survey deck, not solid ground.','Pale cyan high clouds','Cloud Lidar','Tilted Ring Imager','Frost Sampler','Polar Scope','mast','cloud reflectance',55,'cold-weather gasket'],
-                ['Blue Storm Watch','A flight deck overlooks storm tracks in deep blue clouds. All survey points sit on the deck.','Blue cloud banks Â· high winds','Wind Sensor','Dark Vortex Camera','Storm Tracker','High Cloud Probe','mast','wind index',84,'reinforced sensor cap'],
-                ['Frost Plain Traverse','Pale frost, reddish ground and small craters stretch beneath a dim sun.','Dim daylight Â· frost plains','Frost Crater','Nitrogen Plain','Charon Lookout','Kuiper Ridge','ice','frost albedo',64,'insulated collector'],
+                ['Methane Shore','An amber haze hangs above dark liquid and dunes. The lake is part of the local scenery.','Orange haze · hydrocarbon lake','Shoreline Sounder','Amber Dune','Methane Inlet','Haze Ridge','shore','lake echo',29,'hydrocarbon sampler'],
+                ['Tilted Sky Tour','The mission’s Ice Fields are shown as ice-cloud layers below a floating survey deck, not solid ground.','Pale cyan high clouds','Cloud Lidar','Tilted Ring Imager','Frost Sampler','Polar Scope','mast','cloud reflectance',55,'cold-weather gasket'],
+                ['Blue Storm Watch','A flight deck overlooks storm tracks in deep blue clouds. All survey points sit on the deck.','Blue cloud banks · high winds','Wind Sensor','Dark Vortex Camera','Storm Tracker','High Cloud Probe','mast','wind index',84,'reinforced sensor cap'],
+                ['Frost Plain Traverse','Pale frost, reddish ground and small craters stretch beneath a dim sun.','Dim daylight · frost plains','Frost Crater','Nitrogen Plain','Charon Lookout','Kuiper Ridge','ice','frost albedo',64,'insulated collector'],
                 ['Twin-sun Watch','The orbital deck faces an imagined view of nearby stars, with warm light from two directions.','Multiple stellar lights','Gold Star Monitor','Amber Star Monitor','Parallax Mast','Outer Signal Relay','panel','light ratio',36,'stellar spectrometer'],
-                ['Comet Outpost','An imagined outpost looks out over dusty space, with icy fragments and distant comet tails.','Faint light Â· comet dust','Comet Camera','Ice Grain Trap','Dust Compass','Long-period Listening Post','ice','ice grain count',18,'comet grain capsule'],
+                ['Comet Outpost','An imagined outpost looks out over dusty space, with icy fragments and distant comet tails.','Faint light · comet dust','Comet Camera','Ice Grain Trap','Dust Compass','Long-period Listening Post','ice','ice grain count',18,'comet grain capsule'],
                 ['Red Star Fieldwork','An imagined red-sun landscape with strange ridges and a dark shore. Its actual surface is not known.','Speculative red-sun terrain','Red Shore','Copper Bluff','Twilight Spires','Far Lake','shore','red-band intensity',59,'spectral reference tile'],
                 ['Accretion Watch','Observe a lens-shaped glowing disk from a fictional safe lookout. You do not land on the black hole.','Simulated gravitational lensing','Lens Monitor','Disk Spectrometer','Shadow Camera','Outer Relay','panel','lensing index',75,'optical calibration chip'],
                 ['Deep Sky Lookout','A fictional observatory among faraway galaxies, not a literal edge of space.','Fictional deep-sky deck','Spiral Galaxy Scope','Faint Field Camera','Background Receiver','Deep Survey Mast','panel','deep-field signal',42,'background sensor']
@@ -3196,7 +3258,7 @@
             const range=2.8, tau=Math.PI*2;
             const dist=(p,a)=>Math.hypot(p.x-a.x,p.z-a.z);
             const compass=(p,a)=>((Math.round(Math.atan2(p.x-a.x,p.z-a.z)*180/Math.PI)%360)+360)%360;
-            const describe=(p,a)=>`${dist(p,a).toFixed(1)} m Â· bearing ${compass(p,a)}Â°`;
+            const describe=(p,a)=>`${dist(p,a).toFixed(1)} m · bearing ${compass(p,a)}°`;
             const write=(el,value)=>{if(el.textContent!==value)el.textContent=value};
             const toggleButton=(name,text)=>write(document.querySelector(`[data-field-action="${name}"]`),text);
             function create(destination){
@@ -3300,13 +3362,13 @@
             }
             function hud(world,player) {
                 write($('route-brief'),world.current===3?'All three field stops logged.':
-                    world.started?`Next: ${world.route[world.current].name} Â· ${describe(world.route[world.current],player)}`:'Visit three marked sites to use their instruments.');
-                [...$('stops').children].forEach((li,i)=>write(li,`${world.route[i].name}${i<world.current?' Â· logged':i===world.current&&world.started?' Â· next':''}`));
+                    world.started?`Next: ${world.route[world.current].name} · ${describe(world.route[world.current],player)}`:'Visit three marked sites to use their instruments.');
+                [...$('stops').children].forEach((li,i)=>write(li,`${world.route[i].name}${i<world.current?' · logged':i===world.current&&world.started?' · next':''}`));
                 write($('drone'),world.drone?world.revealed?'Scout airborne. Cache coordinates are ready.':
                     `Scout scanning ${Math.min(99,Math.round(world.drone.time/4*100))}%`:'Scout docked. Launch it for an aerial sweep.');
                 toggleButton('worldscout',world.drone?'Recover scout drone':'Launch scout drone');
-                write($('cache'),world.recovered?`Recovered: ${world.prize}.`:world.revealed?`Supply cache Â· ${describe(world.cache,player)}`:'Cache coordinates not yet known.');
-                write($('patch'),world.badge?'Expedition patch earned.':'Earn this destinationâ€™s patch by logging three readings, recovering the cache, and planting a flag.');
+                write($('cache'),world.recovered?`Recovered: ${world.prize}.`:world.revealed?`Supply cache · ${describe(world.cache,player)}`:'Cache coordinates not yet known.');
+                write($('patch'),world.badge?'Expedition patch earned.':'Earn this destination’s patch by logging three readings, recovering the cache, and planting a flag.');
                 $('earned').hidden=!world.badge;
                 write($('flag'),world.flag?`Flag at X ${world.flag.x.toFixed(1)}, Z ${world.flag.z.toFixed(1)}.`:'No flag placed yet.');
             }
@@ -3450,7 +3512,7 @@
             const radio = [
                 ['Mission Control',['Try Survey Pulse before entering a new sector.','Fieldwork is optional. The habitat, four parts and ten samples get you home.','A deployed habitat can recharge your boost pack.']],
                 ['Rover Crew',['The best trail is the one you can follow back.','Try precision walk when lining up a sample.','All four installed parts unlock the driver seat and the drill.']],
-                ['Deep Space FM',['Tonightâ€™s top track: I Need My Space.','If you hear a mysterious beep, it might be your own radio.','Reminder: meteor showers do not come with towels.']]
+                ['Deep Space FM',['Tonight’s top track: I Need My Space.','If you hear a mysterious beep, it might be your own radio.','Reminder: meteor showers do not come with towels.']]
             ];
             const options = {sprint:false,precision:false,rover:false,classicSteering:false,touch:navigator.maxTouchPoints>0||matchMedia('(any-pointer:coarse)').matches,
                 map:true,compass:true,coords:true,trail:false,photo:false,night:false,lamp:false,crt:false,
@@ -3479,12 +3541,12 @@
             function updateEvaHelp(){
                 const touchLayout=options.touch&&(navigator.maxTouchPoints>0||matchMedia('(any-pointer: coarse)').matches);
                 classicToggle.setAttribute('aria-pressed',String(options.classicSteering));
-                text($('surface-action-prompt'),touchLayout?'Hold the arrows to move or turn Â· Jump to hop Â· Use to interact':
-                    options.rover?'W/S drive Â· A/D or â†/â†’ steer Â· Drag to look Â· E use':
-                    options.classicSteering?'W/S walk Â· A/D turn Â· Q/R strafe Â· Drag to look Â· E use Â· F collect':
-                    'WASD walk Â· â†/â†’ or drag to look Â· Space jump Â· E use Â· F collect');
-                const move=options.rover?'W/S drive Â· A/D or â†/â†’ steer':options.classicSteering?'W/S move Â· A/D turn Â· Q/R strafe':'WASD move Â· â†/â†’ or drag to look Â· Q/R also strafe';
-                text($('field-control-help'),`${move} Â· Space jump Â· Shift sprint Â· B boost Â· V visor Â· M map. Bonus activities donâ€™t affect the return-home requirements.`);
+                text($('surface-action-prompt'),touchLayout?'Hold the arrows to move or turn · Jump to hop · Use to interact':
+                    options.rover?'W/S drive · A/D or ←/→ steer · Drag to look · E use':
+                    options.classicSteering?'W/S walk · A/D turn · Q/R strafe · Drag to look · E use · F collect':
+                    'WASD walk · ←/→ or drag to look · Space jump · E use · F collect');
+                const move=options.rover?'W/S drive · A/D or ←/→ steer':options.classicSteering?'W/S move · A/D turn · Q/R strafe':'WASD move · ←/→ or drag to look · Q/R also strafe';
+                text($('field-control-help'),`${move} · Space jump · Shift sprint · B boost · V visor · M map. Bonus activities don’t affect the return-home requirements.`);
             }
             function stopMouseLook(cancelled=false){
                 if(!mouseLook)return;
@@ -3672,7 +3734,7 @@
                 } else {
                     collectedRoverPartsCount++;
                     const status=$(`rp-${p.id}`);
-                    text(status,'[Installed âœ“]'); status.style.color='#10b981';
+                    text(status,'[Installed ✓]'); status.style.color='#10b981';
                     text($('rover-parts-count'),String(collectedRoverPartsCount));
                     playerBalance+=1000;
                     notify(`Installed ${p.name} (+1,000 Craters).`,true);
@@ -3719,7 +3781,7 @@
                 const picture=state.photos[state.photo], el=$('field-photo-img');
                 el.hidden=!picture;
                 if (picture) el.src=picture.url; else el.removeAttribute('src');
-                text($('field-photo-count'),picture?`Photo ${state.photo+1} of ${state.photos.length} Â· ${picture.destination}`:'No photos yet. Up to six are kept during this expedition.');
+                text($('field-photo-count'),picture?`Photo ${state.photo+1} of ${state.photos.length} · ${picture.destination}`:'No photos yet. Up to six are kept during this expedition.');
                 for (const [action,disabled] of [['nextphoto',!picture||state.photo>=state.photos.length-1],['prevphoto',!picture||state.photo===0],['savephoto',!picture]]) {
                     root.querySelector(`[data-field-action="${action}"]`).disabled=disabled;
                 }
@@ -3750,7 +3812,7 @@
                 const list=discoveredChemicals.filter(name=>name.toLowerCase().includes(term));
                 if ($('field-sort').value==='alpha') list.sort((a,b)=>a.localeCompare(b));
                 if ($('field-sort').value==='tag') list.sort((a,b)=>Number(state.tags.has(b))-Number(state.tags.has(a)));
-                select.replaceChildren(...(list.length?list.map(name=>new Option(`${state.tags.has(name)?'â˜… ':''}${name}`,name)):[new Option('No matching samples','')]));
+                select.replaceChildren(...(list.length?list.map(name=>new Option(`${state.tags.has(name)?'★ ':''}${name}`,name)):[new Option('No matching samples','')]));
                 if (list.includes(before)) select.value=before;
                 labSelection();
             }
@@ -3802,7 +3864,7 @@
                         if(!specimen){text($('field-analysis'),'Select a recovered sample first.');break;}
                         const id=masterChemicals.indexOf(specimen);
                         const tones=['amber','cyan','rose','mint','blue','violet'];
-                        const line=`${specimen}: ${tones[id%tones.length]} band Â· ${410+(id*19)%269} nm Â· simulated scan`;
+                        const line=`${specimen}: ${tones[id%tones.length]} band · ${410+(id*19)%269} nm · simulated scan`;
                         text($('field-analysis'),line);addLog(`Analyzed ${specimen}.`);chirp();break;
                     }
                     case 'tag':
@@ -3854,34 +3916,34 @@
             }
             function renderHud() {
                 const h=heading(player3D.angle), cardinals=['N','NE','E','SE','S','SW','W','NW'];
-                text($('field-compass'),`${cardinals[Math.round(h/45)%8]} ${String(h).padStart(3,'0')}Â° Â· `);
-                text($('field-coords'),`X ${player3D.x.toFixed(1)} Â· Z ${player3D.z.toFixed(1)}`);
+                text($('field-compass'),`${cardinals[Math.round(h/45)%8]} ${String(h).padStart(3,'0')}° · `);
+                text($('field-coords'),`X ${player3D.x.toFixed(1)} · Z ${player3D.z.toFixed(1)}`);
                 hud.classList.toggle('field-no-heading',!options.compass&&!options.coords);
-                text($('field-suit'),`BOOST ${Math.floor(state.energy)}% Â· EVA ${clock(state.elapsed)} Â· ${Math.round(state.fps)} FPS`);
+                text($('field-suit'),`BOOST ${Math.floor(state.energy)}% · EVA ${clock(state.elapsed)} · ${Math.round(state.fps)} FPS`);
                 const p=guidance(), guide=$('field-guidance');
                 guide.hidden=state.track==='off';
                 if(!guide.hidden) {
                     const rel=p?relative(p):0;
-                    text(guide,p?`${dist(p)<1?'HERE':Math.abs(rel)<.12?'AHEAD':rel<0?'TURN LEFT':'TURN RIGHT'} Â· ${p.name} Â· ${dist(p).toFixed(1)} m Â· ${heading(angleTo(p))}Â°`:'No remaining target.');
+                    text(guide,p?`${dist(p)<1?'HERE':Math.abs(rel)<.12?'AHEAD':rel<0?'TURN LEFT':'TURN RIGHT'} · ${p.name} · ${dist(p).toFixed(1)} m · ${heading(angleTo(p))}°`:'No remaining target.');
                 }
                 $('field-toast').hidden=now()>state.toastUntil;
                 const nearest=getNearest(surfaceSamples.filter(p=>!p.collected));
                 const local=worldExpedition.nearby(state.world,player3D);
                 text($('scanner-hint'),state.elapsed<state.pulseUntil?'Pulse active':local==='worldread'?'Survey stop [E / Use]':local==='worldcache'?'Supply cache [E / Use]':nearest&&dist(nearest)<5?'Sample nearby [F]':'Explore terrain');
                 worldExpedition.hud(state.world,player3D);
-                text($('field-survey'),`${state.surveyed.size}/4 landmarks surveyed Â· ${state.seen.size}/${cols*rows} sectors mapped`);
+                text($('field-survey'),`${state.surveyed.size}/4 landmarks surveyed · ${state.seen.size}/${cols*rows} sectors mapped`);
                 if(state.labDirty){renderLab(); state.labDirty=false;}
                 if(state.logDirty){listInto($('field-log'),state.log.map(e=>`[${e.t}] ${e.message}`),'No log entries.');state.logDirty=false;}
                 if(state.coresDirty){listInto($('field-cores'),[...state.cores.values()],'No cores yet.');state.coresDirty=false;}
                 if(state.badgesDirty){listInto($('field-badges'),badgeRules.map(([name])=>`${state.badges.has(name)?'Earned':'Locked'}: ${name}`),'No badges.');state.badgesDirty=false;}
                 const b=currentBeacon();
-                text($('field-signal'),state.decoded?'Signal decoded. Mission Control: â€œYou found us!â€':b?`${b.name} Â· ${dist(b).toFixed(1)} m Â· heading ${heading(angleTo(b))}Â° Â· fragments: ${state.fragments.join(' / ')||'none'}`:
+                text($('field-signal'),state.decoded?'Signal decoded. Mission Control: “You found us!”':b?`${b.name} · ${dist(b).toFixed(1)} m · heading ${heading(angleTo(b))}° · fragments: ${state.fragments.join(' / ')||'none'}`:
                     state.hunt?`Three fragments: ${state.fragments.join(' / ')}. Enter them as one six-letter word.`:'Start the hunt to reveal the first transmitter.');
                 const best=state.raceBest===null?'':` Best: ${state.raceBest.toFixed(1)} s.`;
-                text($('field-race'),(state.race?`Gate ${state.race.index+1}/4 Â· ${Math.ceil(Math.max(0,60-state.elapsed+state.race.start))} s left.`:state.raceMessage||'Time trial: four gates in 60 seconds.')+best);
-                text($('field-jump-game'),state.jumpGame?`Landings: ${state.jumpGame.count}/3 Â· ring ${dist(landingRing).toFixed(1)} m away.`:state.jumpWon?'Jump challenge complete.':'Jump challenge: three landings in the marked circle.');
+                text($('field-race'),(state.race?`Gate ${state.race.index+1}/4 · ${Math.ceil(Math.max(0,60-state.elapsed+state.race.start))} s left.`:state.raceMessage||'Time trial: four gates in 60 seconds.')+best);
+                text($('field-jump-game'),state.jumpGame?`Landings: ${state.jumpGame.count}/3 · ring ${dist(landingRing).toFixed(1)} m away.`:state.jumpWon?'Jump challenge complete.':'Jump challenge: three landings in the marked circle.');
                 text($('field-rover-game'),state.roverGame?`${Math.min(50,state.roverMeters-state.roverGame.start).toFixed(1)}/50 m in the rover.`:state.roverWon?'Rover distance run complete.':'Rover distance run: drive 50 m.');
-                text($('field-stats'),`EVA ${clock(state.elapsed)} Â· On foot ${state.walkMeters.toFixed(1)} m Â· Rover ${state.roverMeters.toFixed(1)} m Â· ${state.jumps} jumps Â· ${state.badges.size}/8 badges`);
+                text($('field-stats'),`EVA ${clock(state.elapsed)} · On foot ${state.walkMeters.toFixed(1)} m · Rover ${state.roverMeters.toFixed(1)} m · ${state.jumps} jumps · ${state.badges.size}/8 badges`);
                 renderRadio();
                 if(options.map) drawMap(p);
             }
@@ -4043,7 +4105,8 @@
                         ctx.strokeStyle='#ffedd5';ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(xx-45,yy-16);ctx.lineTo(xx,yy);ctx.stroke();
                     }
                 }
-                surfaceRealism.ground(ctx,g,scene,player3D,project,detailed);
+                if(!options.quiet&&!clean&&!options.photo){for(const [period,dur,hue,seed] of [[9,4.2,'186,230,255',0],[13,3.4,'253,224,160',4.5]]){const age=(state.elapsed+seed)%period;if(age<dur){const t=age/dur,hx=w*(1.08-t*1.32),hy=horizon*(.04+t*.52),L=Math.min(w,h)*.42,tx=hx+L*.72,ty=hy-L*.36;const tail=ctx.createLinearGradient(hx,hy,tx,ty);tail.addColorStop(0,`rgba(${hue},.95)`);tail.addColorStop(1,`rgba(${hue},0)`);ctx.lineCap='round';ctx.strokeStyle=tail;ctx.lineWidth=2.6;ctx.beginPath();ctx.moveTo(hx,hy);ctx.lineTo(tx,ty);ctx.stroke();ctx.globalAlpha=.35;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(hx+8,hy+2);ctx.lineTo(tx+10,ty+3);ctx.stroke();ctx.globalAlpha=1;const glow=ctx.createRadialGradient(hx,hy,0,hx,hy,14);glow.addColorStop(0,`rgba(${hue},1)`);glow.addColorStop(1,`rgba(${hue},0)`);ctx.fillStyle=glow;ctx.beginPath();ctx.arc(hx,hy,14,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ffffff';ctx.beginPath();ctx.arc(hx,hy,2.4,0,Math.PI*2);ctx.fill();}}}
+surfaceRealism.ground(ctx,g,scene,player3D,project,detailed);
                 worldExpedition.effects(ctx,g,state.elapsed,options.quiet||clean||options.photo,scene,state.world);
                 const entries=[];
                 const add=(p,kind,color)=>{const pos=project(p,g);if(pos)entries.push({p,kind,color,...pos});};
@@ -4081,13 +4144,49 @@
                         ctx.fillStyle='#11243a';ctx.strokeStyle='#7dd3fc';ctx.lineWidth=1.5;
                         ctx.beginPath();ctx.moveTo(cx-dash,h);ctx.lineTo(cx-dash*.62,h-32);ctx.lineTo(cx+dash*.62,h-32);ctx.lineTo(cx+dash,h);ctx.closePath();ctx.fill();ctx.stroke();
                         ctx.fillStyle='#bae6fd';ctx.font='600 12px monospace';ctx.textAlign='center';ctx.textBaseline='middle';
-                        ctx.fillText(`ROVER Â· ${state.roverMeters.toFixed(1)} m`,cx,h-16);
+                        ctx.fillText(`ROVER · ${state.roverMeters.toFixed(1)} m`,cx,h-16);
                     }
                     ctx.strokeStyle='rgba(244,251,255,.7)';ctx.lineWidth=1;
                     ctx.beginPath();ctx.moveTo(cx-7,horizon+29);ctx.lineTo(cx+7,horizon+29);
                     ctx.moveTo(cx,horizon+22);ctx.lineTo(cx,horizon+36);ctx.stroke();
                 }
                 ctx.restore();
+            }
+            function roverPart(ctx,x,y,s,p){
+                const R=Math.max(11,Math.min(22,s*.42));
+                ctx.save();ctx.translate(x,y-R*1.2);ctx.lineWidth=1.4;
+                if(p.id===1){
+                    for(const dx of [-R*.62,R*.62]){
+                        ctx.beginPath();ctx.arc(dx,0,R*.52,0,Math.PI*2);ctx.fillStyle='#111827';ctx.fill();ctx.strokeStyle='#f97316';ctx.stroke();
+                        ctx.strokeStyle='#64748b';for(let i=0;i<8;i++){const a=i*Math.PI/4;ctx.beginPath();ctx.moveTo(dx+Math.cos(a)*R*.40,Math.sin(a)*R*.40);ctx.lineTo(dx+Math.cos(a)*R*.50,Math.sin(a)*R*.50);ctx.stroke();}
+                        ctx.beginPath();ctx.arc(dx,0,R*.26,0,Math.PI*2);ctx.fillStyle='#cbd5e1';ctx.fill();
+                        ctx.beginPath();ctx.arc(dx,0,R*.09,0,Math.PI*2);ctx.fillStyle='#f97316';ctx.fill();
+                    }
+                } else if(p.id===2){
+                    for(let i=0;i<3;i++){
+                        const ox=(i-1)*R*.78;
+                        ctx.beginPath();ctx.moveTo(ox-R*.36,-R*.8);ctx.lineTo(ox+R*.36,-R*.8);ctx.lineTo(ox+R*.36,R*.8);ctx.lineTo(ox-R*.36,R*.8);ctx.closePath();
+                        ctx.fillStyle='#1e3a8a';ctx.fill();ctx.strokeStyle='#cbd5e1';ctx.stroke();
+                        ctx.strokeStyle='#60a5fa';ctx.lineWidth=.7;for(let j=-1;j<=1;j++){ctx.beginPath();ctx.moveTo(ox-R*.36,j*R*.4);ctx.lineTo(ox+R*.36,j*R*.4);ctx.stroke();}
+                        ctx.lineWidth=1.4;
+                    }
+                    ctx.fillStyle='#94a3b8';ctx.fillRect(-R*1.2,R*.8,R*2.4,R*.12);
+                } else if(p.id===3){
+                    ctx.beginPath();ctx.moveTo(-R*.42,-R*.9);ctx.lineTo(R*.42,-R*.9);ctx.lineTo(R*.42,-R*.1);ctx.lineTo(0,R*.95);ctx.lineTo(-R*.42,-R*.1);ctx.closePath();
+                    ctx.fillStyle='#67e8f9';ctx.fill();ctx.strokeStyle='#06121e';ctx.stroke();
+                    ctx.strokeStyle='#0e7490';ctx.lineWidth=1;for(let i=0;i<4;i++){const yy=-R*.7+i*R*.4;ctx.beginPath();ctx.moveTo(-R*.42,yy);ctx.lineTo(R*.42,yy+R*.18);ctx.stroke();}
+                    ctx.fillStyle='#a78bfa';ctx.fillRect(-R*.55,-R*1.05,R*1.1,R*.2);
+                } else if(p.id===4){
+                    ctx.strokeStyle='#e2e8f0';ctx.lineWidth=R*.22;ctx.lineCap='round';
+                    ctx.beginPath();ctx.moveTo(-R*.7,R*.85);ctx.lineTo(-R*.1,0);ctx.lineTo(R*.5,-R*.7);ctx.stroke();
+                    ctx.fillStyle='#facc15';for(const [jx,jy] of [[-R*.7,R*.85],[-R*.1,0]]){ctx.beginPath();ctx.arc(jx,jy,R*.18,0,Math.PI*2);ctx.fill();}
+                    ctx.strokeStyle='#34d399';ctx.lineWidth=R*.12;
+                    ctx.beginPath();ctx.moveTo(R*.5,-R*.7);ctx.lineTo(R*.8,-R*1.05);ctx.moveTo(R*.5,-R*.7);ctx.lineTo(R*.78,-R*.4);ctx.stroke();
+                } else {
+                    ctx.fillStyle='#facc15';ctx.fillRect(-R*.5,-R*.5,R,R);
+                }
+                ctx.restore();
+                return y-R*2.6;
             }
             function drawObject(ctx,e,g,clean) {
                 const {p,kind,color,x,y,depth}=e;
@@ -4097,7 +4196,7 @@
                 const s=clamp(g.focal/depth*.62,7,65);
                 let topY=y-s;
                 ctx.lineWidth=1.5;ctx.fillStyle=color;ctx.strokeStyle=color;
-                if(kind==='sample'||kind==='part'){
+                if(kind==='part'){topY=roverPart(ctx,x,y,s,p);}else if(kind==='sample'){
                     const size=kind==='sample'?7:11;
                     topY=y-(kind==='sample'?12:15);
                     ctx.beginPath();ctx.moveTo(x,topY-size);ctx.lineTo(x+size,topY);ctx.lineTo(x,topY+size);ctx.lineTo(x-size,topY);ctx.closePath();
@@ -4191,11 +4290,59 @@
         function updateBlackboxReplay() {
             document.getElementById('replay-alt').innerText = Math.round(currentAlt).toLocaleString() + " km";
             document.getElementById('replay-vel').innerText = currentVel.toFixed(2) + " km/s";
-            document.getElementById('replay-status-text').innerText = "âœ“ Telemetry recorded successfully from last flight mission.";
+            document.getElementById('replay-status-text').innerText = "✓ Telemetry recorded successfully from last flight mission.";
         }
 
         function stopSimulation() { cockpitKeyboard.finish(); flight3D.leave(); flightTouch.leave(); if (simInterval) clearInterval(simInterval); if (surfaceAnimationId) cancelAnimationFrame(surfaceAnimationId); }
         function resetToVAB() { cockpitKeyboard.finish(); flight3D.leave(); flightTouch.leave(); if (simInterval) clearInterval(simInterval); if (surfaceAnimationId) cancelAnimationFrame(surfaceAnimationId); document.getElementById('vab-toggle').checked = true; }
     </script>
+<script>
+(() => {
+  const cv = document.getElementById('bg-comets');
+  if (!cv || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const ctx = cv.getContext('2d');
+  const tints = ['186,230,255', '253,224,160', '196,181,253', '134,239,172'];
+  let W = 0, H = 0, comets = [], last = performance.now(), nextAt = 0;
+  function resize() {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    W = innerWidth; H = innerHeight;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  function spawn() {
+    const speed = 420 + Math.random() * 360;
+    const angle = 0.32 + Math.random() * 0.28;
+    comets.push({
+      x: W * (0.45 + Math.random() * 0.7), y: -30 - Math.random() * H * 0.35,
+      vx: -Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+      len: 140 + Math.random() * 200, tint: tints[(Math.random() * tints.length) | 0], age: 0
+    });
+  }
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    if (now >= nextAt && comets.length < 5) { spawn(); nextAt = now + 2200 + Math.random() * 3000; }
+    ctx.clearRect(0, 0, W, H);
+    comets = comets.filter(c => c.x > -400 && c.y < H + 400);
+    for (const c of comets) {
+      c.age += dt; c.x += c.vx * dt; c.y += c.vy * dt;
+      const sp = Math.hypot(c.vx, c.vy), ux = -c.vx / sp, uy = -c.vy / sp;
+      const tx = c.x + ux * c.len, ty = c.y + uy * c.len;
+      ctx.globalAlpha = Math.min(1, c.age / 0.4);
+      const tail = ctx.createLinearGradient(c.x, c.y, tx, ty);
+      tail.addColorStop(0, `rgba(${c.tint},.95)`); tail.addColorStop(1, `rgba(${c.tint},0)`);
+      ctx.strokeStyle = tail; ctx.lineCap = 'round'; ctx.lineWidth = 2.4;
+      ctx.beginPath(); ctx.moveTo(c.x, c.y); ctx.lineTo(tx, ty); ctx.stroke();
+      const glow = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, 16);
+      glow.addColorStop(0, `rgba(${c.tint},1)`); glow.addColorStop(1, `rgba(${c.tint},0)`);
+      ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(c.x, c.y, 16, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(c.x, c.y, 2.4, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(frame);
+  }
+  addEventListener('resize', resize); resize();
+  requestAnimationFrame(frame);
+})();
+</script>
 </body>
 </html>
