@@ -2580,6 +2580,7 @@
         }
 
         function returnHomeToEarth() {
+            if (window.homeGateMessage && window.homeGateMessage()) { showAlert(window.homeGateMessage()); return; }
             if (!habitatUnlocked || collectedRoverPartsCount < 4 || discoveredChemicals.length < 10) {
                 surfaceField.notify("Unlock the habitat, install 4 rover parts, and find 10 chemicals before returning home.");
                 return;
@@ -3780,7 +3781,7 @@
                 root.querySelectorAll('[data-field-panel]').forEach(p=>p.hidden=p.dataset.fieldPanel!==tab);
             }
             function toggle(name) {
-                if (name==='rover' && collectedRoverPartsCount<4) { notify('Install all four rover parts before driving.'); return; }
+                if (name==='rover' && (collectedRoverPartsCount<4 || (window.roverDriveLocked && window.roverDriveLocked()))) { notify(collectedRoverPartsCount<4 ? 'Install all four rover parts before driving.' : 'Sort the four rover parts in the Rover Bay before driving.'); return; }
                 if (name==='audio' && !options.audio) {
                     try {
                         const Audio=window.AudioContext||window.webkitAudioContext;
@@ -5406,6 +5407,230 @@ body.crt{text-shadow:0 0 6px rgba(56,189,248,.35)}
     else if (e.target.closest('.rotate-btn-vab')) logEvent('Rotated a part');
     else if (e.target.closest('.launch-btn')) setTimeout(() => { if ($('launch-toggle') && $('launch-toggle').checked) onLaunched(); }, 180);
   }, true);
+})();
+</script>
+<style>
+#pt6-hud{position:fixed;left:12px;bottom:70px;z-index:65;display:none;flex-direction:column;gap:6px;align-items:flex-start}
+#pt6-hud.show{display:flex}
+#pt6-status{background:rgba(15,23,42,.94);border:2px solid #38bdf8;border-radius:10px;padding:8px 12px;color:#e2e8f0;font-size:.82rem;font-weight:700;max-width:340px}
+#pt6-hud button{background:#0f172a;border:2px solid #38bdf8;color:#fff;border-radius:10px;padding:8px 12px;font-weight:800;cursor:pointer;font-size:.9rem}
+#pt6-hud button:hover{background:#38bdf8;color:#000}
+.pt6-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.pt6-slot,.pt6-part{border:2px dashed #475569;border-radius:10px;padding:10px;min-height:56px;cursor:pointer;color:#e2e8f0;background:#0b1424;text-align:left;font-weight:700;font-size:.92rem}
+.pt6-slot.filled{border:2px solid #10b981;color:#6ee7b7}
+.pt6-part.sel{border-color:#facc15;box-shadow:0 0 0 2px #facc15}
+.pt6-shake{animation:pt6-shake .35s}
+@keyframes pt6-shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.pt6-swatch{display:inline-block;width:20px;height:20px;border-radius:50%;margin-right:5px;border:2px solid #0f172a;vertical-align:middle}
+.pt6-opt{display:flex;align-items:center;gap:6px;width:100%;margin:6px 0;background:#0b1424;border:2px solid #334155;color:#fff;border-radius:10px;padding:10px;cursor:pointer;font-weight:700;text-align:left}
+.pt6-opt:hover{border-color:#38bdf8}
+.pt6-muted{color:#94a3b8;font-size:.85rem}
+.pt6-select{background:#0f172a;color:#fff;border:2px solid #334155;border-radius:8px;padding:8px;font-weight:700;width:100%;margin:8px 0}
+</style>
+<script>
+(() => {
+  /* ===== Mission gate for screen 6: Rover Bay and Lab Test Bay ===== */
+  const $ = id => document.getElementById(id);
+  const exploreOn = () => !!($('explore-toggle') && $('explore-toggle').checked);
+  const TOTAL = masterChemicals.length;
+  const BAND = ['#f59e0b', '#22d3ee', '#fb7185', '#6ee7b7', '#60a5fa', '#a78bfa'];
+  const STEPS = ['Spectrometer band match', 'Peak wavelength read-out', 'Dissolution check'];
+  const SOLUBILITY = ['Dissolves in water', 'Stays solid in water', 'Melts into water', 'Bubbles off as gas'];
+  const SLOTS = [
+    { label: 'Chassis drive axle', part: 'Heavy All-Terrain Wheels', hint: 'Rolling gear for the chassis' },
+    { label: 'Power mast', part: 'Foldable Solar Array', hint: 'Needs open sky' },
+    { label: 'Front tool arm', part: 'Diamond Core Drill', hint: 'The digger at the front' },
+    { label: 'Manipulator arm', part: 'Robotic Sample Arm', hint: 'Grabs and holds samples' }
+  ];
+
+  let roverSorted = false, slotFill = [null, null, null, null], selectedPart = null;
+  let lab = { cert: {}, step: {}, tests: 0 }, labSelected = null, labCurrent = null;
+  let roverNotified = false, labNotified = false, labUnlockShown = false;
+
+  const certCount = () => Object.keys(lab.cert).length;
+  const labComplete = () => certCount() >= TOTAL;
+  function addBalance(n) {
+    playerBalance += n;
+    const el = $('player-balance'); if (el) el.innerText = playerBalance.toLocaleString();
+  }
+
+  const bubble = document.createElement('div');
+  bubble.className = 'aero-toast'; bubble.style.top = '240px'; bubble.setAttribute('role', 'status');
+  document.body.appendChild(bubble);
+  let bTimer = null;
+  function ping(title, text) {
+    bubble.innerHTML = '<strong>' + title + '</strong><span>' + text + '</span>';
+    bubble.classList.add('show'); clearTimeout(bTimer);
+    bTimer = setTimeout(() => bubble.classList.remove('show'), 3600);
+  }
+  function burst() {
+    const colors = ['#facc15', '#38bdf8', '#34d399', '#f472b6'];
+    for (let i = 0; i < 70; i++) {
+      const c = document.createElement('div');
+      c.className = 'aero-confetti'; c.style.left = (Math.random() * 100) + 'vw';
+      c.style.background = colors[i % colors.length];
+      c.style.animationDuration = (1.8 + Math.random() * 1.4) + 's';
+      document.body.appendChild(c); setTimeout(() => c.remove(), 3800);
+    }
+  }
+
+  const modal = document.createElement('div');
+  modal.className = 'aero-modal-bg';
+  modal.innerHTML = '<div class="aero-modal"><button type="button" class="aero-close" aria-label="Close">×</button><div class="pt6-body"></div></div>';
+  document.body.appendChild(modal);
+  const mBody = modal.querySelector('.pt6-body');
+  function openM(title, html) { mBody.innerHTML = '<h3>' + title + '</h3>' + html; modal.classList.add('open'); }
+  modal.addEventListener('click', e => { if (e.target === modal || e.target.classList.contains('aero-close')) modal.classList.remove('open'); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') modal.classList.remove('open'); });
+
+  /* ----- Rover Bay ----- */
+  function renderRover() {
+    const placed = slotFill.filter(Boolean);
+    const tray = worldRoverParts.map(p => p.name).filter(n => !placed.includes(n))
+      .map(n => '<button type="button" class="pt6-part' + (selectedPart === n ? ' sel' : '') + '" data-act="pick" data-part="' + n + '">🔩 ' + n + '</button>').join('');
+    const slots = SLOTS.map((s, i) => '<button type="button" class="pt6-slot' + (slotFill[i] ? ' filled' : '') + '" data-act="slot" data-i="' + i + '">' +
+      '<small class="pt6-muted">' + s.label + '</small><br>' + (slotFill[i] ? '✓ ' + slotFill[i] : 'Empty. Hint: ' + s.hint) + '</button>').join('');
+    openM('🔧 Rover Bay',
+      '<p class="pt6-muted">Tap a part, then tap the slot it belongs in. A wrong fit is rejected, so check the hints.</p>' +
+      '<div class="pt6-grid">' + slots + '</div><h4 style="margin:14px 0 4px">Parts</h4>' +
+      '<div class="pt6-grid">' + (tray || '<p class="pt6-muted">Every part is installed.</p>') + '</div>');
+  }
+  function completeRover() {
+    roverSorted = true; addBalance(15000); burst();
+    showAlert('🔧 Rover assembled! Driving is unlocked. Rover bonus +15,000.');
+    modal.classList.remove('open'); updatePills();
+  }
+  function onRoverAction(act, el) {
+    if (act === 'pick') { selectedPart = el.dataset.part; renderRover(); return; }
+    const i = Number(el.dataset.i);
+    if (slotFill[i]) return;
+    if (!selectedPart) return ping('Pick a part first', 'Tap a part below, then tap its slot.');
+    if (SLOTS[i].part === selectedPart) {
+      slotFill[i] = selectedPart; selectedPart = null;
+      ping('✓ Installed', SLOTS[i].label + ' is in place.');
+      renderRover();
+      if (slotFill.every(Boolean)) completeRover();
+    } else {
+      el.classList.add('pt6-shake'); setTimeout(() => el.classList.remove('pt6-shake'), 400);
+      ping('That does not fit', 'Try another slot. Hint: ' + SLOTS[i].hint + '.');
+    }
+  }
+
+  /* ----- Lab Test Bay ----- */
+  function solubilityOf(name) {
+    if (/Clathrate/.test(name)) return 'Bubbles off as gas';
+    if (/Ice$/.test(name)) return 'Melts into water';
+    if (/Argon|Neon|Helium|Nitrogen|Lithium|Potassium/.test(name)) return 'Bubbles off as gas';
+    if (/Sulfate|Chloride|Perchlorate|Ammonia|Sulfuric|Borax|Halite|Gypsum/.test(name)) return 'Dissolves in water';
+    return 'Stays solid in water';
+  }
+  function testFor(name, step) {
+    const id = masterChemicals.indexOf(name);
+    if (step === 0) {
+      const pat = k => [0, 1, 2].map(j => BAND[(id + 2 * j + k) % 6]);
+      const c = id % 4;
+      const opts = [1, 2, 3].map(pat); opts.splice(c, 0, pat(0));
+      return { kind: 'bands', prompt: 'Match the spectrometer band pattern for this sample.', target: pat(0), opts: opts, ans: c };
+    }
+    if (step === 1) {
+      const correct = 410 + (id * 19) % 269, c = (id + 1) % 4;
+      const arr = [correct + 37, correct - 53, correct + 101]; arr.splice(c, 0, correct);
+      return { kind: 'text', prompt: 'Read the peak wavelength from the analysis.', opts: arr.map(v => v + ' nm'), ans: c };
+    }
+    const answer = solubilityOf(name), c = id % 4;
+    const arr = SOLUBILITY.filter(x => x !== answer).slice(0, 3); arr.splice(c, 0, answer);
+    return { kind: 'text', prompt: 'Drop a small sample into the test beaker. What happens?', opts: arr, ans: c };
+  }
+  function renderLab() {
+    const head = '<p class="pt6-muted">Certified ' + certCount() + ' / ' + TOTAL + ' · Tests passed ' + lab.tests +
+      ' · Each sample needs ' + STEPS.length + ' tests in a row. A wrong result sends it back to test 1.</p>';
+    const discovered = discoveredChemicals.slice().sort((a, b) => a.localeCompare(b));
+    if (discovered.length < TOTAL) {
+      return openM('🧪 Lab Test Bay', head + '<p>Find all ' + TOTAL + ' chemicals on the surface first (' + discovered.length + ' so far).</p>');
+    }
+    if (labComplete()) {
+      return openM('🧪 Lab Test Bay', head + '<p style="color:#6ee7b7">All ' + TOTAL + ' chemicals are certified.</p>');
+    }
+    const pending = discovered.filter(n => !lab.cert[n]);
+    if (!labSelected || lab.cert[labSelected] || !pending.includes(labSelected)) labSelected = pending[0];
+    const name = labSelected, step = lab.step[name] || 0, t = testFor(name, step);
+    labCurrent = { name: name, step: step, t: t };
+    const picker = '<select id="pt6-pick" class="pt6-select">' + pending.map(n =>
+      '<option value="' + n + '"' + (n === name ? ' selected' : '') + '>' + n + ' (test ' + ((lab.step[n] || 0) + 1) + ' of ' + STEPS.length + ')</option>').join('') + '</select>';
+    const target = t.kind === 'bands'
+      ? '<p>Target: ' + t.target.map(c => '<span class="pt6-swatch" style="background:' + c + '"></span>').join('') + '</p>' : '';
+    const opts = t.kind === 'bands'
+      ? t.opts.map((pat, i) => '<button type="button" class="pt6-opt" data-act="answer" data-i="' + i + '">' +
+          pat.map(c => '<span class="pt6-swatch" style="background:' + c + '"></span>').join('') + ' Pattern ' + String.fromCharCode(65 + i) + '</button>').join('')
+      : t.opts.map((o, i) => '<button type="button" class="pt6-opt" data-act="answer" data-i="' + i + '">' + String.fromCharCode(65 + i) + '. ' + o + '</button>').join('');
+    openM('🧪 Lab Test Bay', head + picker +
+      '<p><strong>Test ' + (step + 1) + ' of ' + STEPS.length + ': ' + STEPS[step] + '</strong></p>' +
+      '<p class="pt6-muted">' + t.prompt + '</p>' + target + opts);
+  }
+  function onLabAnswer(i) {
+    if (!labCurrent) return;
+    const name = labCurrent.name, step = labCurrent.step, t = labCurrent.t;
+    if (i === t.ans) {
+      lab.tests++;
+      if (step + 1 >= STEPS.length) {
+        lab.cert[name] = true; lab.step[name] = 0;
+        ping('✅ Certified', name + ' passed all tests (' + certCount() + ' / ' + TOTAL + ').');
+        if (labComplete() && !labNotified) { labNotified = true; addBalance(25000); burst(); showAlert('🧪 All chemicals certified! Lab bonus +25,000.'); }
+      } else {
+        lab.step[name] = step + 1;
+        ping('✓ Test passed', name + ': next test is ' + STEPS[step + 1] + '.');
+      }
+    } else {
+      lab.step[name] = 0;
+      ping('⚠️ Contamination', name + ' failed. Back to test 1.');
+    }
+    renderLab(); updatePills();
+  }
+
+  /* ----- Bay buttons (shown only on screen 6) ----- */
+  const hud = document.createElement('div');
+  hud.id = 'pt6-hud';
+  hud.innerHTML = '<div id="pt6-status"></div><button type="button" id="pt6-rover">🔧 Rover Bay</button><button type="button" id="pt6-lab">🧪 Lab Test Bay</button>';
+  document.body.appendChild(hud);
+  $('pt6-rover').addEventListener('click', () => { selectedPart = null; renderRover(); });
+  $('pt6-lab').addEventListener('click', () => { labSelected = null; renderLab(); });
+  mBody.addEventListener('click', e => {
+    const el = e.target.closest('[data-act]'); if (!el) return;
+    const act = el.dataset.act;
+    if (act === 'pick' || act === 'slot') onRoverAction(act, el);
+    else if (act === 'answer') onLabAnswer(Number(el.dataset.i));
+  });
+  mBody.addEventListener('change', e => { if (e.target.id === 'pt6-pick') { labSelected = e.target.value; renderLab(); } });
+
+  function updatePills() {
+    $('pt6-rover').style.display = collectedRoverPartsCount >= 4 ? '' : 'none';
+    $('pt6-rover').textContent = roverSorted ? '🔧 Rover Bay ✓' : '🔧 Rover Bay';
+    $('pt6-lab').style.display = discoveredChemicals.length >= TOTAL ? '' : 'none';
+    $('pt6-lab').textContent = labComplete() ? '🧪 Lab Bay ✓' : '🧪 Lab Test Bay (' + certCount() + '/' + TOTAL + ')';
+    $('pt6-status').textContent = 'Return home needs: rover ' + (roverSorted ? 'sorted ✓' : 'not sorted') +
+      ' · chemicals ' + certCount() + '/' + TOTAL + ' certified';
+    if (collectedRoverPartsCount >= 4 && !roverNotified) { roverNotified = true; ping('🔩 All rover parts found', 'Open the Rover Bay to assemble the rover.'); }
+    if (discoveredChemicals.length >= TOTAL && !labUnlockShown) { labUnlockShown = true; ping('🧪 Lab Test Bay unlocked', 'Certify every chemical with its three tests.'); }
+  }
+
+  // New expedition: reset the gate
+  setInterval(() => {
+    if (!discoveredChemicals.length && !collectedRoverPartsCount && (roverSorted || certCount() || lab.tests)) {
+      roverSorted = false; slotFill = [null, null, null, null]; selectedPart = null;
+      lab = { cert: {}, step: {}, tests: 0 }; labSelected = null; labCurrent = null;
+      roverNotified = false; labNotified = false; labUnlockShown = false;
+    }
+    hud.classList.toggle('show', exploreOn());
+    if (exploreOn()) updatePills();
+  }, 400);
+
+  // Hooks read by the original code
+  window.roverDriveLocked = () => !roverSorted;
+  window.homeGateMessage = () => {
+    if (!roverSorted) return 'Sort the four rover parts in the Rover Bay before returning home.';
+    if (!labComplete()) return 'Certify all ' + TOTAL + ' chemicals in the Lab Test Bay before returning home (' + certCount() + '/' + TOTAL + ').';
+    return null;
+  };
 })();
 </script>
 </body>
