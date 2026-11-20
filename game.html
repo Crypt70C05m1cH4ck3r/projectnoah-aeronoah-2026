@@ -431,6 +431,10 @@
 
         #notification-banner { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); background: #f43f5e; color: #fff; padding: 16px 32px; border-radius: 10px; font-weight: 800; font-size: 1.15rem; box-shadow: 0 0 50px rgba(244, 63, 94, 0.95); z-index: 9999; display: none; animation: fadeIn 0.2s ease-out forwards; }
     </style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>html, body, body * { font-family: 'Orbitron', ui-sans-serif, system-ui, sans-serif !important; }</style>
 </head>
 <body>
     <canvas id="bg-comets" aria-hidden="true"></canvas>
@@ -5516,81 +5520,130 @@ body.crt{text-shadow:0 0 6px rgba(56,189,248,.35)}
     }
   }
 
-  /* ----- Lab Test Bay ----- */
-  function solubilityOf(name) {
-    if (/Clathrate/.test(name)) return 'Bubbles off as gas';
-    if (/Ice$/.test(name)) return 'Melts into water';
-    if (/Argon|Neon|Helium|Nitrogen|Lithium|Potassium/.test(name)) return 'Bubbles off as gas';
-    if (/Sulfate|Chloride|Perchlorate|Ammonia|Sulfuric|Borax|Halite|Gypsum/.test(name)) return 'Dissolves in water';
-    return 'Stays solid in water';
-  }
-  function testFor(name, step) {
+  /* ----- Crystal Lab: hold to heat, keep the crystal in the green zone ----- */
+  function crystalParams(name) {
     const id = masterChemicals.indexOf(name);
-    if (step === 0) {
-      const pat = k => [0, 1, 2].map(j => BAND[(id + 2 * j + k) % 6]);
-      const c = id % 4;
-      const opts = [1, 2, 3].map(pat); opts.splice(c, 0, pat(0));
-      return { kind: 'bands', prompt: 'Match the spectrometer band pattern for this sample.', target: pat(0), opts: opts, ans: c };
-    }
-    if (step === 1) {
-      const correct = 410 + (id * 19) % 269, c = (id + 1) % 4;
-      const arr = [correct + 37, correct - 53, correct + 101]; arr.splice(c, 0, correct);
-      return { kind: 'text', prompt: 'Read the peak wavelength from the analysis.', opts: arr.map(v => v + ' nm'), ans: c };
-    }
-    const answer = solubilityOf(name), c = id % 4;
-    const arr = SOLUBILITY.filter(x => x !== answer).slice(0, 3); arr.splice(c, 0, answer);
-    return { kind: 'text', prompt: 'Drop a small sample into the test beaker. What happens?', opts: arr, ans: c };
+    const lo = 30 + ((id * 7) % 30);
+    const hi = lo + 14 + (id % 4) * 3;
+    return { id: id, color: BAND[id % 6], lo: lo, hi: hi, speed: 9 + (id % 5) * 2.5 };
   }
+  let cur = null, running = false, lastFrame = 0, cv = null, cx = null, sparks = [];
+  function flash(text) { const m = $('pt6-msg'); if (m) m.textContent = text; }
+  function shatter() {
+    cur.growth = Math.max(0, cur.growth - 12); cur.temp = 55; cur.shatters++;
+    lab.shatters = (lab.shatters || 0) + 1;
+    try { if (navigator.vibrate) navigator.vibrate([80, 40, 80]); } catch (e) {}
+    flash('💥 Crack! The crystal shattered. Let it cool down.');
+  }
+  function complete() {
+    running = false;
+    const name = cur.name;
+    lab.cert[name] = true; lab.tests = (lab.tests || 0) + 1;
+    burst();
+    ping('💎 Crystal grown', name + ' certified (' + certCount() + ' / ' + TOTAL + ').');
+    if (labComplete() && !labNotified) { labNotified = true; addBalance(25000); showAlert('💎 Every crystal grown! Lab bonus +25,000.'); }
+    cur = null; updatePills();
+    setTimeout(() => { if (!cur) renderLab(); }, 1800);
+  }
+  function draw(dt, inZone) {
+    const W = cv.width, H = cv.height, p = cur.p, g = cur.growth;
+    cx.clearRect(0, 0, W, H);
+    cx.fillStyle = 'rgba(15,23,42,.7)'; cx.fillRect(70, 30, 280, 210);
+    cx.fillStyle = 'rgba(56,189,248,.18)'; cx.fillRect(74, 110, 272, 126);
+    cx.strokeStyle = '#93c5fd'; cx.lineWidth = 3; cx.strokeRect(70, 30, 280, 210);
+    const s = 25 + 95 * (g / 100), bx = 200, by = 225;
+    const pts = [[-0.42, 0], [-0.5, -0.35], [-0.3, -0.82], [0.05, -1], [0.36, -0.7], [0.46, -0.3], [0.4, 0]];
+    cx.beginPath();
+    pts.forEach(([x, y], k) => { const px = bx + x * s, py = by + y * s; if (k === 0) cx.moveTo(px, py); else cx.lineTo(px, py); });
+    cx.closePath(); cx.fillStyle = p.color; cx.globalAlpha = 0.9; cx.fill(); cx.globalAlpha = 1;
+    cx.strokeStyle = '#e0f2fe'; cx.lineWidth = 2; cx.stroke();
+    cx.beginPath(); cx.moveTo(bx, by); cx.lineTo(bx - 0.3 * s, by - 0.82 * s); cx.lineTo(bx + 0.05 * s, by - s); cx.closePath();
+    cx.fillStyle = 'rgba(255,255,255,.35)'; cx.fill();
+    sparks = sparks.filter(q => (q.life -= dt * 1.5) > 0);
+    sparks.forEach(q => { q.y -= 30 * dt; cx.globalAlpha = Math.max(0, q.life); cx.fillStyle = '#fef9c3'; cx.beginPath(); cx.arc(q.x, q.y, 2.5, 0, Math.PI * 2); cx.fill(); });
+    cx.globalAlpha = 1;
+    const tx = 368, ty0 = 40, ty1 = 235, th = ty1 - ty0;
+    cx.fillStyle = '#0f172a'; cx.fillRect(tx - 4, ty0 - 4, 30, th + 8);
+    cx.fillStyle = 'rgba(16,185,129,.6)';
+    cx.fillRect(tx, ty1 - (p.hi / 100) * th, 22, ((p.hi - p.lo) / 100) * th);
+    const my = ty1 - (cur.temp / 100) * th;
+    cx.fillStyle = cur.temp >= 92 ? '#ef4444' : '#f97316';
+    cx.fillRect(tx + 6, my, 10, ty1 - my);
+    cx.fillStyle = '#e2e8f0'; cx.font = "12px 'Orbitron', sans-serif";
+    cx.fillText(Math.round(cur.temp) + '°C', tx - 6, ty0 - 10);
+    const ro = $('pt6-readout');
+    if (ro) ro.textContent = 'Growth ' + Math.round(g) + '% · ' +
+      (inZone ? '🔥 In the green zone' : (cur.temp < p.lo ? '❄️ Too cool, hold to heat' : '🌡️ Too hot, let go')) +
+      ' · Cracks: ' + cur.shatters;
+  }
+  function frame(now) {
+    if (!running || !cur || !modal.classList.contains('open')) { running = false; return; }
+    const dt = Math.min(0.05, (now - lastFrame) / 1000); lastFrame = now;
+    const p = cur.p;
+    cur.clock += dt;
+    cur.temp += (cur.holding ? 45 : -30) * dt + Math.sin(cur.clock * 2 + p.id) * 2.5 * dt;
+    cur.temp = Math.max(0, Math.min(100, cur.temp));
+    const inZone = cur.temp >= p.lo && cur.temp <= p.hi;
+    if (inZone) {
+      cur.growth = Math.min(100, cur.growth + p.speed * dt);
+      const tipY = 225 - (25 + 95 * cur.growth / 100);
+      if (Math.random() < dt * 8) sparks.push({ x: 200 + (Math.random() - 0.5) * 60, y: tipY + Math.random() * 10, life: 1 });
+      [25, 50, 75].forEach((m, k) => {
+        if (cur.growth >= m && !cur.marks[m]) { cur.marks[m] = true; flash(['✨ Nice shine!', '💠 Halfway there!', '🌟 Almost a gem!'][k]); }
+      });
+    }
+    if (cur.temp >= 92) shatter();
+    draw(dt, inZone);
+    if (cur.growth >= 100) { complete(); return; }
+    requestAnimationFrame(frame);
+  }
+  function crystalView(name) {
+    cur = { name: name, p: crystalParams(name), growth: 0, temp: 20, holding: false, shatters: 0, clock: 0, marks: {} };
+    sparks = [];
+    openM('💎 Growing ' + name,
+      '<p id="pt6-msg" class="pt6-muted">Press and hold the beaker to heat it. Keep the temperature in the green zone.</p>' +
+      '<canvas id="pt6-canvas" class="pt6-canvas" width="420" height="260" aria-label="Crystal beaker"></canvas>' +
+      '<p id="pt6-readout" class="pt6-muted"></p>' +
+      '<button type="button" class="pt6-opt" data-act="back">← Back to the crystal list</button>');
+    cv = $('pt6-canvas'); cx = cv.getContext('2d');
+    cv.addEventListener('pointerdown', e => { if (cur) cur.holding = true; try { cv.setPointerCapture(e.pointerId); } catch (err) {} });
+    const release = () => { if (cur) cur.holding = false; };
+    cv.addEventListener('pointerup', release);
+    cv.addEventListener('pointercancel', release);
+    cv.addEventListener('lostpointercapture', release);
+    running = true; lastFrame = performance.now();
+    requestAnimationFrame(frame);
+  }
+  document.addEventListener('keydown', e => {
+    if (e.code === 'Space' && cur && modal.classList.contains('open')) { e.preventDefault(); cur.holding = true; }
+  }, true);
+  document.addEventListener('keyup', e => { if (e.code === 'Space' && cur) cur.holding = false; }, true);
+
   function renderLab() {
-    const head = '<p class="pt6-muted">Certified ' + certCount() + ' / ' + TOTAL + ' · Tests passed ' + lab.tests +
-      ' · Each sample needs ' + STEPS.length + ' tests in a row. A wrong result sends it back to test 1.</p>';
+    running = false; cur = null;
+    const head = '<p class="pt6-muted">Crystals grown ' + certCount() + ' / ' + TOTAL + ' · Cracks so far: ' + (lab.shatters || 0) + '</p>';
     const discovered = discoveredChemicals.slice().sort((a, b) => a.localeCompare(b));
     if (discovered.length < TOTAL) {
-      return openM('🧪 Lab Test Bay', head + '<p>Find all ' + TOTAL + ' chemicals on the surface first (' + discovered.length + ' so far).</p>');
+      return openM('💎 Crystal Lab', head + '<p>Find all ' + TOTAL + ' chemicals on the surface first (' + discovered.length + ' so far).</p>');
     }
     if (labComplete()) {
-      return openM('🧪 Lab Test Bay', head + '<p style="color:#6ee7b7">All ' + TOTAL + ' chemicals are certified.</p>');
+      return openM('💎 Crystal Lab', head + '<p style="color:#6ee7b7">Every crystal is grown. The lab is complete!</p>');
     }
-    const pending = discovered.filter(n => !lab.cert[n]);
-    if (!labSelected || lab.cert[labSelected] || !pending.includes(labSelected)) labSelected = pending[0];
-    const name = labSelected, step = lab.step[name] || 0, t = testFor(name, step);
-    labCurrent = { name: name, step: step, t: t };
-    const picker = '<select id="pt6-pick" class="pt6-select">' + pending.map(n =>
-      '<option value="' + n + '"' + (n === name ? ' selected' : '') + '>' + n + ' (test ' + ((lab.step[n] || 0) + 1) + ' of ' + STEPS.length + ')</option>').join('') + '</select>';
-    const target = t.kind === 'bands'
-      ? '<p>Target: ' + t.target.map(c => '<span class="pt6-swatch" style="background:' + c + '"></span>').join('') + '</p>' : '';
-    const opts = t.kind === 'bands'
-      ? t.opts.map((pat, i) => '<button type="button" class="pt6-opt" data-act="answer" data-i="' + i + '">' +
-          pat.map(c => '<span class="pt6-swatch" style="background:' + c + '"></span>').join('') + ' Pattern ' + String.fromCharCode(65 + i) + '</button>').join('')
-      : t.opts.map((o, i) => '<button type="button" class="pt6-opt" data-act="answer" data-i="' + i + '">' + String.fromCharCode(65 + i) + '. ' + o + '</button>').join('');
-    openM('🧪 Lab Test Bay', head + picker +
-      '<p><strong>Test ' + (step + 1) + ' of ' + STEPS.length + ': ' + STEPS[step] + '</strong></p>' +
-      '<p class="pt6-muted">' + t.prompt + '</p>' + target + opts);
-  }
-  function onLabAnswer(i) {
-    if (!labCurrent) return;
-    const name = labCurrent.name, step = labCurrent.step, t = labCurrent.t;
-    if (i === t.ans) {
-      lab.tests++;
-      if (step + 1 >= STEPS.length) {
-        lab.cert[name] = true; lab.step[name] = 0;
-        ping('✅ Certified', name + ' passed all tests (' + certCount() + ' / ' + TOTAL + ').');
-        if (labComplete() && !labNotified) { labNotified = true; addBalance(25000); burst(); showAlert('🧪 All chemicals certified! Lab bonus +25,000.'); }
-      } else {
-        lab.step[name] = step + 1;
-        ping('✓ Test passed', name + ': next test is ' + STEPS[step + 1] + '.');
-      }
-    } else {
-      lab.step[name] = 0;
-      ping('⚠️ Contamination', name + ' failed. Back to test 1.');
-    }
-    renderLab(); updatePills();
+    const cards = discovered.filter(n => !lab.cert[n]).map(n => {
+      const p = crystalParams(n);
+      return '<button type="button" class="pt6-card" data-act="grow" data-name="' + n + '">' +
+        '<span class="pt6-dot" style="background:' + p.color + '"></span><strong>' + n + '</strong>' +
+        '<small>Sweet zone ' + p.lo + '–' + p.hi + '°C</small></button>';
+    }).join('');
+    openM('💎 Crystal Lab', head +
+      '<p class="pt6-muted">Pick a sample, then press and hold the beaker to heat it. Keep the temperature in the green zone to grow the crystal. Too hot and it cracks.</p>' +
+      '<div class="pt6-grid2">' + cards + '</div>');
   }
 
   /* ----- Bay buttons (shown only on screen 6) ----- */
   const hud = document.createElement('div');
   hud.id = 'pt6-hud';
-  hud.innerHTML = '<div id="pt6-status"></div><button type="button" id="pt6-rover">🔧 Rover Bay</button><button type="button" id="pt6-lab">🧪 Lab Test Bay</button>';
+  hud.innerHTML = '<div id="pt6-status"></div><button type="button" id="pt6-rover">🔧 Rover Bay</button><button type="button" id="pt6-lab">💎 Crystal Lab</button>';
   document.body.appendChild(hud);
   $('pt6-rover').addEventListener('click', () => { selectedPart = null; renderRover(); });
   $('pt6-lab').addEventListener('click', () => { labSelected = null; renderLab(); });
@@ -5598,7 +5651,8 @@ body.crt{text-shadow:0 0 6px rgba(56,189,248,.35)}
     const el = e.target.closest('[data-act]'); if (!el) return;
     const act = el.dataset.act;
     if (act === 'pick' || act === 'slot') onRoverAction(act, el);
-    else if (act === 'answer') onLabAnswer(Number(el.dataset.i));
+    else if (act === 'grow') crystalView(el.dataset.name);
+    else if (act === 'back') { running = false; cur = null; renderLab(); }
   });
   mBody.addEventListener('change', e => { if (e.target.id === 'pt6-pick') { labSelected = e.target.value; renderLab(); } });
 
@@ -5606,11 +5660,11 @@ body.crt{text-shadow:0 0 6px rgba(56,189,248,.35)}
     $('pt6-rover').style.display = collectedRoverPartsCount >= 4 ? '' : 'none';
     $('pt6-rover').textContent = roverSorted ? '🔧 Rover Bay ✓' : '🔧 Rover Bay';
     $('pt6-lab').style.display = discoveredChemicals.length >= TOTAL ? '' : 'none';
-    $('pt6-lab').textContent = labComplete() ? '🧪 Lab Bay ✓' : '🧪 Lab Test Bay (' + certCount() + '/' + TOTAL + ')';
+    $('pt6-lab').textContent = labComplete() ? '💎 Crystal Lab ✓' : '💎 Crystal Lab (' + certCount() + '/' + TOTAL + ')';
     $('pt6-status').textContent = 'Return home needs: rover ' + (roverSorted ? 'sorted ✓' : 'not sorted') +
       ' · chemicals ' + certCount() + '/' + TOTAL + ' certified';
     if (collectedRoverPartsCount >= 4 && !roverNotified) { roverNotified = true; ping('🔩 All rover parts found', 'Open the Rover Bay to assemble the rover.'); }
-    if (discoveredChemicals.length >= TOTAL && !labUnlockShown) { labUnlockShown = true; ping('🧪 Lab Test Bay unlocked', 'Certify every chemical with its three tests.'); }
+    if (discoveredChemicals.length >= TOTAL && !labUnlockShown) { labUnlockShown = true; ping('💎 Crystal Lab unlocked', 'Grow a crystal from every chemical you found.'); }
   }
 
   // New expedition: reset the gate
@@ -5628,10 +5682,21 @@ body.crt{text-shadow:0 0 6px rgba(56,189,248,.35)}
   window.roverDriveLocked = () => !roverSorted;
   window.homeGateMessage = () => {
     if (!roverSorted) return 'Sort the four rover parts in the Rover Bay before returning home.';
-    if (!labComplete()) return 'Certify all ' + TOTAL + ' chemicals in the Lab Test Bay before returning home (' + certCount() + '/' + TOTAL + ').';
+    if (!labComplete()) return 'Grow all ' + TOTAL + ' crystals in the Crystal Lab before returning home (' + certCount() + '/' + TOTAL + ').';
     return null;
   };
 })();
 </script>
+<style>
+.pt6-canvas{display:block;width:100%;max-width:420px;margin:8px auto;background:#070d19;border-radius:12px;touch-action:none;cursor:pointer;user-select:none}
+.pt6-grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.pt6-card{display:flex;flex-direction:column;align-items:flex-start;gap:3px;background:#0b1424;border:2px solid #334155;color:#fff;border-radius:10px;padding:10px;cursor:pointer;text-align:left;font-weight:700}
+.pt6-card:hover{border-color:#38bdf8}
+.pt6-card small{color:#94a3b8;font-weight:500}
+</style>
+<style>
+.aero-toast{transition:transform .4s ease,opacity .4s ease,visibility .4s}
+.aero-toast:not(.show){opacity:0;visibility:hidden}
+</style>
 </body>
 </html>
