@@ -6270,20 +6270,50 @@ body.crt{text-shadow:0 0 6px rgba(56,189,248,.35)}
   const bbBody = modal.querySelector('.bb-body');
   modal.addEventListener('click', e => { if (e.target === modal || e.target.classList.contains('aero-close')) modal.classList.remove('open'); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') modal.classList.remove('open'); });
+  function classicBadges() {
+    const old = readJSON('aero-badges', {});
+    const s6 = (readJSON('aero-s6', { badges: {} }).badges) || {};
+    const quiz = readJSON('aero-quiz-badges', {});
+    return [
+      { icon: '🥇', name: 'First Stage', desc: 'Added your first part.', ok: !!old.first },
+      { icon: '🌀', name: 'Spin Doctor', desc: 'Rotated parts 5 times.', ok: !!old.spin },
+      { icon: '🎯', name: 'Tight Fit', desc: 'Moved parts 10 times.', ok: !!old.tight },
+      { icon: '🏗️', name: 'Stage Master', desc: 'Built a rocket with 5 parts.', ok: !!old.stack },
+      { icon: '🧭', name: 'Launch Pioneer', desc: 'Started a valid launch.', ok: !!old.pioneer },
+      { icon: '📻', name: 'Hidden Frequency', desc: 'Entered the classic cheat code.', ok: !!readJSON('aero-secret', false) },
+      { icon: '🧠', name: 'Cosmic Genius', desc: 'Perfect score on the Cosmic Aptitude Exam.', ok: !!quiz.cosmic },
+      { icon: '🔧', name: 'Rover Engineer', desc: 'Assembled the rover from scratch.', ok: !!s6.rover },
+      { icon: '📐', name: 'Perfect Calibration', desc: 'All three calibration rounds locked on.', ok: !!s6.calib3 },
+      { icon: '💠', name: 'Legendary Find', desc: 'Grew a legendary crystal.', ok: !!s6.legend },
+      { icon: '🔥', name: 'Hot Streak', desc: 'Three crystals in a row within two minutes.', ok: !!s6.combo3 },
+      { icon: '👑', name: 'Crystal Collector', desc: 'Ten crystals grown.', ok: !!s6.crystal10 }
+    ];
+  }
   function openBook() {
     const got = BADGES.filter(b => bb.earned[b.id]).length;
-    const rank = got >= 24 ? 'Galactic Legend' : got >= 18 ? 'Mission Commander' : got >= 10 ? 'Flight Engineer' : got >= 4 ? 'Cadet' : 'Rookie';
+    const classic = classicBadges();
+    const classicGot = classic.filter(b => b.ok).length;
+    const total = BADGES.length + classic.length;
+    const all = got + classicGot;
+    const rank = all >= 30 ? 'Galactic Legend' : all >= 22 ? 'Mission Commander' : all >= 12 ? 'Flight Engineer' : all >= 5 ? 'Cadet' : 'Rookie';
     const cards = ['legend', 'epic', 'rare', 'common'].map(tier => BADGES.filter(b => b.tier === tier).map(b => {
       const t = TIER[b.tier], ok = !!bb.earned[b.id];
       return '<div class="bb-card' + (ok ? '' : ' locked') + '" style="--tc:' + t.c + ';--tg:' + t.g + '">' +
         '<div class="i">' + (ok ? b.icon : '🔒') + '</div><b>' + (ok ? b.name : '???') + '</b>' +
         '<div class="bb-tier">' + t.label + '</div><small>' + b.desc + '</small></div>';
     }).join('')).join('');
-    bbBody.innerHTML = '<h3>🏆 Trophy Book</h3>' +
+    const classicHtml = classic.map(b =>
+      '<div class="bb-card' + (b.ok ? '' : ' locked') + '" style="--tc:#94a3b8;--tg:#64748b">' +
+      '<div class="i">' + (b.ok ? b.icon : '🔒') + '</div><b>' + (b.ok ? b.name : '???') + '</b>' +
+      '<div class="bb-tier">CLASSIC</div><small>' + b.desc + '</small></div>').join('');
+    bbBody.innerHTML = '<h3>🏆 Badge Gallery</h3>' +
       '<p class="bb-rank">' + rank.toUpperCase() + '</p>' +
-      '<p style="color:#cbd5e1">' + got + ' / ' + BADGES.length + ' unlocked</p>' +
-      '<div class="bb-progress"><i style="width:' + Math.round(got / BADGES.length * 100) + '%"></i></div>' +
-      '<div class="bb-grid">' + cards + '</div>';
+      '<p style="color:#cbd5e1">' + all + ' / ' + total + ' badges unlocked</p>' +
+      '<div class="bb-progress"><i style="width:' + Math.round(all / total * 100) + '%"></i></div>' +
+      '<h4 class="bb-sec">Trophy Book · ' + got + ' / ' + BADGES.length + '</h4>' +
+      '<div class="bb-grid">' + cards + '</div>' +
+      '<h4 class="bb-sec">Classic & Expedition · ' + classicGot + ' / ' + classic.length + '</h4>' +
+      '<div class="bb-grid">' + classicHtml + '</div>';
     modal.classList.add('open');
   }
 
@@ -6316,6 +6346,17 @@ body.crt{text-shadow:0 0 6px rgba(56,189,248,.35)}
   trophyBtn.type = 'button'; trophyBtn.className = 'aero-tool-btn'; trophyBtn.textContent = '🏆';
   trophyBtn.title = 'Trophy book (P)'; trophyBtn.setAttribute('aria-label', 'Trophy book');
   trophyBtn.addEventListener('click', () => openBook());
+  // The old 🏅 Badge gallery button and the B key now open this full gallery, so every badge shows
+  window.addEventListener('click', e => {
+    const t = e.target;
+    if (t && t.closest && t.closest('[aria-label="Badge gallery"]')) { e.stopImmediatePropagation(); e.preventDefault(); openBook(); }
+  }, true);
+  window.addEventListener('keydown', e => {
+    if (!e.key || e.key.toLowerCase() !== 'b') return;
+    if (e.target.closest && e.target.closest('input, textarea, select')) return;
+    if (exploreOn() || flightOn()) return;
+    e.stopImmediatePropagation(); openBook();
+  }, true);
   (document.querySelector('.aero-toolbar-b') || document.body).appendChild(trophyBtn);
 
   setInterval(() => {
@@ -6331,5 +6372,6 @@ body.crt{text-shadow:0 0 6px rgba(56,189,248,.35)}
   setTimeout(evaluate, 2000);
 })();
 </script>
+<style>.bb-sec{margin:14px 0 4px;color:#38bdf8;letter-spacing:2px;font-size:.8rem;text-transform:uppercase}</style>
 </body>
 </html>
