@@ -4682,7 +4682,7 @@ body.calm #bg-comets{display:none}
   ];
   function openHelp() {
     openModal('⌨️ Keyboard shortcuts', '<table>' + KEYS.map(([k, t]) => row('<kbd>' + k + '</kbd>', t)).join('') +
-      '</table><p style="color:#94a3b8;font-size:.85rem">Letter shortcuts work on the VAB screen. The corner buttons work everywhere.</p>');
+      '</table><p style="color:#94a3b8;font-size:.85rem">Letter shortcuts work on every screen except while flying or exploring. The corner buttons work everywhere.</p>');
   }
 
   // FEATURE 6 - Lifetime stats panel (S)
@@ -4817,7 +4817,7 @@ body.calm #bg-comets{display:none}
       say('🏅 Secret badge: Hidden Frequency', 'You found the classic cheat code. ' + pick(DAILY_FACTS));
     }
     if (e.key === 'Escape') { closeModal(); return; }
-    if (typing(e) || !vabActive()) return;
+    if (typing(e) || (document.getElementById('explore-toggle') && document.getElementById('explore-toggle').checked) || (document.getElementById('launch-toggle') && document.getElementById('launch-toggle').checked)) return;
     const k = e.key.toLowerCase();
     if (e.key === '?') openHelp();
     else if (k === 'm') { const mb = document.querySelector('.aero-mute-btn'); if (mb) mb.click(); }
@@ -5709,12 +5709,15 @@ body.crt{text-shadow:0 0 6px rgba(56,189,248,.35)}
     if (!cur || cur.done) return;
     const p = cur.p, inZone = cur.temp >= p.lo && cur.temp <= p.hi;
     if (!inZone) return flash('🥄 Stir while the beaker is in the green zone for a bonus.');
-    cur.growth = Math.min(100, cur.growth + 6);
-    fxSpark(200, 200, 14, 220, '#bae6fd');
-    fxRing(200, 190, '#ffffff');
-    shake(90, 3);
-    try { if (navigator.vibrate) navigator.vibrate(12); } catch (e) {}
-    flash('🥄 Nice stir! +6% growth');
+    const beat = (cur.clock * 1.2) % 1;
+    const perfect = beat > 0.86;
+    cur.growth = Math.min(100, cur.growth + (perfect ? 14 : 6));
+    if (perfect) cur.perfects = (cur.perfects || 0) + 1;
+    fxSpark(200, 200, perfect ? 30 : 14, 260, perfect ? '#fde047' : '#bae6fd');
+    fxRing(200, 190, perfect ? '#fde047' : '#ffffff');
+    shake(perfect ? 160 : 90, perfect ? 6 : 3);
+    try { if (navigator.vibrate) navigator.vibrate(perfect ? [20, 30, 20] : 12); } catch (e) {}
+    flash(perfect ? '✨ PERFECT PULSE! +14% growth' : '🥄 Stir! +6% growth (time it with the ring)');
   }
   function complete() {
     cur.done = true; cur.doneT = 0; cur.growth = 100;
@@ -5783,6 +5786,29 @@ body.crt{text-shadow:0 0 6px rgba(56,189,248,.35)}
     const size = cur.done ? 120 : 25 + 95 * (g / 100);
     drawGem(c, p.shape, 200, 225, size, p.color, p.rar, cur.clock);
 
+    // Beat ring: shrinks to the target circle once per beat. Stir inside the target for a PERFECT PULSE
+    if (!cur.done) {
+      const beat = (cur.clock * 1.2) % 1, perfect = beat > 0.86;
+      c.save();
+      c.beginPath(); c.arc(200, 150, 44, 0, Math.PI * 2);
+      c.strokeStyle = 'rgba(253,224,71,.35)'; c.lineWidth = 1; c.stroke();
+      c.strokeStyle = perfect ? 'rgba(253,224,71,' + (0.9 - beat * 0.3).toFixed(2) + ')' : 'rgba(186,230,253,' + (0.55 * (1 - beat)).toFixed(2) + ')';
+      c.lineWidth = perfect ? 4 : 2;
+      c.shadowColor = perfect ? '#fde047' : '#38bdf8'; c.shadowBlur = perfect ? 18 : 6;
+      c.beginPath(); c.arc(200, 150, 44 + (1 - beat) * 140, 0, Math.PI * 2); c.stroke();
+      c.restore();
+      if (perfect) { c.fillStyle = '#fde047'; c.font = "10px 'Orbitron', sans-serif"; c.fillText('TAP NOW', 165, 22); }
+    }
+    // Golden mutation aura
+    if ((cur.mut || 0) > 0) {
+      c.save();
+      c.shadowColor = '#fde047'; c.shadowBlur = 30;
+      c.strokeStyle = 'rgba(253,224,71,' + (0.35 + 0.25 * Math.sin(cur.clock * 10)).toFixed(2) + ')';
+      c.lineWidth = 6;
+      c.beginPath(); c.arc(200, 150, 110, 0, Math.PI * 2); c.stroke();
+      c.restore();
+    }
+
     // Particles and lightning on top
     stepFx(dt);
     drawFx(c);
@@ -5821,17 +5847,24 @@ body.crt{text-shadow:0 0 6px rgba(56,189,248,.35)}
     if (cur.done) {
       cur.doneT += dt;
       drawScene(dt, false);
-      if (cur.doneT > 2) { renderLab(); return; }
+      if (cur.doneT > 2) { running = false; showGemCard(cur); return; }
       requestAnimationFrame(frame); return;
     }
     cur.clock += dt;
+    if ((cur.mut || 0) > 0) cur.mut -= dt;
     const heating = cur.holding;
     cur.temp += (heating ? 48 : -30) * dt + Math.sin(cur.clock * 2 + p.id) * 2.5 * dt;
     cur.temp = Math.max(0, Math.min(100, cur.temp));
     const inZone = cur.temp >= p.lo && cur.temp <= p.hi;
     const overdrive = lab.combo >= 3;
     if (inZone) {
-      cur.growth = Math.min(100, cur.growth + p.speed * (overdrive ? 1.25 : 1) * dt);
+      const boost = (cur.mut || 0) > 0 ? 2 : 1;
+      cur.growth = Math.min(100, cur.growth + p.speed * (overdrive ? 1.25 : 1) * boost * dt);
+      if ((cur.mut || 0) <= 0 && Math.random() < dt * 0.12) {
+        cur.mut = 4; cur.mutations = (cur.mutations || 0) + 1;
+        fxRing(200, 150, '#fde047'); fxSpark(200, 120, 40, 260, '#fde047');
+        flash('🌟 MUTATION! Golden growth x2 for 4 seconds');
+      }
       const tipY = 225 - (25 + 95 * cur.growth / 100);
       if (Math.random() < dt * (overdrive ? 18 : 8)) fxSpark(200 + (Math.random() - 0.5) * 70, tipY + Math.random() * 10, 1, 60, p.color);
       if (cur.growth >= 75 && Math.random() < dt * 3) bolt(200, tipY);
@@ -5885,6 +5918,29 @@ body.crt{text-shadow:0 0 6px rgba(56,189,248,.35)}
   }, true);
   document.addEventListener('keyup', e => { if (e.code === 'Space' && cur) cur.holding = false; }, true);
 
+  function gemStats(name) {
+    const id = masterChemicals.indexOf(name);
+    return { hardness: 3 + (id % 8), shine: 40 + ((id * 13) % 60), clarity: ['Flawless', 'Very clear', 'Cloudy', 'Milky'][id % 4] };
+  }
+  function gemStatsHTML(name) {
+    const g = gemStats(name);
+    return '<small>Hardness ' + g.hardness + ' · Shine ' + g.shine + ' · ' + g.clarity + '</small>';
+  }
+  function showGemCard(c) {
+    const name = c.name, p = c.p, st = gemStats(name);
+    const bar = (label, v) => '<div class="pt6-stat"><span>' + label + '</span><div class="pt6-bar"><i style="width:' + Math.min(100, v) + '%"></i></div></div>';
+    const clarityValue = { 'Flawless': 100, 'Very clear': 78, 'Cloudy': 52, 'Milky': 30 }[st.clarity];
+    openM('💎 Gem card',
+      '<div class="pt6-gemcard" style="border-color:' + RARITY[p.rar].glow + '">' +
+      '<canvas id="pt6-gemcv" width="200" height="170"></canvas>' +
+      '<h4 style="margin:6px 0 2px">' + name + '</h4>' +
+      '<p class="pt6-muted">' + SHAPES[p.shape] + ' · ' + RARITY[p.rar].name + ' ' + RARITY[p.rar].stars + ' · Perfect pulses: ' + (c.perfects || 0) + ' · Mutations: ' + (c.mutations || 0) + '</p>' +
+      bar('Hardness', st.hardness * 10) + bar('Shine', st.shine) + bar('Clarity', clarityValue) +
+      '</div><button type="button" class="pt6-btn" data-act="back">✨ Back to the crystal list</button>');
+    const gc = $('pt6-gemcv');
+    if (gc) drawGem(gc.getContext('2d'), p.shape, 100, 150, 70, p.color, p.rar, performance.now() / 1000);
+  }
+
   function renderLab() {
     running = false; cur = null; calib.running = false;
     const head = '<p class="pt6-muted">Crystals grown ' + certCount() + ' / ' + TOTAL + ' · Best combo: ' + lab.bestCombo + ' · Cracks: ' + (lab.shatters || 0) + '</p>';
@@ -5918,7 +5974,7 @@ body.crt{text-shadow:0 0 6px rgba(56,189,248,.35)}
       const p = crystalParams(n);
       return '<div class="pt6-card"><canvas class="pt6-gem" width="90" height="70" data-shape="' + p.shape +
         '" data-color="' + p.color + '" data-rar="' + p.rar + '"></canvas><strong>' + n + '</strong>' +
-        '<small>' + SHAPES[p.shape] + ' · ' + RARITY[p.rar].name + ' ' + RARITY[p.rar].stars + '</small></div>';
+        '<small>' + SHAPES[p.shape] + ' · ' + RARITY[p.rar].name + ' ' + RARITY[p.rar].stars + '</small>' + gemStatsHTML(n) + '</div>';
     }).join('');
     openM('🏛️ Geode Shelf (' + names.length + ' / ' + TOTAL + ')',
       '<p class="pt6-muted">Best combo: ' + lab.bestCombo + ' · Cracks: ' + (lab.shatters || 0) + '</p>' +
@@ -6015,5 +6071,265 @@ body.crt{text-shadow:0 0 6px rgba(56,189,248,.35)}
 .aero-toast{transition:transform .4s ease,opacity .4s ease,visibility .4s}
 .aero-toast:not(.show){opacity:0;visibility:hidden}
 </style>
+<style>
+.pt6-gemcard{border:2px solid;border-radius:12px;padding:10px;text-align:center;background:#070d19}
+.pt6-gemcard canvas{display:block;margin:0 auto}
+.pt6-stat{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:.8rem}
+.pt6-stat span{width:84px;text-align:left}
+.pt6-bar{flex:1;height:10px;background:#0b1424;border-radius:6px;overflow:hidden}
+.pt6-bar i{display:block;height:100%;background:linear-gradient(90deg,#38bdf8,#a78bfa)}
+.bb-pop{position:fixed;left:50%;top:50%;z-index:120;transform:translate(-50%,-50%) scale(.6);opacity:0;pointer-events:none;display:flex;gap:14px;align-items:center;min-width:280px;max-width:90vw;padding:16px 20px;border-radius:16px;background:rgba(5,10,24,.96);border:3px solid var(--tc,#38bdf8);box-shadow:0 0 30px var(--tg,#38bdf8);transition:transform .45s cubic-bezier(.2,1.6,.4,1),opacity .35s}
+.bb-pop.show{transform:translate(-50%,-50%) scale(1);opacity:1}
+.bb-pop.legend{animation:bb-shine 1.2s linear infinite}
+@keyframes bb-shine{0%{box-shadow:0 0 30px var(--tg)}50%{box-shadow:0 0 70px var(--tg)}100%{box-shadow:0 0 30px var(--tg)}}
+.bb-ico{font-size:2.6rem;filter:drop-shadow(0 0 10px var(--tg))}
+.bb-pop small{display:block;color:var(--tc);font-weight:900;letter-spacing:3px;font-size:.68rem}
+.bb-pop strong{display:block;font-size:1.05rem;color:#fff;margin:2px 0}
+.bb-pop span{color:#cbd5e1;font-size:.82rem}
+.bb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.bb-card{border:2px solid var(--tc);border-radius:12px;padding:8px;background:#0b1424;text-align:center;color:#fff;min-height:118px;box-shadow:0 0 12px var(--tg) inset}
+.bb-card.locked{opacity:.45;border-style:dashed;filter:grayscale(1);box-shadow:none}
+.bb-card .i{font-size:1.7rem}
+.bb-card b{display:block;margin:4px 0 2px;font-size:.78rem}
+.bb-card small{color:#94a3b8;display:block;font-size:.66rem;line-height:1.3}
+.bb-tier{font-weight:900;letter-spacing:2px;font-size:.6rem;color:var(--tc)}
+.bb-progress{height:14px;background:#0b1424;border:2px solid #334155;border-radius:10px;overflow:hidden;margin:8px 0}
+.bb-progress i{display:block;height:100%;background:linear-gradient(90deg,#f59e0b,#facc15,#fff7ae,#facc15);background-size:200% 100%;animation:bb-flow 2s linear infinite}
+@keyframes bb-flow{to{background-position:200% 0}}
+.bb-rank{font-weight:900;color:#facc15;letter-spacing:2px}
+</style>
+<script>
+(() => {
+  /* ===== Trophy Book: 27 badges, unlock popups, chimes, confetti ===== */
+  const $ = id => document.getElementById(id);
+  const readJSON = (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } };
+  const writeJSON = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+  const exploreOn = () => !!($('explore-toggle') && $('explore-toggle').checked);
+  const flightOn = () => !!($('launch-toggle') && $('launch-toggle').checked);
+
+  const TIER = {
+    common: { label: 'COMMON', c: '#cd7f32', g: '#f59e0b', conf: 40 },
+    rare: { label: 'RARE', c: '#38bdf8', g: '#38bdf8', conf: 70 },
+    epic: { label: 'EPIC', c: '#c084fc', g: '#a855f7', conf: 100 },
+    legend: { label: 'LEGENDARY', c: '#facc15', g: '#fde047', conf: 150 }
+  };
+  const BADGES = [
+    { id: 'ignition', tier: 'common', icon: '🚀', name: 'Ignition', desc: 'Launch your first rocket.' },
+    { id: 'hangar', tier: 'common', icon: '🛠️', name: 'Hangar Rat', desc: 'Add 10 parts to your rockets.' },
+    { id: 'spin', tier: 'common', icon: '🔁', name: 'Spin Cycle', desc: 'Rotate parts 25 times.' },
+    { id: 'lucky', tier: 'common', icon: '🎲', name: 'Lucky Dip', desc: 'Build 3 random rockets with Surprise.' },
+    { id: 'earlybird', tier: 'common', icon: '🌅', name: 'Early Bird', desc: 'Play between 5am and 7am.' },
+    { id: 'retro', tier: 'common', icon: '📺', name: 'Retro Hero', desc: 'Switch on retro scanline mode.' },
+    { id: 'quizrookie', tier: 'common', icon: '🧠', name: 'Quiz Rookie', desc: 'Answer 10 quiz questions correctly.' },
+    { id: 'renamer', tier: 'common', icon: '🚙', name: 'Name Giver', desc: 'Give your rover a new name.' },
+    { id: 'cracked', tier: 'common', icon: '🧊', name: 'Cracked It', desc: 'Shatter a crystal. It happens to the best.' },
+    { id: 'precision', tier: 'rare', icon: '🎯', name: 'Precision Pilot', desc: 'Move parts 50 times.' },
+    { id: 'stack', tier: 'rare', icon: '🧱', name: 'Stack Overflow', desc: 'Build a rocket with 8 or more parts.' },
+    { id: 'quizace', tier: 'rare', icon: '🎓', name: 'Quiz Ace', desc: 'Answer 50 quiz questions correctly.' },
+    { id: 'onfire', tier: 'rare', icon: '🔥', name: 'On Fire', desc: 'Get 5 quiz answers right in a row.' },
+    { id: 'snapshot', tier: 'rare', icon: '📸', name: 'Snapshot Artist', desc: 'Export a picture of your rocket.' },
+    { id: 'gardener', tier: 'rare', icon: '💎', name: 'Crystal Gardener', desc: 'Grow 10 crystals.' },
+    { id: 'engineer', tier: 'rare', icon: '🔧', name: 'Rover Engineer', desc: 'Assemble the rover.' },
+    { id: 'calibrated', tier: 'rare', icon: '🎚️', name: 'Dialled In', desc: 'Earn 3 stars on drive calibration.' },
+    { id: 'nightowl', tier: 'rare', icon: '🌙', name: 'Night Owl', desc: 'Play between midnight and 4am.' },
+    { id: 'regular', tier: 'rare', icon: '📅', name: 'Regular', desc: 'Visit on 3 different days.' },
+    { id: 'heavy', tier: 'epic', icon: '🪐', name: 'Heavy Lifter', desc: 'Build a rocket heavier than 20 tonnes.' },
+    { id: 'bigspender', tier: 'epic', icon: '💸', name: 'Big Spender', desc: 'Hold more than 5,000,000 in your budget.' },
+    { id: 'cosmic', tier: 'epic', icon: '🌌', name: 'Cosmic Scholar', desc: 'Score 15 out of 15 on the cosmic quiz.' },
+    { id: 'fivestar', tier: 'epic', icon: '⭐', name: 'Five-Star Engineer', desc: 'Rate a rocket five stars.' },
+    { id: 'explorer', tier: 'epic', icon: '🛰️', name: 'Surface Explorer', desc: 'Step onto the alien surface.' },
+    { id: 'gemhunter', tier: 'legend', icon: '💠', name: 'Gem Hunter', desc: 'Grow a legendary crystal.' },
+    { id: 'cheatmaster', tier: 'legend', icon: '🕹️', name: 'Cheat Code Master', desc: 'Enter the classic cheat code.' },
+    { id: 'liftoff', tier: 'legend', icon: '🌠', name: 'Ready for Liftoff', desc: 'Assemble the rover and grow every crystal.' }
+  ];
+
+  let bb = readJSON('aero-trophies', { earned: {}, quizCorrect: 0, streak: 0, bestStreak: 0, surprise: 0, renames: 0, exports: 0, cracks: 0, rated5: false, visited6: false, days: [] });
+  const today = new Date().toDateString();
+  if (!bb.days.includes(today)) bb.days.push(today);
+  const save = () => writeJSON('aero-trophies', bb);
+  save();
+  let lastQ = '', lastCr = 0;
+
+  function rawStars() {
+    const types = new Set(rocketParts.map(p => p.type));
+    let s = 0;
+    if (types.has('capsule')) s++;
+    if (types.has('tank')) s++;
+    if (types.has('engine')) s++;
+    if (rocketParts.length >= 4) s++;
+    if (rocketParts.length >= 7) s++;
+    if (types.has('decoupler') || types.has('other')) s++;
+    return s;
+  }
+  function snapshot() {
+    const st = readJSON('aero-stats', { adds: 0, rotates: 0, nudges: 0, launches: 0 });
+    const s6 = readJSON('aero-s6', { badges: {} });
+    const labText = $('pt6-lab') ? $('pt6-lab').textContent : '';
+    const m = labText.match(/\((\d+) \/ \d+\)/);
+    const crystals = /✓/.test(labText) ? masterChemicals.length : (m ? Number(m[1]) : 0);
+    return {
+      launches: st.launches || 0, adds: st.adds || 0, rotates: st.rotates || 0, nudges: st.nudges || 0,
+      quizCorrect: bb.quizCorrect, bestStreak: bb.bestStreak, surprise: bb.surprise, renames: bb.renames,
+      exports: bb.exports, cracks: bb.cracks, rated5: bb.rated5, visited6: bb.visited6, days: bb.days.length,
+      parts: rocketParts.length, mass: rocketParts.reduce((sum, p) => sum + (Number(p.mass) || 0), 0),
+      balance: playerBalance, hour: new Date().getHours(), crystals: crystals,
+      roverSorted: typeof window.roverDriveLocked === 'function' && !window.roverDriveLocked(),
+      calib3: !!(s6.badges && s6.badges.calib3), legend: !!(s6.badges && s6.badges.legend),
+      secret: !!readJSON('aero-secret', false), cosmic: !!readJSON('aero-quiz-badges', {}).cosmic,
+      crt: !!readJSON('aero-crt', false)
+    };
+  }
+  const RULES = {
+    ignition: S => S.launches >= 1,
+    hangar: S => S.adds >= 10,
+    spin: S => S.rotates >= 25,
+    lucky: S => S.surprise >= 3,
+    earlybird: S => S.hour >= 5 && S.hour <= 6,
+    retro: S => S.crt,
+    quizrookie: S => S.quizCorrect >= 10,
+    renamer: S => S.renames >= 1,
+    cracked: S => S.cracks >= 1,
+    precision: S => S.nudges >= 50,
+    stack: S => S.parts >= 8,
+    quizace: S => S.quizCorrect >= 50,
+    onfire: S => S.bestStreak >= 5,
+    snapshot: S => S.exports >= 1,
+    gardener: S => S.crystals >= 10,
+    engineer: S => S.roverSorted,
+    calibrated: S => S.calib3,
+    nightowl: S => S.hour <= 3,
+    regular: S => S.days >= 3,
+    heavy: S => S.mass >= 20,
+    bigspender: S => S.balance >= 5000000,
+    cosmic: S => S.cosmic,
+    fivestar: S => S.rated5,
+    explorer: S => S.visited6,
+    gemhunter: S => S.legend,
+    cheatmaster: S => S.secret,
+    liftoff: S => S.roverSorted && S.crystals >= masterChemicals.length
+  };
+
+  let actx = null;
+  document.addEventListener('pointerdown', () => {
+    try { if (!actx) { const AC = window.AudioContext || window.webkitAudioContext; if (AC) actx = new AC(); } if (actx && actx.state === 'suspended') actx.resume(); } catch (e) {}
+  }, true);
+  function tone(f, t, d, type, v) {
+    if (!actx || readJSON('aero-muted', false)) return;
+    const o = actx.createOscillator(), g = actx.createGain(), t0 = actx.currentTime + t;
+    o.type = type; o.frequency.setValueAtTime(f, t0);
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(v, t0 + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t0 + d);
+    o.connect(g).connect(actx.destination); o.start(t0); o.stop(t0 + d + 0.02);
+  }
+  const CHIME = { common: [523, 659], rare: [523, 659, 784], epic: [523, 659, 784, 1046], legend: [523, 659, 784, 1046, 1318, 1568] };
+  function chime(tier) { CHIME[tier].forEach((f, i) => tone(f, i * 0.09, 0.3, tier === 'legend' ? 'sine' : 'triangle', 0.16)); }
+  function confetti(n) {
+    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const cols = ['#facc15', '#38bdf8', '#c084fc', '#f472b6', '#34d399'];
+    for (let i = 0; i < n; i++) {
+      const c = document.createElement('div');
+      c.className = 'aero-confetti'; c.style.left = (Math.random() * 100) + 'vw';
+      c.style.background = cols[i % cols.length];
+      c.style.animationDuration = (1.8 + Math.random() * 1.6) + 's';
+      document.body.appendChild(c); setTimeout(() => c.remove(), 3900);
+    }
+  }
+
+  const pop = document.createElement('div');
+  pop.className = 'bb-pop'; pop.setAttribute('role', 'status');
+  document.body.appendChild(pop);
+  const queue = [];
+  let showing = false;
+  function nextPopup() {
+    const b = queue.shift();
+    if (!b) { showing = false; return; }
+    showing = true;
+    const t = TIER[b.tier];
+    pop.className = 'bb-pop ' + b.tier;
+    pop.style.setProperty('--tc', t.c); pop.style.setProperty('--tg', t.g);
+    pop.innerHTML = '<div class="bb-ico">' + b.icon + '</div><div><small>BADGE UNLOCKED · ' + t.label + '</small><strong>' + b.name + '</strong><span>' + b.desc + '</span></div>';
+    pop.classList.remove('show'); void pop.offsetWidth; pop.classList.add('show');
+    chime(b.tier); confetti(t.conf);
+    try { if (navigator.vibrate) navigator.vibrate(b.tier === 'legend' ? [40, 60, 40, 60, 80] : [30]); } catch (e) {}
+    setTimeout(() => { pop.classList.remove('show'); setTimeout(nextPopup, 500); }, 3800);
+  }
+  function evaluate() {
+    const S = snapshot();
+    BADGES.forEach(b => {
+      if (bb.earned[b.id]) return;
+      let ok = false;
+      try { ok = !!RULES[b.id](S); } catch (e) {}
+      if (ok) { bb.earned[b.id] = Date.now(); save(); queue.push(b); }
+    });
+    if (queue.length && !showing) nextPopup();
+  }
+
+  const modal = document.createElement('div');
+  modal.className = 'aero-modal-bg';
+  modal.innerHTML = '<div class="aero-modal"><button type="button" class="aero-close" aria-label="Close">×</button><div class="bb-body"></div></div>';
+  document.body.appendChild(modal);
+  const bbBody = modal.querySelector('.bb-body');
+  modal.addEventListener('click', e => { if (e.target === modal || e.target.classList.contains('aero-close')) modal.classList.remove('open'); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') modal.classList.remove('open'); });
+  function openBook() {
+    const got = BADGES.filter(b => bb.earned[b.id]).length;
+    const rank = got >= 24 ? 'Galactic Legend' : got >= 18 ? 'Mission Commander' : got >= 10 ? 'Flight Engineer' : got >= 4 ? 'Cadet' : 'Rookie';
+    const cards = ['legend', 'epic', 'rare', 'common'].map(tier => BADGES.filter(b => b.tier === tier).map(b => {
+      const t = TIER[b.tier], ok = !!bb.earned[b.id];
+      return '<div class="bb-card' + (ok ? '' : ' locked') + '" style="--tc:' + t.c + ';--tg:' + t.g + '">' +
+        '<div class="i">' + (ok ? b.icon : '🔒') + '</div><b>' + (ok ? b.name : '???') + '</b>' +
+        '<div class="bb-tier">' + t.label + '</div><small>' + b.desc + '</small></div>';
+    }).join('')).join('');
+    bbBody.innerHTML = '<h3>🏆 Trophy Book</h3>' +
+      '<p class="bb-rank">' + rank.toUpperCase() + '</p>' +
+      '<p style="color:#cbd5e1">' + got + ' / ' + BADGES.length + ' unlocked</p>' +
+      '<div class="bb-progress"><i style="width:' + Math.round(got / BADGES.length * 100) + '%"></i></div>' +
+      '<div class="bb-grid">' + cards + '</div>';
+    modal.classList.add('open');
+  }
+
+  document.addEventListener('click', e => {
+    const t = e.target; if (!t.closest) return;
+    if (t.closest('.aero-surprise-btn')) { bb.surprise++; save(); }
+    else if (t.closest('[data-act="rename"]')) { bb.renames++; save(); }
+    else if (t.closest('[title="Export rocket picture"]')) { bb.exports++; save(); }
+    else if (t.closest('.aero-rate-btn')) { setTimeout(() => { if (rawStars() >= 5) { bb.rated5 = true; save(); } }, 80); }
+    else if (t.closest('.quiz-option-btn')) {
+      const key = ($('quiz-question-title') || {}).innerText || '';
+      setTimeout(() => {
+        if (key === lastQ) return;
+        lastQ = key;
+        const fb = ($('quiz-feedback') || {}).innerText || '';
+        if (fb.indexOf('✓') === 0) { bb.quizCorrect++; bb.streak++; bb.bestStreak = Math.max(bb.bestStreak, bb.streak); }
+        else if (fb.indexOf('✗') === 0) bb.streak = 0;
+        save();
+      }, 60);
+    }
+  }, true);
+
+  document.addEventListener('keydown', e => {
+    if (e.target.closest && e.target.closest('input, textarea, select')) return;
+    if (exploreOn() || flightOn()) return;
+    if (e.key && e.key.toLowerCase() === 'p') openBook();
+  });
+
+  const trophyBtn = document.createElement('button');
+  trophyBtn.type = 'button'; trophyBtn.className = 'aero-tool-btn'; trophyBtn.textContent = '🏆';
+  trophyBtn.title = 'Trophy book (P)'; trophyBtn.setAttribute('aria-label', 'Trophy book');
+  trophyBtn.addEventListener('click', () => openBook());
+  (document.querySelector('.aero-toolbar-b') || document.body).appendChild(trophyBtn);
+
+  setInterval(() => {
+    if (exploreOn() && !bb.visited6) { bb.visited6 = true; save(); }
+    const rd = $('pt6-readout');
+    if (rd) {
+      const m = rd.textContent.match(/Cracks: (\d+)/);
+      if (m) { const n = Number(m[1]); if (n > lastCr) { bb.cracks += n - lastCr; save(); } lastCr = n; }
+      else lastCr = 0;
+    }
+    evaluate();
+  }, 1000);
+  setTimeout(evaluate, 2000);
+})();
+</script>
 </body>
 </html>
