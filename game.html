@@ -5617,7 +5617,7 @@ body.crt{text-shadow:0 0 6px rgba(56,189,248,.35)}
     updatePills();
   }
 
-  /* ----- Crystal Lab: hold to heat, tap to stir, grow the crystal ----- */
+  /* ----- Crystal Lab (extreme edition): living beaker, shockwaves, lightning, shards, overdrive ----- */
   function crystalParams(name) {
     const id = masterChemicals.indexOf(name);
     const lo = 30 + ((id * 7) % 30);
@@ -5625,48 +5625,99 @@ body.crt{text-shadow:0 0 6px rgba(56,189,248,.35)}
     const rar = id % 7 === 0 ? 2 : (id % 3 === 0 ? 1 : 0);
     return { id: id, color: BAND[id % 6], lo: lo, hi: hi, speed: 9 + (id % 5) * 2.5, shape: id % 4, rar: rar };
   }
-  function drawGem(c, shape, bx, by, s, color, rar) {
+  function heatColor(t, a) {
+    const k = Math.max(0, Math.min(1, (t - 20) / 75));
+    const r = Math.round(56 + (239 - 56) * k), g = Math.round(189 + (68 - 189) * k), b = Math.round(248 + (68 - 248) * k);
+    return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+  }
+  function drawGem(c, shape, bx, by, s, color, rar, t) {
+    t = t || 0;
     c.save();
-    if (rar > 0) { c.shadowColor = RARITY[rar].glow; c.shadowBlur = 14; }
-    const fillPath = (pts, col) => {
+    const pulse = 0.5 + 0.5 * Math.sin(t * 4);
+    if (rar > 0) { c.shadowColor = RARITY[rar].glow; c.shadowBlur = (rar === 2 ? 26 : 14) + pulse * (rar === 2 ? 22 : 8); }
+    const hl = 'rgba(255,255,255,' + (0.25 + 0.35 * pulse).toFixed(2) + ')';
+    const fillPath = (pts, col, alpha) => {
       c.beginPath();
       pts.forEach(([x, y], k) => { const px = bx + x * s, py = by + y * s; if (k === 0) c.moveTo(px, py); else c.lineTo(px, py); });
-      c.closePath(); c.fillStyle = col; c.globalAlpha = 0.92; c.fill(); c.globalAlpha = 1;
-      c.strokeStyle = '#e0f2fe'; c.lineWidth = 1.6; c.stroke();
+      c.closePath(); c.fillStyle = col; c.globalAlpha = alpha; c.fill(); c.globalAlpha = 1;
+      c.strokeStyle = '#e0f2fe'; c.lineWidth = 1.6 + pulse * 0.8; c.stroke();
     };
     if (shape === 0) {
-      fillPath([[-0.45, 0], [0.45, 0], [0.45, -0.6], [-0.45, -0.6]], color);
-      fillPath([[-0.45, -0.6], [0.45, -0.6], [0.7, -0.85], [-0.2, -0.85]], '#ffffff66');
+      fillPath([[-0.45, 0], [0.45, 0], [0.45, -0.6], [-0.45, -0.6]], color, 0.92);
+      fillPath([[-0.45, -0.6], [0.45, -0.6], [0.7, -0.85], [-0.2, -0.85]], hl, 1);
     } else if (shape === 1) {
-      fillPath([[-0.42, 0], [-0.5, -0.35], [-0.3, -0.82], [0.05, -1], [0.36, -0.7], [0.46, -0.3], [0.4, 0]], color);
-      fillPath([[-0.3, -0.82], [0.05, -1], [0.05, -0.2], [-0.2, -0.1]], '#ffffff59');
+      fillPath([[-0.42, 0], [-0.5, -0.35], [-0.3, -0.82], [0.05, -1], [0.36, -0.7], [0.46, -0.3], [0.4, 0]], color, 0.92);
+      fillPath([[-0.3, -0.82], [0.05, -1], [0.05, -0.2], [-0.2, -0.1]], hl, 1);
     } else if (shape === 2) {
-      fillPath([[-0.14, 0], [0.14, 0], [0.02, -1.1]], color);
+      fillPath([[-0.14, 0], [0.14, 0], [0.02, -1.1]], color, 0.92);
+      fillPath([[0.02, -1.1], [0.14, 0], [0.02, -0.2]], hl, 1);
     } else {
-      fillPath([[-0.45, 0], [-0.05, 0], [-0.25, -0.8]], color);
-      fillPath([[0.0, 0], [0.42, 0], [0.22, -1]], color);
-      fillPath([[-0.2, 0], [0.2, 0], [0.0, -0.55]], '#ffffff66');
+      fillPath([[-0.45, 0], [-0.05, 0], [-0.25, -0.8]], color, 0.92);
+      fillPath([[0.0, 0], [0.42, 0], [0.22, -1]], color, 0.92);
+      fillPath([[-0.2, 0], [0.2, 0], [0.0, -0.55]], hl, 1);
     }
     c.restore();
   }
+
+  // Effects: sparks, shockwave rings, flying shards, rising bubbles, lightning
+  let fx = [];
+  let shakeUntil = 0, shakeAmp = 0;
+  const shake = (ms, amp) => { shakeUntil = performance.now() + ms; shakeAmp = amp; };
+  function fxSpark(x, y, n, spread, col) {
+    for (let i = 0; i < n; i++) fx.push({ k: 'spark', x: x, y: y, vx: (Math.random() - 0.5) * spread, vy: -Math.random() * spread * 0.8, life: 1, col: col || '#fef9c3' });
+  }
+  function fxRing(x, y, col) { fx.push({ k: 'ring', x: x, y: y, r: 6, life: 1, col: col }); }
+  function fxShard(x, y, col) { fx.push({ k: 'shard', x: x, y: y, vx: (Math.random() - 0.5) * 300, vy: -Math.random() * 280 - 40, rot: 0, vr: (Math.random() - 0.5) * 12, life: 1, col: col }); }
+  function fxBubble(x, y) { fx.push({ k: 'bubble', x: x, y: y, r: 2 + Math.random() * 4, life: 1 }); }
+  function bolt(x, y) {
+    const pts = [[x, y]], tx = x + (Math.random() - 0.5) * 160, ty = y + 60 + Math.random() * 90;
+    for (let i = 1; i <= 5; i++) pts.push([x + (tx - x) * i / 5 + (Math.random() - 0.5) * 26, y + (ty - y) * i / 5 + (Math.random() - 0.5) * 18]);
+    fx.push({ k: 'bolt', pts: pts, life: 0.5, col: '#e0f2fe' });
+  }
+  function stepFx(dt) {
+    fx = fx.filter(q => (q.life -= dt * (q.k === 'ring' ? 1.6 : q.k === 'bubble' ? 0.35 : 1.4)) > 0);
+    fx.forEach(q => {
+      if (q.k === 'spark') { q.vy += 260 * dt; q.x += q.vx * dt; q.y += q.vy * dt; }
+      else if (q.k === 'shard') { q.vy += 520 * dt; q.x += q.vx * dt; q.y += q.vy * dt; q.rot += q.vr * dt; }
+      else if (q.k === 'ring') { q.r += 280 * dt; }
+      else if (q.k === 'bubble') { q.y -= 46 * dt; q.x += Math.sin(q.y * 0.1) * 0.4; }
+    });
+  }
+  function drawFx(c) {
+    fx.forEach(q => {
+      c.globalAlpha = Math.max(0, Math.min(1, q.life));
+      if (q.k === 'spark') { c.fillStyle = q.col; c.shadowColor = q.col; c.shadowBlur = 8; c.beginPath(); c.arc(q.x, q.y, 2 + q.life * 2.5, 0, Math.PI * 2); c.fill(); }
+      else if (q.k === 'ring') { c.strokeStyle = q.col; c.lineWidth = 3 * q.life + 0.5; c.shadowColor = q.col; c.shadowBlur = 14; c.beginPath(); c.arc(q.x, q.y, q.r, 0, Math.PI * 2); c.stroke(); }
+      else if (q.k === 'shard') { c.save(); c.translate(q.x, q.y); c.rotate(q.rot); c.fillStyle = q.col; c.beginPath(); c.moveTo(0, -7); c.lineTo(4, 5); c.lineTo(-5, 4); c.closePath(); c.fill(); c.restore(); }
+      else if (q.k === 'bubble') { c.strokeStyle = 'rgba(186,230,253,.8)'; c.lineWidth = 1.2; c.beginPath(); c.arc(q.x, q.y, q.r, 0, Math.PI * 2); c.stroke(); }
+      else if (q.k === 'bolt') { c.strokeStyle = q.col; c.lineWidth = 2; c.shadowColor = q.col; c.shadowBlur = 12; c.beginPath(); q.pts.forEach(([x, y], i) => { if (i === 0) c.moveTo(x, y); else c.lineTo(x, y); }); c.stroke(); }
+    });
+    c.globalAlpha = 1; c.shadowBlur = 0; c.shadowColor = 'transparent';
+  }
+
   function flash(text) { const m = $('pt6-msg'); if (m) m.textContent = text; }
   function shatter() {
     cur.growth = Math.max(0, cur.growth - 12); cur.temp = 55; cur.shatters++;
     lab.shatters = (lab.shatters || 0) + 1;
+    for (let i = 0; i < 18; i++) fxShard(200 + (Math.random() - 0.5) * 60, 200, i % 2 ? '#ef4444' : cur.p.color);
+    fxRing(200, 190, '#ef4444');
+    shake(380, 14);
     try { if (navigator.vibrate) navigator.vibrate([80, 40, 80]); } catch (e) {}
     flash('💥 Crack! The crystal shattered. Let it cool down.');
   }
   function stir() {
-    if (!cur) return;
+    if (!cur || cur.done) return;
     const p = cur.p, inZone = cur.temp >= p.lo && cur.temp <= p.hi;
     if (!inZone) return flash('🥄 Stir while the beaker is in the green zone for a bonus.');
     cur.growth = Math.min(100, cur.growth + 6);
-    for (let i = 0; i < 8; i++) sparks.push({ x: 200 + (Math.random() - 0.5) * 90, y: 150 + (Math.random() - 0.5) * 60, life: 1 });
+    fxSpark(200, 200, 14, 220, '#bae6fd');
+    fxRing(200, 190, '#ffffff');
+    shake(90, 3);
     try { if (navigator.vibrate) navigator.vibrate(12); } catch (e) {}
     flash('🥄 Nice stir! +6% growth');
   }
   function complete() {
-    running = false;
+    cur.done = true; cur.doneT = 0; cur.growth = 100;
     const name = cur.name, p = cur.p, now = Date.now();
     lab.combo = (lab.lastCertAt && now - lab.lastCertAt < 120000) ? lab.combo + 1 : 1;
     lab.bestCombo = Math.max(lab.bestCombo, lab.combo);
@@ -5675,6 +5726,12 @@ body.crt{text-shadow:0 0 6px rgba(56,189,248,.35)}
     lab.tests = (lab.tests || 0) + 1;
     const mult = Math.min(3, lab.combo);
     addBalance(RARITY[p.rar].bonus * mult);
+    fxRing(200, 150, p.color);
+    setTimeout(() => fxRing(200, 150, '#ffffff'), 180);
+    setTimeout(() => fxRing(200, 140, RARITY[p.rar].glow), 360);
+    fxSpark(200, 110, 90, 340, '#fef9c3');
+    for (let i = 0; i < 26; i++) fxShard(200 + (Math.random() - 0.5) * 50, 120, i % 2 ? p.color : RARITY[p.rar].glow);
+    shake(420, 12);
     burst();
     ping('💎 ' + name + ' grown!', RARITY[p.rar].name + ' ' + RARITY[p.rar].stars + (mult > 1 ? ' · Combo x' + mult : '') + ' · certified ' + certCount() + ' / ' + TOTAL);
     if (p.rar === 2) award('legend', 'Legendary find', 'You grew a legendary crystal: ' + name + '.');
@@ -5683,63 +5740,123 @@ body.crt{text-shadow:0 0 6px rgba(56,189,248,.35)}
     if (labComplete() && !labNotified) {
       labNotified = true; addBalance(25000); showAlert('💎 Every crystal grown! Lab bonus +25,000.');
     }
-    cur = null; updatePills();
-    setTimeout(() => { if (!cur && !running) renderLab(); }, 1800);
+    updatePills();
   }
-  function draw(dt, inZone) {
-    const W = cv.width, H = cv.height, p = cur.p, g = cur.growth;
-    cx.clearRect(0, 0, W, H);
-    cx.fillStyle = 'rgba(15,23,42,.7)'; cx.fillRect(70, 30, 280, 210);
-    cx.fillStyle = 'rgba(56,189,248,.18)'; cx.fillRect(74, 110, 272, 126);
-    cx.strokeStyle = '#93c5fd'; cx.lineWidth = 3; cx.strokeRect(70, 30, 280, 210);
-    drawGem(cx, p.shape, 200, 225, 25 + 95 * (g / 100), p.color, p.rar);
-    sparks = sparks.filter(q => (q.life -= dt * 1.5) > 0);
-    sparks.forEach(q => {
-      q.y -= 30 * dt; cx.globalAlpha = Math.max(0, q.life);
-      cx.fillStyle = '#fef9c3'; cx.beginPath(); cx.arc(q.x, q.y, 2.5, 0, Math.PI * 2); cx.fill();
-    });
-    cx.globalAlpha = 1;
+
+  function drawScene(dt, inZone) {
+    const W = cv.width, H = cv.height, c = cx, p = cur.p, g = cur.growth;
+    if (performance.now() < shakeUntil) {
+      cv.style.transform = 'translate(' + ((Math.random() - 0.5) * shakeAmp).toFixed(1) + 'px,' + ((Math.random() - 0.5) * shakeAmp).toFixed(1) + 'px)';
+    } else if (cv.style.transform) cv.style.transform = '';
+
+    c.clearRect(0, 0, W, H);
+    const halo = c.createRadialGradient(200, 150, 10, 200, 150, 200);
+    halo.addColorStop(0, p.color + '40'); halo.addColorStop(1, 'rgba(7,13,25,0)');
+    c.fillStyle = halo; c.fillRect(0, 0, W, H);
+
+    // Heat haze rising above a hot beaker
+    if (cur.temp > 70) {
+      const amp = (cur.temp - 70) / 30 * 4;
+      c.strokeStyle = 'rgba(253,186,116,.18)'; c.lineWidth = 2;
+      for (let k = 0; k < 4; k++) {
+        c.beginPath();
+        for (let x = 70; x <= 350; x += 8) {
+          const y = 14 - k * 6 + Math.sin(x * 0.08 + cur.clock * 6 + k) * amp;
+          if (x === 70) c.moveTo(x, y); else c.lineTo(x, y);
+        }
+        c.stroke();
+      }
+    }
+
+    // Beaker with living, heat-coloured liquid
+    c.fillStyle = 'rgba(15,23,42,.6)'; c.fillRect(70, 30, 280, 210);
+    c.beginPath(); c.moveTo(74, 236);
+    for (let x = 74; x <= 346; x += 6) c.lineTo(x, 112 + Math.sin(x * 0.05 + cur.clock * 3) * 3);
+    c.lineTo(346, 236); c.closePath();
+    c.fillStyle = heatColor(cur.temp, 0.34); c.fill();
+    c.save();
+    c.shadowColor = heatColor(cur.temp, 0.9); c.shadowBlur = cur.temp > 70 ? 22 : 8;
+    c.strokeStyle = '#93c5fd'; c.lineWidth = 3; c.strokeRect(70, 30, 280, 210);
+    c.restore();
+
+    // Crystal (full size when complete)
+    const size = cur.done ? 120 : 25 + 95 * (g / 100);
+    drawGem(c, p.shape, 200, 225, size, p.color, p.rar, cur.clock);
+
+    // Particles and lightning on top
+    stepFx(dt);
+    drawFx(c);
+
+    // Thermometer with a warning glow near the top
+    const hot = cur.temp >= 85;
     const tx = 368, ty0 = 40, ty1 = 235, th = ty1 - ty0;
-    cx.fillStyle = '#0f172a'; cx.fillRect(tx - 4, ty0 - 4, 30, th + 8);
-    cx.fillStyle = 'rgba(16,185,129,.6)';
-    cx.fillRect(tx, ty1 - (p.hi / 100) * th, 22, ((p.hi - p.lo) / 100) * th);
+    c.save();
+    c.fillStyle = '#0f172a'; c.fillRect(tx - 4, ty0 - 4, 30, th + 8);
+    c.fillStyle = 'rgba(16,185,129,.6)';
+    c.fillRect(tx, ty1 - (p.hi / 100) * th, 22, ((p.hi - p.lo) / 100) * th);
     const my = ty1 - (cur.temp / 100) * th;
-    cx.fillStyle = cur.temp >= 92 ? '#ef4444' : '#f97316';
-    cx.fillRect(tx + 6, my, 10, ty1 - my);
-    cx.fillStyle = '#e2e8f0'; cx.font = "12px 'Orbitron', sans-serif";
-    cx.fillText(Math.round(cur.temp) + '°C', tx - 6, ty0 - 10);
+    if (hot) { c.shadowColor = '#ef4444'; c.shadowBlur = 16 + 10 * Math.sin(cur.clock * 12); }
+    c.fillStyle = hot ? '#ef4444' : '#f97316';
+    c.fillRect(tx + 6, my, 10, ty1 - my);
+    c.restore();
+    c.fillStyle = '#e2e8f0'; c.font = "12px 'Orbitron', sans-serif";
+    c.fillText(Math.round(cur.temp) + '°C', tx - 6, ty0 - 10);
+    if (hot && Math.sin(cur.clock * 12) > 0) { c.fillStyle = '#fca5a5'; c.font = "10px 'Orbitron', sans-serif"; c.fillText('CRITICAL', 336, 252); }
+    if (lab.combo >= 2) { c.fillStyle = '#fde047'; c.font = "14px 'Orbitron', sans-serif"; c.fillText('🔥 x' + lab.combo, 10, 22); }
+
     const ro = $('pt6-readout');
-    if (ro) ro.textContent = 'Growth ' + Math.round(g) + '% · ' +
-      (inZone ? '🔥 In the green zone' : (cur.temp < p.lo ? '❄️ Too cool, hold to heat' : '🌡️ Too hot, let go')) +
-      ' · Cracks: ' + cur.shatters + ' · Combo: ' + lab.combo;
+    if (ro) {
+      const overdrive = lab.combo >= 3 ? ' · ⚡ OVERDRIVE' : '';
+      ro.textContent = cur.done ? '💎 Crystal complete!' :
+        ('Growth ' + Math.round(g) + '% · ' +
+          (inZone ? '🔥 In the green zone' : (cur.temp < p.lo ? '❄️ Too cool, hold to heat' : '🌡️ Too hot, let go')) +
+          ' · Cracks: ' + cur.shatters + ' · Combo: ' + lab.combo + overdrive);
+    }
   }
+
   function frame(now) {
     if (!running || !cur || !modal.classList.contains('open')) { running = false; return; }
     const dt = Math.min(0.05, (now - lastFrame) / 1000); lastFrame = now;
     const p = cur.p;
+    if (cur.done) {
+      cur.doneT += dt;
+      drawScene(dt, false);
+      if (cur.doneT > 2) { renderLab(); return; }
+      requestAnimationFrame(frame); return;
+    }
     cur.clock += dt;
-    cur.temp += (cur.holding ? 45 : -30) * dt + Math.sin(cur.clock * 2 + p.id) * 2.5 * dt;
+    const heating = cur.holding;
+    cur.temp += (heating ? 48 : -30) * dt + Math.sin(cur.clock * 2 + p.id) * 2.5 * dt;
     cur.temp = Math.max(0, Math.min(100, cur.temp));
     const inZone = cur.temp >= p.lo && cur.temp <= p.hi;
+    const overdrive = lab.combo >= 3;
     if (inZone) {
-      cur.growth = Math.min(100, cur.growth + p.speed * dt);
+      cur.growth = Math.min(100, cur.growth + p.speed * (overdrive ? 1.25 : 1) * dt);
       const tipY = 225 - (25 + 95 * cur.growth / 100);
-      if (Math.random() < dt * 8) sparks.push({ x: 200 + (Math.random() - 0.5) * 60, y: tipY + Math.random() * 10, life: 1 });
+      if (Math.random() < dt * (overdrive ? 18 : 8)) fxSpark(200 + (Math.random() - 0.5) * 70, tipY + Math.random() * 10, 1, 60, p.color);
+      if (cur.growth >= 75 && Math.random() < dt * 3) bolt(200, tipY);
       [25, 50, 75].forEach((m, k) => {
-        if (cur.growth >= m && !cur.marks[m]) { cur.marks[m] = true; flash(['✨ Nice shine!', '💠 Halfway there!', '🌟 Almost a gem!'][k]); }
+        if (cur.growth >= m && !cur.marks[m]) {
+          cur.marks[m] = true;
+          fxRing(200, 160, p.color);
+          fxSpark(200, tipY, 24, 180, '#fef9c3');
+          flash(['✨ Nice shine!', '💠 Halfway there!', '🌟 Almost a gem!'][k]);
+        }
       });
     }
+    if (heating && Math.random() < dt * (6 + cur.temp / 10)) fxBubble(90 + Math.random() * 220, 230);
     if (cur.temp >= 92) shatter();
-    draw(dt, inZone);
-    if (cur.growth >= 100) { complete(); return; }
+    stepFx(dt);
+    drawScene(dt, inZone);
+    if (cur.growth >= 100 && !cur.done) complete();
     requestAnimationFrame(frame);
   }
   function crystalView(name) {
     calib.running = false;
-    cur = { name: name, p: crystalParams(name), growth: 0, temp: 20, holding: false, shatters: 0, clock: 0, marks: {}, downAt: 0 };
-    sparks = [];
+    cur = { name: name, p: crystalParams(name), growth: 0, temp: 20, holding: false, shatters: 0, clock: 0, marks: {}, downAt: 0, done: false, doneT: 0 };
+    fx = [];
     openM('💎 Growing ' + name,
-      '<p id="pt6-msg" class="pt6-muted">Press and hold the beaker to heat it. Tap it to stir. Keep the temperature in the green zone.</p>' +
+      '<p id="pt6-msg" class="pt6-muted">Hold the beaker to heat it. Tap it to stir. Keep the temperature in the green zone and build a combo.</p>' +
       '<canvas id="pt6-canvas" class="pt6-canvas" width="420" height="260" aria-label="Crystal beaker"></canvas>' +
       '<p id="pt6-readout" class="pt6-muted"></p>' +
       '<button type="button" class="pt6-btn" data-act="back">← Back to the crystal list</button>');
@@ -5761,7 +5878,7 @@ body.crt{text-shadow:0 0 6px rgba(56,189,248,.35)}
     running = true; lastFrame = performance.now();
     requestAnimationFrame(frame);
   }
-  // Fix: releasing the finger outside the beaker also stops the heating
+  // Releasing the finger outside the beaker also stops the heating
   window.addEventListener('pointerup', () => { if (cur && cur.holding) cur.holding = false; });
   document.addEventListener('keydown', e => {
     if (e.code === 'Space' && cur && modal.classList.contains('open')) { e.preventDefault(); cur.holding = true; }
@@ -5798,7 +5915,7 @@ body.crt{text-shadow:0 0 6px rgba(56,189,248,.35)}
         '<button type="button" class="pt6-btn" data-act="back">← Back to the crystal list</button>');
     }
     const cards = names.map(n => {
-      const c = lab.cert[n] || {}, p = crystalParams(n);
+      const p = crystalParams(n);
       return '<div class="pt6-card"><canvas class="pt6-gem" width="90" height="70" data-shape="' + p.shape +
         '" data-color="' + p.color + '" data-rar="' + p.rar + '"></canvas><strong>' + n + '</strong>' +
         '<small>' + SHAPES[p.shape] + ' · ' + RARITY[p.rar].name + ' ' + RARITY[p.rar].stars + '</small></div>';
@@ -5808,7 +5925,7 @@ body.crt{text-shadow:0 0 6px rgba(56,189,248,.35)}
       '<div class="pt6-grid2">' + cards + '</div>' +
       '<button type="button" class="pt6-btn" data-act="back">← Back to the crystal list</button>');
     mBody.querySelectorAll('canvas.pt6-gem').forEach(cnv => {
-      drawGem(cnv.getContext('2d'), Number(cnv.dataset.shape), 45, 60, 34, cnv.dataset.color, Number(cnv.dataset.rar));
+      drawGem(cnv.getContext('2d'), Number(cnv.dataset.shape), 45, 60, 34, cnv.dataset.color, Number(cnv.dataset.rar), performance.now() / 1000);
     });
   }
 
